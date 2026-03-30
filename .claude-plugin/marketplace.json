@@ -1,0 +1,10 @@
+{
+  "name": "motherduck-skills",
+  "display_name": "MotherDuck Skills",
+  "description": "Opinionated app-builder skills for connecting to MotherDuck, shipping Dives, pipelines, CFA apps, and DuckLake-backed workflows.",
+  "author": "motherduck",
+  "repository": "https://github.com/motherduckdb/agent-skills",
+  "homepage": "https://motherduck.com",
+  "tags": ["motherduck", "duckdb", "data-warehouse", "analytics", "sql", "postgres", "dives", "ducklake", "mcp"],
+  "license": "MIT"
+}
