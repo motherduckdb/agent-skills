@@ -6,7 +6,7 @@ metadata:
   author: motherduck
   version: "2.0"
   layer: utility
-  language_focus: "typescript|javascript|python"
+  language_focus: "sql|typescript|javascript|python"
   depends_on: []
 ---
 
