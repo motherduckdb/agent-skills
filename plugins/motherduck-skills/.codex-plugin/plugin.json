@@ -1,1 +1,40 @@
-../../../.codex-plugin/plugin.json
+{
+  "name": "motherduck-skills",
+  "version": "1.0.0",
+  "description": "Opinionated MotherDuck skills for AI coding agents building analytics apps, Dives, pipelines, and customer-facing data products.",
+  "author": {
+    "name": "MotherDuck",
+    "url": "https://motherduck.com"
+  },
+  "homepage": "https://github.com/motherduckdb/agent-skills",
+  "repository": "https://github.com/motherduckdb/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "motherduck",
+    "duckdb",
+    "analytics",
+    "data-warehouse",
+    "sql",
+    "postgres",
+    "dives",
+    "ducklake"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "MotherDuck Skills",
+    "shortDescription": "Opinionated MotherDuck workflows for AI coding agents.",
+    "longDescription": "Reusable MotherDuck skills for connection setup, DuckDB SQL, Dives, pipelines, self-serve analytics, and customer-facing analytics architectures.",
+    "developerName": "MotherDuck",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://motherduck.com",
+    "defaultPrompt": [
+      "Use MotherDuck Skills to explore my databases and recommend the right query path.",
+      "Use MotherDuck Skills to design a Dive-backed dashboard for my analytics tables."
+    ],
+    "brandColor": "#0777b3",
+    "logo": "./assets/duck_skills.png"
+  }
+}

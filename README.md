@@ -183,6 +183,7 @@ If you are editing the repo itself:
 ```bash
 uv run scripts/validate_skills.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+uv run scripts/test_codex_plugin.py
 uv run scripts/test_motherduck_artifacts.py
 ```
 

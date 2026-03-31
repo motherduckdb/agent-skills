@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local virtual environments
+.venv/
+
+# Local DuckDB repro files
+*.duckdb
+*.duckdb.wal
+
+# Validator scratch output
+snippet-errors.json
