@@ -18,15 +18,14 @@ For reusable language patterns, see `references/typescript.md` and `references/p
   - DuckLake
 - If `ask_docs_question` is unavailable, use public pages on `motherduck.com` and `motherduck.com/docs`.
 
-## Closest `motherduck-examples` Starters
+## Verified Delivery Defaults
 
-Use the nearby starters in `../motherduck-examples/` as migration implementation references:
+The repeated repo runs point to a stable migration posture:
 
-- `dlt-db-replication/README.md` -- the closest database-to-MotherDuck replication path and the best operational benchmark reference here
-- `postgres-demo/README.md` -- the closest `pg_duckdb` and hybrid PostgreSQL analytics example
-- `dbt-ingestion-s3/README.md` -- the closest direct external-file/dbt pattern when the migration is really about preserving an object-storage-based analytical layout
-
-This skill should stay responsible for sequencing, target-pattern choice, and validation posture. The examples repo is the better source for starter-project mechanics.
+- decide the target MotherDuck pattern before arguing about tooling
+- migrate in slices with source-vs-target validation at each step
+- treat metric comparison and missing-key checks as mandatory, not optional
+- keep rollback and cutover posture explicit in the first migration plan
 
 ## When To Use
 

@@ -43,6 +43,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
 - Related-skill discovery stays in prose sections like `Related Skills`; we do not add repo-specific frontmatter for that.
+- Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency in plugin-facing guidance.
 
 ## Product Positioning Invariants
 
@@ -83,3 +84,8 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Codex marketplace discovery
 - Codex plugin read/install flows
 - installed plugin skill exposure through `skills/list`
+
+`scripts/test_codex_use_cases.py` is the runtime structure layer for:
+
+- full use-case generation through the installed Codex plugin
+- required top-level output fields for use-case planning responses

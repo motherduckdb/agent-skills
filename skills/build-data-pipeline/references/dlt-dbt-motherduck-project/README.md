@@ -2,10 +2,11 @@
 
 This is a minimal end-to-end pipeline reference for the `build-data-pipeline` skill.
 
-It is based on two examples from `motherduck-examples`:
+It captures the pipeline shape that this repo repeatedly verified against real MotherDuck runs:
 
-- `dlt-db-replication` for the `dlt` to MotherDuck loading pattern
-- `dbt-dual-execution` for the `dbt-duckdb` project shape
+- `dlt` for the raw loading step
+- `dbt-duckdb` for staging and analytics modeling
+- Python validation and cleanup around the workflow
 
 The example is deliberately small and fully runnable:
 

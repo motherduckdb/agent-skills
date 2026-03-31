@@ -11,14 +11,14 @@ Use this skill when a team wants broad internal access to analytics without turn
 - If the MotherDuck MCP `ask_docs_question` feature is available, use it first.
 - When it is unavailable, use the public Dives, pricing, and Hypertenancy pages plus the docs site.
 
-## Closest `motherduck-examples` Starters
+## Verified Delivery Defaults
 
-Use the nearest starters in `../motherduck-examples/` to keep this rollout guidance grounded:
+The repeated repo runs point to a stable self-serve rollout posture:
 
-- `motherduck-ui/README.md` -- the closest lightweight product-surface walkthrough for turning SQL into an answer surface
-- `motherduck-grafana/README.md` -- the closest example of a team consuming MotherDuck data through an external dashboard layer
-
-This skill should still default to curated MotherDuck-native assets first: one trusted dataset, then one Dive or one share boundary.
+- pick one audience first instead of launching broadly
+- publish one governed dataset before expanding the surface area
+- make the first asset a MotherDuck-native answer surface such as a Dive
+- keep ownership, sharing, and editing boundaries explicit from the first rollout slice
 
 ## When To Use
 

@@ -34,6 +34,9 @@ Put detailed guidance in `references/`:
 
 When shrinking a skill, move content into `references/`; do not delete it.
 
+Do not point shipped `SKILL.md`, `references/`, or `artifacts/` content at `motherduck-examples`.
+That repo is an authoring-only comparison source for maintainers. If it teaches us something useful, copy the learning into this repo's guidance or artifacts before shipping.
+
 ## What Goes in `artifacts/`
 
 Put runnable helpers in `artifacts/` when they help an agent move faster:
@@ -78,4 +81,11 @@ When changing skills, references, artifacts, or catalog surfaces:
 ```bash
 uv run scripts/validate_skills.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+```
+
+When a change affects use-case skills or their artifacts, also run:
+
+```bash
+uv run scripts/test_codex_use_cases.py
+uv run scripts/test_motherduck_artifacts.py
 ```

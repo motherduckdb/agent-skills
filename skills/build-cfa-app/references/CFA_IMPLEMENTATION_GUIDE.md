@@ -17,14 +17,15 @@ This is a use-case skill. It ties together `connect`, `model-data`, `query`, `lo
   - read scaling for truly concurrent read-heavy workloads
   - native storage first unless an explicit DuckLake requirement exists
 
-## Closest `motherduck-examples` Starters
+## Verified Delivery Defaults
 
-Use the nearby starters in `../motherduck-examples/` as implementation-adjacent checks rather than as replacements for this skill:
+The repeated repo runs point to a stable CFA posture:
 
-- `nodejs-motherduck/README.md` -- the closest backend connection example when the app stack is Node.js and the team wants native DuckDB connections, cached instances, or pooled query execution
-- `postgres-demo/README.md` -- the closest `pg_duckdb` and hybrid Postgres/MotherDuck example when the CFA backend is extending an existing PostgreSQL estate rather than moving fully to MotherDuck-native APIs
-
-This skill remains the stronger source for customer isolation, service-account boundaries, and serving-pattern choice. The example repo is most useful for concrete client-library behavior.
+- start from the live MotherDuck workspace or target database before picking a serving pattern
+- default to a 3-tier app with an API layer between the browser and MotherDuck
+- default to structural isolation such as per-customer databases or service-account boundaries
+- use native DuckDB `md:` connections when the backend needs direct MotherDuck control
+- keep any PostgreSQL-compatible path as an integration tactic, not the primary CFA architecture
 
 ## Language Focus: TypeScript/Javascript and Python
 

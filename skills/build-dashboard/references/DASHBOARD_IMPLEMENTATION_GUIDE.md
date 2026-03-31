@@ -15,14 +15,14 @@ Use this skill when creating a multi-chart, multi-KPI interactive dashboard with
   - small previews are for iteration; saved dashboards should query live data
   - for full customer-facing analytics with per-customer isolation, see `build-cfa-app`
 
-## Closest `motherduck-examples` Starters
+## Verified Delivery Defaults
 
-The examples repo does not ship a direct Dive dashboard starter, so use the closest adjacent references in `../motherduck-examples/`:
+The repeated repo runs point to a stable dashboard posture:
 
-- `motherduck-ui/README.md` -- the closest lightweight UI walkthrough for interactive SQL-driven analysis in the MotherDuck product surface
-- `motherduck-grafana/README.md` -- the closest external dashboard integration when the workload is really BI delivery rather than a native Dive
-
-Keep this repo focused on the MotherDuck-native Dive path. If the design starts drifting toward external BI tooling, say so explicitly and hand off to the more appropriate example.
+- keep one dashboard story per Dive instead of mixing several unrelated narratives
+- shape metrics and breakdowns in SQL first, then render the result in TSX
+- use small previews for iteration, but keep saved dashboards live against MotherDuck data
+- escalate to `build-cfa-app` when the request becomes a customer-facing product surface rather than a workspace dashboard
 
 ## Language Focus: TypeScript/Javascript and Python
 

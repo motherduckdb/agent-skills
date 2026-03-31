@@ -28,6 +28,7 @@ The intended review loop is:
    - the detailed content in `references/`
    - the runnable examples in `artifacts/`
    - any fuller reference project shipped under `references/`
+   - optional maintainer-only comparison inputs such as `motherduck-examples`
 4. update the skill and references
 5. run the artifacts that represent the use case
 6. run any deeper reference project if that skill ships one
@@ -44,6 +45,8 @@ Product docs change often, but naive auto-sync creates low-quality skill content
 - examples and artifacts need human judgment
 
 The goal is not to mirror docs line by line. The goal is to keep the skills aligned with current MotherDuck behavior.
+
+If an external comparison repo helps during authoring, internalize the resulting guidance here. Do not ship references that require the user to have that comparison repo alongside the plugin.
 
 ## Practical Next Step
 
