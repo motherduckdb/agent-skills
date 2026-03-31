@@ -14,23 +14,78 @@ This repo is intentionally agent-oriented:
 
 ## Install
 
+Choose one install path for each agent. For most users, the simplest default is the Skills CLI. Use the Claude Code or Codex plugin path only if you specifically want the packaged plugin experience.
+
+Avoid mixing plugin installs and raw skill installs for the same agent unless you are testing packaging behavior.
+
+### Install all skills with the Skills CLI
+
 ```bash
 npx skills add motherduckdb/agent-skills
 ```
 
-Claude Code plugin install:
+Useful variants:
+
+```bash
+# list the skills in this repo without installing
+npx skills add motherduckdb/agent-skills --list
+
+# install only selected skills
+npx skills add motherduckdb/agent-skills --skill connect --skill explore --skill query
+
+# install only to Claude Code, globally
+npx skills add motherduckdb/agent-skills --skill connect -a claude-code -g
+
+# install only to Codex, globally
+npx skills add motherduckdb/agent-skills --skill connect -a codex -g
+```
+
+Best practices:
+
+- the default install scope is project-local; use that when the skills should travel with the repo
+- add `-g` when you want a personal cross-project install
+- use `--skill <name>` when you want only a few skills instead of the whole catalog
+
+### Claude Code plugin install
 
 ```bash
 /plugin marketplace add motherduckdb/agent-skills
 /plugin install motherduck-skills@motherduck-agent-skills
 ```
 
-Codex plugin install:
+After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
+
+### Codex plugin install
 
 1. Clone or open this repo in Codex.
 2. Restart Codex if it was already running for the repo.
 3. Open `/plugins`.
 4. Install **MotherDuck Skills** from the repo marketplace.
+
+This path installs the packaged repo-local Codex plugin. After installation, the skills are available automatically when relevant.
+
+### Manual per-skill install
+
+Copy the whole skill directory, not just `SKILL.md`, so any bundled `references/`, `scripts/`, and `artifacts/` remain available.
+
+Project-local manual install:
+
+```bash
+mkdir -p .agents/skills
+cp -R skills/connect .agents/skills/connect
+```
+
+Global manual install for a specific agent:
+
+```bash
+mkdir -p ~/.claude/skills ~/.codex/skills
+cp -R skills/connect ~/.claude/skills/connect
+cp -R skills/connect ~/.codex/skills/connect
+```
+
+Replace `connect` with any skill name from this repo, for example `query`, `create-dive`, or `build-dashboard`.
+
+For manual installs, prefer `.agents/skills/<name>` when the skill should be shared with the project. Use `~/.claude/skills/<name>` or `~/.codex/skills/<name>` only for personal cross-project defaults.
 
 ## What Agents Can Build With This Repo
 
