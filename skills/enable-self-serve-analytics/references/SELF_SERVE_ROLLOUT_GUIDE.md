@@ -11,6 +11,15 @@ Use this skill when a team wants broad internal access to analytics without turn
 - If the MotherDuck MCP `ask_docs_question` feature is available, use it first.
 - When it is unavailable, use the public Dives, pricing, and Hypertenancy pages plus the docs site.
 
+## Closest `motherduck-examples` Starters
+
+Use the nearest starters in `../motherduck-examples/` to keep this rollout guidance grounded:
+
+- `motherduck-ui/README.md` -- the closest lightweight product-surface walkthrough for turning SQL into an answer surface
+- `motherduck-grafana/README.md` -- the closest example of a team consuming MotherDuck data through an external dashboard layer
+
+This skill should still default to curated MotherDuck-native assets first: one trusted dataset, then one Dive or one share boundary.
+
 ## When To Use
 
 - The user wants internal teams to explore data and answer their own questions.
@@ -51,7 +60,9 @@ export default function TeamKpiView() {
 ```python
 import duckdb
 
-conn = duckdb.connect("md:analytics")
+USE_CASE_USER_AGENT = "agent-skills/1.0.0(harness-codex;llm-gpt-5.4)"
+
+conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 conn.sql("""
 CREATE OR REPLACE VIEW "analytics"."main"."customer_health" AS
 SELECT team, account_id, status, arr

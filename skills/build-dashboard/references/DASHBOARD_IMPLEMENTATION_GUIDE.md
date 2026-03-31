@@ -15,6 +15,15 @@ Use this skill when creating a multi-chart, multi-KPI interactive dashboard with
   - small previews are for iteration; saved dashboards should query live data
   - for full customer-facing analytics with per-customer isolation, see `build-cfa-app`
 
+## Closest `motherduck-examples` Starters
+
+The examples repo does not ship a direct Dive dashboard starter, so use the closest adjacent references in `../motherduck-examples/`:
+
+- `motherduck-ui/README.md` -- the closest lightweight UI walkthrough for interactive SQL-driven analysis in the MotherDuck product surface
+- `motherduck-grafana/README.md` -- the closest external dashboard integration when the workload is really BI delivery rather than a native Dive
+
+Keep this repo focused on the MotherDuck-native Dive path. If the design starts drifting toward external BI tooling, say so explicitly and hand off to the more appropriate example.
+
 ## Language Focus: TypeScript/Javascript and Python
 
 - Prefer **TypeScript/TSX** for dashboard UI examples because Dives are React components.
@@ -50,7 +59,9 @@ export default function MonthlyRevenueDashboard() {
 ```python
 import duckdb
 
-conn = duckdb.connect("md:analytics")
+USE_CASE_USER_AGENT = "agent-skills/1.0.0(harness-codex;llm-gpt-5.4)"
+
+conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 rows = conn.sql("""
 SELECT strftime(date_trunc('month', order_date), '%Y-%m') AS month,
        SUM(revenue) AS revenue

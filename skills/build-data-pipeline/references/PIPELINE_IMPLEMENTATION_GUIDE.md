@@ -75,6 +75,20 @@ Operational notes from that verified example:
 - keep this stack on Python 3.11 or 3.12 for now; the tested `dbt-duckdb` path here was not reliable on Python 3.14
 - if you want exact schema names like `raw`, `staging`, and `analytics` in dbt, override `generate_schema_name`; otherwise dbt defaults may append the target schema name
 
+## Closest `motherduck-examples` Starters
+
+When this repo needs a fuller implementation pattern, compare it to these adjacent starters in `../motherduck-examples/`:
+
+- `python-ingestion/README.md` -- the clearest ingestion best-practice example here for typed and chunked Python loads; use it when the user needs a stronger raw landing implementation than the minimal artifact
+- `dlt-db-replication/README.md` -- the closest replication and measured pipeline run example; use it when the user needs database extraction, batching, and operational metrics
+- `dbt-ingestion-s3/README.md` -- the closest direct external-file/dbt pattern; use it when the source already lives in object storage and the better answer is to read Parquet directly rather than copy rows first
+
+This repo should stay smaller and more opinionated than those starter projects, but it should not drift away from their operational posture. In particular:
+
+- prefer Parquet or other bulk paths over row inserts
+- prefer measured stage boundaries over one-shot transformation blobs
+- prefer a small runnable MotherDuck-backed slice plus a deeper reference project instead of turning `SKILL.md` into the full tutorial
+
 ---
 
 ## Pipeline Architecture
@@ -141,7 +155,7 @@ Operational defaults:
 
 - buffer API or event traffic before writing analytical tables
 - prefer staged Parquet, Arrow/dataframes, or `COPY`
-- tag long-lived workloads with `custom_user_agent`
+- tag long-lived workloads with `custom_user_agent`; for repo use-case builds, use `agent-skills/1.0.0(harness-<harness>;llm-<llm>)`
 - keep write transactions comfortably bounded instead of unbounded monoliths
 
 ---
@@ -447,7 +461,7 @@ Number files to enforce execution order (`01_ingest.sql`, `02_dedupe.sql`, etc.)
 - **Version control all SQL transformations.** Store `.sql` files in git, not in ad-hoc query editors.
 - **Deduplicate before building analytics tables.** Raw sources often contain duplicates.
 - **Use fully qualified table names** in every statement: `"database"."schema"."table"`.
-- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later.
+- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later. For repo use-case builds, use `agent-skills/1.0.0(harness-<harness>;llm-<llm>)`.
 
 ---
 

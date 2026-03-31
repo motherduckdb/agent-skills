@@ -54,6 +54,8 @@ For lower-level Dive mechanics, use `create-dive`.
 5. Compose the dashboard in a Dive.
 6. Save only after preview iteration is approved.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -63,6 +65,8 @@ The output of this skill should be:
 - the validated SQL for each section
 - the Dive implementation plan
 - the save/update path
+
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
 
 ## References
 

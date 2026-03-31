@@ -1,5 +1,6 @@
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 import duckdb
@@ -15,6 +16,10 @@ def fetch_rows(conn: duckdb.DuckDBPyConnection, sql: str) -> list[dict]:
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
+def sql_string(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
+
+
 def main() -> None:
     with artifact_session(
         slug="build-data-pipeline",
@@ -25,26 +30,35 @@ def main() -> None:
         staging_table = session.table("staging", "main", "orders_deduped")
         analytics_table = session.table("analytics", "main", "daily_revenue")
 
-        conn.execute(
-            f"""
-            CREATE TABLE {raw_table} (
-                order_id INTEGER,
-                customer_id INTEGER,
-                order_date DATE,
-                total_amount DOUBLE,
-                updated_at TIMESTAMP
+        with tempfile.TemporaryDirectory(prefix="md_pipeline_stage_") as tmpdir:
+            parquet_path = Path(tmpdir) / "orders_landing.parquet"
+            conn.execute(
+                """
+                CREATE TEMP TABLE stage_orders_extract AS
+                SELECT *
+                FROM (
+                  VALUES
+                    (1, 101, DATE '2026-03-01', 120.0, TIMESTAMP '2026-03-01 10:00:00'),
+                    (1, 101, DATE '2026-03-01', 120.0, TIMESTAMP '2026-03-01 12:00:00'),
+                    (2, 102, DATE '2026-03-02', 75.0, TIMESTAMP '2026-03-02 09:00:00'),
+                    (3, 103, DATE '2026-03-03', 210.0, TIMESTAMP '2026-03-03 11:00:00')
+                ) AS source_rows(order_id, customer_id, order_date, total_amount, updated_at)
+                """
             )
-            """
-        )
-        conn.executemany(
-            f"INSERT INTO {raw_table} VALUES (?, ?, ?, ?, ?)",
-            [
-                (1, 101, "2026-03-01", 120.0, "2026-03-01 10:00:00"),
-                (1, 101, "2026-03-01", 120.0, "2026-03-01 12:00:00"),
-                (2, 102, "2026-03-02", 75.0, "2026-03-02 09:00:00"),
-                (3, 103, "2026-03-03", 210.0, "2026-03-03 11:00:00"),
-            ],
-        )
+            conn.execute(
+                f"""
+                COPY stage_orders_extract
+                TO {sql_string(str(parquet_path))}
+                (FORMAT PARQUET)
+                """
+            )
+            conn.execute(
+                f"""
+                CREATE TABLE {raw_table} AS
+                SELECT *
+                FROM read_parquet({sql_string(str(parquet_path))})
+                """
+            )
 
         conn.execute(
             f"""
@@ -79,6 +93,7 @@ def main() -> None:
 
         result = {
             "backend": session.describe(),
+            "ingestion_mode": "bulk_parquet_stage",
             "stages": {
                 "raw": fetch_rows(conn, f"SELECT COUNT(*) AS row_count FROM {raw_table}"),
                 "staging": fetch_rows(conn, f"SELECT COUNT(*) AS row_count FROM {staging_table}"),

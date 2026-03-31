@@ -61,6 +61,8 @@ If no server is active, ask for a representative schema excerpt or table list an
 5. Choose the connection path and read-scaling posture.
 6. Produce the implementation plan, API contract, and rollout sequence.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -70,6 +72,8 @@ The output of this skill should be:
 - the connection strategy
 - the first implementation slice
 - the validation and rollout plan
+
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
 
 ## References
 

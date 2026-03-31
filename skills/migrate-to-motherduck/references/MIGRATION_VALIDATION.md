@@ -409,7 +409,8 @@ def print_report(results: dict) -> None:
 import duckdb
 
 # Connect to both databases
-conn = duckdb.connect("md:")
+USE_CASE_USER_AGENT = "agent-skills/1.0.0(harness-codex;llm-gpt-5.4)"
+conn = duckdb.connect(f"md:?custom_user_agent={USE_CASE_USER_AGENT}")
 
 # If source is a Postgres database (local DuckDB only):
 # conn.sql("ATTACH 'dbname=legacy host=pg.example.com' AS source_db (TYPE POSTGRES, READ_ONLY)")

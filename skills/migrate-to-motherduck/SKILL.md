@@ -56,6 +56,8 @@ If no server is active, ask for representative source and target schemas before 
 6. Run source-vs-target validation.
 7. Cut over one workload at a time.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -65,6 +67,8 @@ The output of this skill should be:
 - the validation plan
 - the rollback path
 - the first cutover slice
+
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
 
 ## References
 

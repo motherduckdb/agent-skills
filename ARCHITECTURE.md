@@ -39,7 +39,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - SKILL frontmatter stays portable and limited to broadly supported fields like `name`, `description`, and `license`.
 - Repo-only skill graph data lives in `skills/catalog.json`, not in SKILL frontmatter.
 - The README catalog, `CLAUDE.md` catalog, Claude plugin manifest, Claude marketplace manifest, Codex plugin manifest, and Codex marketplace entry must stay in sync with the `skills/` directory.
-- The Codex plugin package under `plugins/motherduck-skills/` is a synced copy of the repo plugin manifest, `skills/`, and `assets/`; it must not use symlinks.
+- The Codex marketplace must point at the packaged plugin under `plugins/motherduck-skills`, not the repo root.
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
 - Related-skill discovery stays in prose sections like `Related Skills`; we do not add repo-specific frontmatter for that.

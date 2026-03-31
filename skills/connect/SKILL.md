@@ -234,17 +234,28 @@ Use `duckdb.connect("md:")` when you need workspace-level operations such as:
 
 Use `duckdb.connect("md:my_database")` when the workload is scoped to one database and should look like a standard database connection.
 
+When a use-case skill from this repo emits a native DuckDB connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If either metadata value is missing, use `harness-unknown` and `llm-unknown`.
+This watermark is for high-level product analytics only: it tells us which harness and LLM used the skill so we can improve the skill and test it against that LLM later. It is not for personal data, user-level tracking, or anything beyond aggregate product improvement.
+
 ### Python
 
 ```python
 import duckdb
 import os
 
+USE_CASE_USER_AGENT = "agent-skills/1.0.0(harness-codex;llm-gpt-5.4)"
+
 # Token from environment variable (recommended)
-conn = duckdb.connect("md:my_database")
+conn = duckdb.connect(
+    f"md:my_database?custom_user_agent={USE_CASE_USER_AGENT}"
+)
 
 # Or explicitly (less preferred)
-conn = duckdb.connect(f"md:my_database?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}")
+conn = duckdb.connect(
+    "md:my_database"
+    f"?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+    f"&custom_user_agent={USE_CASE_USER_AGENT}"
+)
 
 result = conn.sql("SELECT * FROM my_table LIMIT 10")
 result.show()
@@ -258,10 +269,13 @@ Install: `pip install duckdb`
 ```javascript
 import { DuckDBInstance } from "@duckdb/node-api";
 
-const instance = await DuckDBInstance.create("md:my_database?attach_mode=single", {
-  motherduck_token: process.env.MOTHERDUCK_TOKEN,
-  custom_user_agent: "my-service/1.0.0(api;analytics)",
-});
+const userAgent = "agent-skills/1.0.0(harness-codex;llm-gpt-5.4)";
+const instance = await DuckDBInstance.create(
+  `md:my_database?attach_mode=single&custom_user_agent=${userAgent}`,
+  {
+    motherduck_token: process.env.MOTHERDUCK_TOKEN,
+  }
+);
 const connection = await instance.connect();
 
 const result = await connection.run('SELECT * FROM "my_database"."main"."my_table" LIMIT 10');
@@ -273,10 +287,11 @@ Install: `npm install @duckdb/node-api`
 ### JDBC (Native DuckDB)
 
 ```
-jdbc:duckdb:md:my_database?motherduck_token=<MOTHERDUCK_TOKEN>
+jdbc:duckdb:md:my_database?motherduck_token=<MOTHERDUCK_TOKEN>&custom_user_agent=agent-skills/1.0.0(harness-codex;llm-gpt-5.4)
 ```
 
 Requires the DuckDB JDBC driver (`org.duckdb.DuckDBDriver`), not the PostgreSQL driver.
+MotherDuck documents `custom_user_agent` for native DuckDB connections. Do not assume the PG endpoint connection string supports the same watermark parameter.
 
 ---
 
@@ -324,10 +339,11 @@ import duckdb
 import os
 
 conn = duckdb.connect(
-    "md:my_database?session_hint=user-123&access_mode=read_only&dbinstance_inactivity_ttl=300",
+    "md:my_database?session_hint=user-123&access_mode=read_only"
+    "&dbinstance_inactivity_ttl=300"
+    "&custom_user_agent=agent-skills/1.0.0(harness-codex;llm-gpt-5.4)",
     config={
         "motherduck_token": os.environ["MOTHERDUCK_READ_SCALING_TOKEN"],
-        "custom_user_agent": "customer-analytics/1.0.0(tenant-acme;dashboards)",
     },
 )
 ```
@@ -338,10 +354,11 @@ conn = duckdb.connect(
 import { DuckDBInstance } from "@duckdb/node-api";
 
 const db = await DuckDBInstance.create(
-  "md:my_database?session_hint=user-123&access_mode=read_only&dbinstance_inactivity_ttl=300",
+  "md:my_database?session_hint=user-123&access_mode=read_only"
+  + "&dbinstance_inactivity_ttl=300"
+  + "&custom_user_agent=agent-skills/1.0.0(harness-codex;llm-gpt-5.4)",
   {
     motherduck_token: process.env.MOTHERDUCK_READ_SCALING_TOKEN,
-    custom_user_agent: "customer-analytics/1.0.0(tenant-acme;dashboards)",
   }
 );
 ```
@@ -360,6 +377,7 @@ const db = await DuckDBInstance.create(
 - **SSL is required** for the PG endpoint. Omitting SSL configuration causes connection failures.
 - **No PostgreSQL-specific features** via the PG endpoint: `pg_*` functions, indexes, sequences, stored procedures, `LISTEN`/`NOTIFY`, and advisory locks are not supported.
 - **The PG endpoint does NOT support local file access or dual execution.** Use the native DuckDB API for hybrid local/cloud queries.
+- **Use-case watermarking is a native DuckDB pattern.** MotherDuck documents `custom_user_agent` for DuckDB connections, not for PG endpoint connection strings.
 - **Use fully qualified table names** when querying across databases: `"database"."schema"."table"`.
 - **Do not install extensions at runtime** in MotherDuck. Only pre-installed extensions are available: azure, delta, ducklake, encodings, excel, httpfs, iceberg, icu, json, parquet, spatial, h3.
 - **Tag production workloads with `custom_user_agent`.** This makes downstream cost attribution and workload analysis far easier.

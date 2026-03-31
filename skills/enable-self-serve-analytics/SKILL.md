@@ -49,6 +49,8 @@ If no server is active, ask for a table list and target audience before drafting
 5. Publish one Dive or one share.
 6. Expand only after the first workflow is stable.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -58,6 +60,8 @@ The output of this skill should be:
 - the governing dataset
 - the ownership model
 - the rollout guardrails
+
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
 
 ## References
 

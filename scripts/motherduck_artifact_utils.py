@@ -9,8 +9,8 @@ from typing import Iterator
 
 import duckdb
 
+from scripts.motherduck_user_agent import build_use_case_user_agent
 
-DEFAULT_USER_AGENT = "agent-skills/1.0.0(artifact-tests)"
 TRUTHY = {"1", "true", "yes", "on"}
 
 
@@ -34,6 +34,7 @@ class ArtifactSession:
     mode: str
     databases: dict[str, str]
     created_databases: list[str]
+    user_agent: str
 
     def database_name(self, key: str) -> str:
         return self.databases[key]
@@ -51,6 +52,7 @@ class ArtifactSession:
         return {
             "mode": self.mode,
             "databases": self.databases,
+            "user_agent": self.user_agent,
         }
 
 
@@ -59,8 +61,9 @@ def artifact_session(
     *,
     slug: str,
     database_keys: list[str],
-    user_agent: str = DEFAULT_USER_AGENT,
+    user_agent: str | None = None,
 ) -> Iterator[ArtifactSession]:
+    effective_user_agent = user_agent or build_use_case_user_agent()
     use_motherduck = env_flag("MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK")
     if not use_motherduck:
         conn = duckdb.connect()
@@ -75,6 +78,7 @@ def artifact_session(
                 mode="local",
                 databases=attached,
                 created_databases=[],
+                user_agent=effective_user_agent,
             )
         finally:
             conn.close()
@@ -96,7 +100,7 @@ def artifact_session(
         "md:",
         config={
             "motherduck_token": token,
-            "custom_user_agent": user_agent,
+            "custom_user_agent": effective_user_agent,
         },
     )
     created_databases: list[str] = []
@@ -112,6 +116,7 @@ def artifact_session(
             mode="motherduck",
             databases=databases,
             created_databases=created_databases,
+            user_agent=effective_user_agent,
         )
     finally:
         for database_name in reversed(created_databases):

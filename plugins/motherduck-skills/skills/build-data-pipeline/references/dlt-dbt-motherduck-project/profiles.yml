@@ -1,8 +1,0 @@
-md_pipeline_demo:
-  outputs:
-    dev:
-      type: duckdb
-      path: "md:{{ env_var('MOTHERDUCK_PIPELINE_DB', 'md_skills_pipeline_demo') }}?motherduck_token={{ env_var('MOTHERDUCK_TOKEN') }}"
-      schema: main
-      threads: 1
-  target: dev

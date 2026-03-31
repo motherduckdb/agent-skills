@@ -48,6 +48,8 @@ If no server is active, ask for representative client patterns and regions befor
 5. Document client-specific exceptions.
 6. Produce the handoff assets and validation checks.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -56,6 +58,8 @@ The output of this skill should be:
 - the standard provisioning checklist
 - the region and isolation posture
 - the client-specific exceptions
+
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
 
 ## References
 

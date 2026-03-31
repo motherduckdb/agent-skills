@@ -54,6 +54,8 @@ If no server is active, ask for source shape and target shape before drafting th
 6. Materialize analytics-ready outputs.
 7. Validate counts and business metrics before publishing downstream assets.
 
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/1.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+
 ## Output
 
 The output of this skill should be:
@@ -64,6 +66,8 @@ The output of this skill should be:
 - the serving tables or views
 - the validation checks
 
+If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
+
 ## References
 
 - `references/dlt-dbt-motherduck-project/` -- fully runnable MotherDuck reference project using `dlt`, `dbt-duckdb`, and validation queries
@@ -72,7 +76,7 @@ The output of this skill should be:
 
 ## Runnable Artifact
 
-- `artifacts/pipeline_stage_example.py` -- local DuckDB example that lands raw data, deduplicates it, and publishes analytics output across raw/staging/analytics databases
+- `artifacts/pipeline_stage_example.py` -- local DuckDB example that stages a Parquet extract, lands it into raw, deduplicates it, and publishes analytics output across raw/staging/analytics databases
 - `references/dlt-dbt-motherduck-project/` -- end-to-end MotherDuck example that bootstraps the target database, lands raw data with `dlt`, builds staging and analytics models with `dbt`, and validates the final mart
 
 Run it with:

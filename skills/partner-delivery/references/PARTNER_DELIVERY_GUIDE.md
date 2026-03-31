@@ -11,6 +11,16 @@ Use this skill when a consultancy, implementation partner, or multi-client produ
 - If the MotherDuck MCP `ask_docs_question` feature is available, use it first.
 - Verify anything commercial, regional, or security-sensitive against live public materials before giving a definitive answer.
 
+## Closest `motherduck-examples` Starters
+
+The examples repo does not have a dedicated multi-client delivery starter, so use its adjacent building blocks in `../motherduck-examples/`:
+
+- `nodejs-motherduck/README.md` -- reusable app-side connection starter for client-specific backends
+- `dlt-db-replication/README.md` -- reusable ingestion and measured replication starter when a partner engagement includes client pipeline work
+- `dbt-ingestion-s3/README.md` -- reusable external-file/dbt starter when the client pattern is object-storage-first
+
+Keep this repo responsible for the repeatable isolation and provisioning pattern, not for pretending one starter schema or one demo app fits every client.
+
 ## When To Use
 
 - The user needs a repeatable architecture for several customers.

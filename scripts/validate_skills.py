@@ -19,24 +19,13 @@ CLAUDE_CONTEXT = ROOT / "CLAUDE.md"
 CLAUDE_PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
 CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
+CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
-IGNORED_PACKAGE_PARTS = {".venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "target"}
-IGNORED_PACKAGE_SUFFIXES = {".pyc"}
 
 
 class ValidationError(Exception):
     pass
-
-
-def include_packaged_path(path: Path) -> bool:
-    if any(part in IGNORED_PACKAGE_PARTS for part in path.parts):
-        return False
-    if path.name == ".DS_Store":
-        return False
-    if path.suffix in IGNORED_PACKAGE_SUFFIXES:
-        return False
-    return True
 
 
 def parse_frontmatter(path: Path) -> dict[str, object]:
@@ -264,64 +253,6 @@ def validate_codex_plugin(skills: list[str]) -> str:
     return plugin_name
 
 
-def compare_package_file(source: Path, packaged: Path, label: str) -> None:
-    if packaged.is_symlink():
-        raise ValidationError(f"{packaged}: packaged {label} must be a real file, not a symlink")
-    if not packaged.exists():
-        raise ValidationError(f"{packaged}: missing packaged {label}")
-    if source.read_bytes() != packaged.read_bytes():
-        raise ValidationError(f"{packaged}: packaged {label} is out of sync with {source}")
-
-
-def compare_package_directory(source_dir: Path, packaged_dir: Path, label: str) -> None:
-    if packaged_dir.is_symlink():
-        raise ValidationError(f"{packaged_dir}: packaged {label} must be a real directory, not a symlink")
-    if not packaged_dir.exists():
-        raise ValidationError(f"{packaged_dir}: missing packaged {label}")
-
-    source_files = sorted(
-        path.relative_to(source_dir)
-        for path in source_dir.rglob("*")
-        if path.is_file() and include_packaged_path(path.relative_to(source_dir))
-    )
-    packaged_files = sorted(
-        path.relative_to(packaged_dir)
-        for path in packaged_dir.rglob("*")
-        if path.is_file() and include_packaged_path(path.relative_to(packaged_dir))
-    )
-    if packaged_files != source_files:
-        raise ValidationError(
-            f"{packaged_dir}: packaged {label} file set is out of sync\n"
-            f"expected: {source_files}\n"
-            f"found:    {packaged_files}"
-        )
-
-    for relative_path in packaged_dir.rglob("*"):
-        if relative_path.is_symlink():
-            raise ValidationError(f"{relative_path}: packaged {label} must not contain symlinks")
-
-    for relative_path in source_files:
-        compare_package_file(source_dir / relative_path, packaged_dir / relative_path, f"{label}/{relative_path}")
-
-
-def validate_codex_packaged_plugin(expected_plugin_name: str, skills: list[str]) -> None:
-    packaged_root = ROOT / "plugins" / expected_plugin_name
-    if packaged_root.is_symlink():
-        raise ValidationError(f"{packaged_root}: packaged plugin root must be a real directory, not a symlink")
-    if not packaged_root.exists():
-        raise ValidationError(f"Missing packaged Codex plugin root: {packaged_root}")
-
-    compare_package_file(CODEX_PLUGIN, packaged_root / ".codex-plugin" / "plugin.json", "plugin manifest")
-    compare_package_directory(SKILLS_DIR, packaged_root / "skills", "skills directory")
-    compare_package_directory(ROOT / "assets", packaged_root / "assets", "assets directory")
-
-    packaged_skills = sorted(p.parent.name for p in (packaged_root / "skills").glob("*/SKILL.md"))
-    if packaged_skills != skills:
-        raise ValidationError(
-            f"{packaged_root / 'skills'}: packaged skill directory mismatch\nexpected: {skills}\nfound:    {packaged_skills}"
-        )
-
-
 def validate_codex_marketplace(expected_plugin_name: str) -> None:
     if not CODEX_MARKETPLACE.exists():
         raise ValidationError(f"Missing required Codex marketplace: {CODEX_MARKETPLACE}")
@@ -352,16 +283,10 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
 
     marketplace_root = CODEX_MARKETPLACE.parents[2]
     resolved_plugin_root = (marketplace_root / source_path).resolve()
-    if resolved_plugin_root == marketplace_root.resolve():
+    if resolved_plugin_root != CODEX_PACKAGED_PLUGIN.resolve():
         raise ValidationError(
-            f"{CODEX_MARKETPLACE}: source.path must point to a plugin subdirectory, not the marketplace root"
+            f"{CODEX_MARKETPLACE}: source.path must resolve to {CODEX_PACKAGED_PLUGIN}, found {resolved_plugin_root}"
         )
-    if resolved_plugin_root != ROOT.resolve():
-        expected_plugin_root = ROOT / "plugins" / expected_plugin_name
-        if resolved_plugin_root != expected_plugin_root.resolve():
-            raise ValidationError(
-                f"{CODEX_MARKETPLACE}: source.path must resolve to {expected_plugin_root}, found {resolved_plugin_root}"
-            )
     if not (resolved_plugin_root / ".codex-plugin" / "plugin.json").exists():
         raise ValidationError(f"{CODEX_MARKETPLACE}: source.path does not point at a valid Codex plugin root")
 
@@ -451,7 +376,6 @@ def main() -> int:
     validate_claude_marketplace(claude_plugin_name)
 
     codex_plugin_name = validate_codex_plugin(skills)
-    validate_codex_packaged_plugin(codex_plugin_name, skills)
     validate_codex_marketplace(codex_plugin_name)
 
     print(f"Validated {len(skills)} skills successfully.")

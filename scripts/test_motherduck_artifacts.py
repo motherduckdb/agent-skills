@@ -6,14 +6,19 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
 import uuid
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
+from scripts.motherduck_user_agent import build_use_case_user_agent
+
 ARTIFACTS = [
     ROOT / "skills" / "build-cfa-app" / "artifacts" / "customer_routing_example.py",
     ROOT / "skills" / "build-dashboard" / "artifacts" / "dashboard_story_example.py",
@@ -25,9 +30,30 @@ ARTIFACTS = [
 REFERENCE_PROJECT = ROOT / "skills" / "build-data-pipeline" / "references" / "dlt-dbt-motherduck-project"
 
 
-def run(command: list[str], *, env: dict[str, str], cwd: Path | None = None) -> None:
+def run(command: list[str], *, env: dict[str, str], cwd: Path | None = None) -> str:
     print(f"$ {' '.join(command)}")
-    subprocess.run(command, check=True, cwd=cwd or ROOT, env=env)
+    result = subprocess.run(
+        command,
+        check=True,
+        cwd=cwd or ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    return result.stdout
+
+
+def verify_artifact_output(artifact: Path, stdout: str, *, expected_user_agent: str) -> None:
+    payload = json.loads(stdout)
+    actual = payload.get("backend", {}).get("user_agent")
+    if actual != expected_user_agent:
+        raise RuntimeError(
+            f"{artifact.name} returned user_agent={actual!r}, expected {expected_user_agent!r}"
+        )
 
 
 def main() -> int:
@@ -36,9 +62,18 @@ def main() -> int:
 
     env = os.environ.copy()
     env["MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK"] = "1"
+    expected_user_agent = build_use_case_user_agent(
+        harness=env.get("MOTHERDUCK_AGENT_HARNESS"),
+        llm=env.get("MOTHERDUCK_AGENT_LLM"),
+    )
 
     for artifact in ARTIFACTS:
-        run(["uv", "run", "--with", "duckdb", "python", str(artifact)], env=env)
+        stdout = run(["uv", "run", "--with", "duckdb", "python", str(artifact)], env=env)
+        verify_artifact_output(
+            artifact,
+            stdout,
+            expected_user_agent=expected_user_agent,
+        )
 
     pipeline_env = env.copy()
     pipeline_env["MOTHERDUCK_PIPELINE_DB"] = f"tmp_agent_skills_pipeline_{uuid.uuid4().hex[:8]}"
