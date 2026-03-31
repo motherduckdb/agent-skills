@@ -1,0 +1,39 @@
+name: Validate Codex Plugin Sync
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'plugins/motherduck-skills/**'
+      - '.codex-plugin/**'
+      - 'scripts/check_codex_plugin_sync.py'
+      - 'scripts/sync_codex_plugin.py'
+      - '.github/workflows/validate-codex-plugin-sync.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'plugins/motherduck-skills/**'
+      - '.codex-plugin/**'
+      - 'scripts/check_codex_plugin_sync.py'
+      - 'scripts/sync_codex_plugin.py'
+      - '.github/workflows/validate-codex-plugin-sync.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-codex-plugin-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Verify packaged Codex plugin matches source skills
+        run: uv run scripts/check_codex_plugin_sync.py

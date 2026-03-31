@@ -18,10 +18,32 @@ Choose one install path for each agent. For most users, the simplest default is 
 
 Avoid mixing plugin installs and raw skill installs for the same agent unless you are testing packaging behavior.
 
-### Install all skills with the Skills CLI
+### Choose an install path
+
+| Goal | Recommended path |
+|-------|------------------|
+| Install the whole MotherDuck catalog quickly | Skills CLI |
+| Install only one or two skills | Skills CLI with `--skill` |
+| Use the packaged Claude Code plugin from the repo marketplace | Claude Code plugin install |
+| Use the packaged Codex plugin from the repo marketplace | Codex plugin install |
+| Vendor one skill directly into a repo or agent home without plugin tooling | Manual per-skill install |
+
+### Skills CLI: install all skills
 
 ```bash
 npx skills add motherduckdb/agent-skills
+```
+
+### Skills CLI: install one or more specific skills
+
+```bash
+npx skills add motherduckdb/agent-skills --skill connect --skill explore --skill query
+```
+
+You can also install directly from a single skill path in the repo:
+
+```bash
+npx skills add https://github.com/motherduckdb/agent-skills/tree/main/skills/connect
 ```
 
 Useful variants:
@@ -38,6 +60,9 @@ npx skills add motherduckdb/agent-skills --skill connect -a claude-code -g
 
 # install only to Codex, globally
 npx skills add motherduckdb/agent-skills --skill connect -a codex -g
+
+# install one skill from the repo path, to Claude Code only
+npx skills add https://github.com/motherduckdb/agent-skills/tree/main/skills/connect -a claude-code -g
 ```
 
 Best practices:
@@ -45,6 +70,7 @@ Best practices:
 - the default install scope is project-local; use that when the skills should travel with the repo
 - add `-g` when you want a personal cross-project install
 - use `--skill <name>` when you want only a few skills instead of the whole catalog
+- prefer the repo-level install plus `--skill` over many one-off path installs when you want multiple MotherDuck skills from this catalog
 
 ### Claude Code plugin install
 
@@ -54,6 +80,8 @@ Best practices:
 ```
 
 After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
+
+This plugin packages the whole MotherDuck catalog. You do not need to install each skill separately.
 
 ### Codex plugin install
 
@@ -86,6 +114,18 @@ cp -R skills/connect ~/.codex/skills/connect
 Replace `connect` with any skill name from this repo, for example `query`, `create-dive`, or `build-dashboard`.
 
 For manual installs, prefer `.agents/skills/<name>` when the skill should be shared with the project. Use `~/.claude/skills/<name>` or `~/.codex/skills/<name>` only for personal cross-project defaults.
+
+### After installation
+
+These are skills, not standalone apps. Once installed, the normal flow is to ask the agent to do the work and let it pull in the relevant skill when needed.
+
+Examples:
+
+- `Use MotherDuck skills to connect to my workspace and inspect the schema.`
+- `Use the connect, explore, and query skills to validate this analytics query.`
+- `Use MotherDuck skills to build a Dive-backed dashboard on these tables.`
+
+If you installed a single skill manually or through the Skills CLI, you can name it explicitly, but most agents should also discover it automatically from context.
 
 ## What Agents Can Build With This Repo
 
@@ -120,35 +160,36 @@ When a use-case skill is involved and a remote or local MotherDuck server is act
 
 ## Featured Skills
 
-- `connect` -- choose PG endpoint, native DuckDB, `pg_duckdb`, or Wasm
-- `query` -- write and validate DuckDB SQL against MotherDuck
-- `create-dive` -- build, theme, preview, save, and update Dives
-- `build-dashboard` -- compose one coherent multi-section Dive-backed dashboard
-- `build-cfa-app` -- design serious customer-facing analytics with isolation and serving boundaries
+These are the end-to-end use-case skills in the catalog:
+
+- `build-cfa-app` -- build serious customer-facing analytics with isolation and serving boundaries
+- `build-dashboard` -- compose one coherent multi-section analytics dashboard
 - `build-data-pipeline` -- land, transform, and publish analytics-ready data
 - `migrate-to-motherduck` -- move off legacy warehouses and validate cutover
+- `enable-self-serve-analytics` -- roll out governed self-serve analytics for internal teams
+- `partner-delivery` -- deliver repeatable MotherDuck architectures for consultants and partners
 
 ## Skills Overview
 
-| Skill | Layer | Description |
+| Skill | Layer | Use it when |
 |-------|-------|-------------|
-| `connect` | Utility | Connect to MotherDuck via the Postgres endpoint, native DuckDB API, `pg_duckdb`, or Wasm |
-| `query` | Utility | Execute and optimize DuckDB SQL queries against MotherDuck |
-| `explore` | Utility | Discover databases, tables, columns, views, and shares |
-| `duckdb-sql` | Utility | DuckDB SQL syntax reference for MotherDuck |
-| `load-data` | Workflow | Ingest data from files, cloud storage, HTTP, and upstream systems |
-| `model-data` | Workflow | Design schemas and data models for analytical workloads |
-| `share-data` | Workflow | Create and consume MotherDuck shares safely |
-| `create-dive` | Workflow | Build, theme, preview, save, and update Dives |
-| `ducklake` | Workflow | Decide when DuckLake fits and how to use it on MotherDuck |
-| `security-governance` | Workflow | Answer security, governance, residency, and access-control questions with MotherDuck-specific guidance |
-| `pricing-roi` | Workflow | Frame MotherDuck pricing, workload cost drivers, and ROI tradeoffs for technical and commercial buyers |
-| `build-cfa-app` | Use-case | Build customer-facing analytics applications |
-| `build-dashboard` | Use-case | Create multi-section analytics dashboards backed by Dives |
-| `build-data-pipeline` | Use-case | Design ingestion-to-serving data pipelines |
-| `migrate-to-motherduck` | Use-case | Plan migrations from Snowflake, Redshift, Postgres, and dbt-heavy stacks onto MotherDuck |
-| `enable-self-serve-analytics` | Use-case | Roll out self-serve analytics, sharing, and Dive-backed dashboards for internal teams |
-| `partner-delivery` | Use-case | Deliver repeatable multi-client MotherDuck architectures for consultants and partners |
+| `connect` | Utility | you need to choose the right connection path before writing code or SQL |
+| `explore` | Utility | you need to inspect real databases, schemas, tables, columns, views, or shares |
+| `query` | Utility | you need to write, validate, or optimize DuckDB SQL against MotherDuck |
+| `duckdb-sql` | Utility | you need DuckDB SQL syntax or MotherDuck-specific SQL constraints quickly |
+| `load-data` | Workflow | you need to ingest files, cloud objects, HTTP data, or upstream systems into MotherDuck |
+| `model-data` | Workflow | you need to design analytical schemas, tables, views, or transformation layers |
+| `share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |
+| `create-dive` | Workflow | you need to build, theme, preview, save, or update a Dive |
+| `ducklake` | Workflow | you need to decide whether DuckLake is appropriate and how to apply it safely |
+| `security-governance` | Workflow | you need MotherDuck-specific guidance on security, access, governance, or residency |
+| `pricing-roi` | Workflow | you need to frame workload cost drivers, pricing posture, or ROI tradeoffs |
+| `build-cfa-app` | Use-case | you are building a customer-facing analytics product on MotherDuck |
+| `build-dashboard` | Use-case | you are building one coherent analytics dashboard backed by Dives and tables |
+| `build-data-pipeline` | Use-case | you are designing an ingestion-to-serving data pipeline on MotherDuck |
+| `migrate-to-motherduck` | Use-case | you are moving from Snowflake, Redshift, Postgres, or dbt-heavy stacks onto MotherDuck |
+| `enable-self-serve-analytics` | Use-case | you are rolling out internal self-serve analytics, sharing, and governed dashboards |
+| `partner-delivery` | Use-case | you are delivering repeatable multi-client MotherDuck implementations for customers or partners |
 
 ## Repo Shape
 

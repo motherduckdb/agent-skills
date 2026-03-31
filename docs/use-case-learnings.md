@@ -50,3 +50,6 @@ This document captures the durable lessons from repeatedly building and testing 
   - plugin installation and skill exposure
   - use-case output structure
   - MotherDuck-backed artifact execution
+- Treat the runtime loop as two tiers:
+  - quick inner-loop checks: `validate_skills.py`, snippet validation, and targeted artifact runs
+  - slower regression checks: `test_codex_use_cases.py` and the full MotherDuck artifact suite

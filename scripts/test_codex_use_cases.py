@@ -54,16 +54,16 @@ def rpc_call(proc: subprocess.Popen[str], request_id: int, method: str, params: 
             return message["result"]
 
 
-def normalize_json_output(raw: str) -> dict:
+def parse_json_output(raw: str, *, skill_name: str) -> dict:
     candidate = raw.strip()
     if candidate.startswith("```"):
-        lines = candidate.splitlines()
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        candidate = "\n".join(lines).strip()
-    return json.loads(candidate)
+        raise UseCaseTestError(
+            f"{skill_name} returned fenced JSON; use-case skills must emit raw JSON only when structured JSON is requested"
+        )
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError as exc:
+        raise UseCaseTestError(f"{skill_name} returned invalid JSON: {exc}") from exc
 
 
 def run_use_case(env: dict[str, str], plugin_name: str, skill_name: str) -> dict[str, object]:
@@ -95,7 +95,7 @@ def run_use_case(env: dict[str, str], plugin_name: str, skill_name: str) -> dict
         return entry
 
     raw = output_path.read_text()
-    payload = normalize_json_output(raw)
+    payload = parse_json_output(raw, skill_name=skill_name)
     missing = [key for key in REQUIRED_KEYS if key not in payload]
     if missing:
         raise UseCaseTestError(f"{skill_name} output missing keys: {missing}")

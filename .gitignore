@@ -19,6 +19,3 @@ __pycache__/
 
 # Validator scratch output
 snippet-errors.json
-
-# Deprecated packaged plugin mirror
-plugins/motherduck-skills/
