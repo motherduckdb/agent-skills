@@ -32,6 +32,9 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - Prefer comments on analytical tables and columns.
 - Prefer per-customer isolation for serious B2B customer-facing analytics.
 - Prefer native MotherDuck storage unless DuckLake is explicitly the better fit.
+- In use-case skills, structured JSON is an explicit test/tooling contract, not the default human-facing response format.
+- `Validation Signals` sections in references are maintainer/reviewer guidance, not a required heading in normal user-facing replies.
+- Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency.
 
 ## Skill Catalog
 

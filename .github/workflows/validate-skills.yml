@@ -1,4 +1,4 @@
-name: Validate Skills Catalog
+name: Validate Skills and Plugins
 
 on:
   workflow_dispatch:
@@ -41,7 +41,7 @@ permissions:
   contents: read
 
 jobs:
-  validate-skills:
+  validate-skills-and-plugins:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -57,7 +57,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Run structural validator
+      - name: Validate skills plus Claude and Codex plugin wiring
         run: uv run scripts/validate_skills.py
 
       - name: Verify packaged Codex plugin matches source skills

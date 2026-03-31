@@ -403,6 +403,30 @@ def print_report(results: dict) -> None:
     print(f"\n=== Overall: {overall} ===")
 ```
 
+---
+
+## Investigating Non-Zero Variance
+
+When validation reports non-zero variance, do not treat it as an automatic failure. Investigate in order:
+
+1. **Row count differs?** Check for new or deleted records first. Use the EXCEPT queries above to find exactly which keys are affected. New records may be expected if the migration included a data refresh.
+
+2. **Aggregates differ but row count matches?** Run the column-level comparison to find changed rows. Common causes:
+   - floating-point rounding differences between source and DuckDB (usually < 0.01%)
+   - timezone handling differences on timestamps that affect date-based aggregations
+   - NULL handling differences (`NULL + 5` returns `NULL` in DuckDB, some sources treat it as `5`)
+
+3. **Small variance (< 0.5%)?** Document it and decide with the user whether it is acceptable. Many migrations accept small rounding variance on financial aggregates.
+
+4. **Large variance (> 1%)?** Narrow it down to specific rows. Filter the metric comparison to date ranges, customer segments, or product categories to isolate the affected partition. The usual suspects are:
+   - duplicate rows in either source or target
+   - a WHERE clause in the migration that excluded records
+   - type coercion that changed values (e.g., truncating DECIMAL precision)
+
+5. **Hash comparison finds changed rows?** Use the column-level comparison filtered to those keys to see exactly which columns changed. This is the fastest path to root cause.
+
+---
+
 ### Usage Example
 
 ```python

@@ -30,6 +30,8 @@ Use this skill when designing an end-to-end workflow that moves data from raw so
 
 ## TypeScript/Javascript Orchestration Starter
 
+Use the PG endpoint for TypeScript pipeline orchestration. This integrates with existing Node.js stacks without installing native DuckDB bindings.
+
 ```ts
 import pg from "pg";
 import { readFile } from "node:fs/promises";
@@ -48,6 +50,20 @@ for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
   await client.query(await readFile(`sql/pipeline/${file}`, "utf8"));
 }
 await client.end();
+```
+
+For Node.js services that already use `@duckdb/node-api`, use the native DuckDB connection instead:
+
+```ts
+import { DuckDBInstance } from "@duckdb/node-api";
+import { readFile } from "node:fs/promises";
+
+const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/1.0.0");
+const conn = await instance.connect();
+for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
+  await conn.run(await readFile(`sql/pipeline/${file}`, "utf8"));
+}
+conn.close();
 ```
 
 ## Prerequisites
@@ -115,6 +131,19 @@ Source --> Raw --> Staging --> Analytics/Serve
 - **Analytics/Serve:** Analytics-ready tables, views, Dives, or shares for downstream consumption.
 
 Separating stages ensures you never lose raw data, can debug transformations independently, and can rebuild downstream assets from raw or staging at any time.
+
+When stages live in separate databases, MotherDuck supports cross-database queries seamlessly. Reference tables in other databases with fully qualified names:
+
+```sql
+-- Query staging data from the analytics database context
+SELECT * FROM "raw"."main"."orders_landing" WHERE order_date >= '2024-01-01';
+-- Join across databases
+SELECT s.*, c.customer_name
+FROM "staging"."main"."orders_clean" s
+LEFT JOIN "raw"."main"."customers_landing" c ON s.customer_id = c.customer_id;
+```
+
+This means pipeline SQL does not need to switch database context between stages -- every query can reference any stage by name.
 
 ---
 
@@ -427,10 +456,37 @@ CREATE SHARE IF NOT EXISTS analytics_share FROM analytics (
 
 MotherDuck does not have built-in scheduling. Use external schedulers: cron, GitHub Actions, Dagster, Airflow, or Prefect.
 
-Store SQL transformations in version-controlled `.sql` files. Execute them from a scheduled script:
+Store SQL transformations in version-controlled `.sql` files. Execute them from a scheduled script.
+
+### Native DuckDB (recommended)
+
+Use native `duckdb.connect("md:")` for pipeline runners. This gives you full DuckDB SQL support, cross-database queries, and no driver translation layer.
 
 ```python
 # pipeline.py -- run via cron, Airflow, or GitHub Actions
+import duckdb
+import os
+from pathlib import Path
+
+PIPELINE_USER_AGENT = "agent-skills/1.0.0(harness-unknown;llm-unknown)"
+
+def run_pipeline():
+    conn = duckdb.connect(f"md:?custom_user_agent={PIPELINE_USER_AGENT}")
+    for step in sorted(Path("sql/pipeline").glob("*.sql")):
+        print(f"Running {step.name}...")
+        conn.execute(step.read_text())
+    conn.close()
+
+if __name__ == "__main__":
+    run_pipeline()
+```
+
+### PG endpoint alternative
+
+Use the PG endpoint when the pipeline runs in an environment that already has PostgreSQL drivers and you want to avoid installing `duckdb`. This is common in serverless runtimes, container images with existing `psycopg2`, or TypeScript backends.
+
+```python
+# pipeline_pg.py -- PG endpoint alternative
 import psycopg2, certifi, os
 from pathlib import Path
 

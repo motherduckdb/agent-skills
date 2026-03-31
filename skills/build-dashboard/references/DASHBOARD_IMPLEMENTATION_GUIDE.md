@@ -49,17 +49,68 @@ Use these signals for testing, review, and regression checks. They are not an in
 
 ```tsx
 import { useSQLQuery } from "@motherduck/react-sql-query";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+const N = (v: unknown): number => (v != null ? Number(v) : 0);
 
 export default function MonthlyRevenueDashboard() {
-  const { data } = useSQLQuery(`
+  const kpis = useSQLQuery(`
+    SELECT SUM(revenue) AS total_revenue,
+           COUNT(DISTINCT order_id) AS order_count,
+           ROUND(AVG(revenue), 2) AS avg_order_value
+    FROM "analytics"."main"."orders"
+  `);
+
+  const trend = useSQLQuery(`
     SELECT strftime(date_trunc('month', order_date), '%Y-%m') AS month,
            SUM(revenue) AS revenue
     FROM "analytics"."main"."orders"
-    GROUP BY 1
-    ORDER BY 1
+    GROUP BY 1 ORDER BY 1
   `);
-  const rows = Array.isArray(data) ? data : [];
-  return <pre>{JSON.stringify(rows, null, 2)}</pre>;
+
+  const kpiRows = Array.isArray(kpis.data) ? kpis.data : [];
+  const trendData = (Array.isArray(trend.data) ? trend.data : []).map(r => ({
+    month: r.month as string,
+    revenue: N(r.revenue),
+  }));
+
+  return (
+    <div className="p-6" style={{ background: "#f8f8f8" }}>
+      <h1 className="text-2xl font-semibold" style={{ color: "#231f20" }}>Revenue</h1>
+      <p className="text-sm mb-6" style={{ color: "#6a6a6a" }}>Monthly overview</p>
+
+      <div className="grid grid-cols-3 gap-8 mb-8">
+        {[
+          { label: "Total Revenue", value: kpiRows[0]?.total_revenue, fmt: (v: number) => `$${(v / 1000).toFixed(0)}K` },
+          { label: "Orders", value: kpiRows[0]?.order_count, fmt: (v: number) => v.toLocaleString() },
+          { label: "Avg Order", value: kpiRows[0]?.avg_order_value, fmt: (v: number) => `$${v.toFixed(2)}` },
+        ].map(({ label, value, fmt }) => (
+          <div key={label}>
+            {kpis.isLoading ? (
+              <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
+            ) : (
+              <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{fmt(N(value))}</p>
+            )}
+            <p className="text-sm mt-2" style={{ color: "#6a6a6a" }}>{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {trend.isLoading ? (
+        <div className="bg-gray-100 animate-pulse rounded" style={{ height: 250 }} />
+      ) : (
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={trendData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis dataKey="month" fontSize={11} />
+            <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} fontSize={11} />
+            <Tooltip formatter={(v: number) => `$${v.toLocaleString()}`} />
+            <Line type="linear" dataKey="revenue" stroke="#0777b3" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
 }
 ```
 
@@ -113,7 +164,17 @@ Use the `explore` skill to discover what data is available and understand its sh
 2. List tables in the target database with `duckdb_tables()`.
 3. Inspect columns with `duckdb_columns()` to understand types and nullability.
 4. Run `SUMMARIZE` on each key table to understand distributions, ranges, null rates, and cardinality.
-5. Sample rows with `LIMIT 10` to see actual values.
+5. **Check date ranges** on every time column -- the data may not cover the period you expect, which changes the dashboard story entirely.
+6. Sample rows with `LIMIT 10` to see actual values.
+
+A quick date range check prevents building a dashboard on stale or misaligned data:
+
+```sql
+SELECT min(order_date) AS earliest,
+       max(order_date) AS latest,
+       count(*) AS total_rows
+FROM "my_db"."main"."orders";
+```
 
 Identify the following before proceeding:
 - **Key metrics** -- the numeric columns that will become KPIs and chart values (e.g., revenue, order count, session duration).

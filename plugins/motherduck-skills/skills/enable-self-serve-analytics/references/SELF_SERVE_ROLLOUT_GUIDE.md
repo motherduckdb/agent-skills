@@ -51,16 +51,71 @@ Use these signals for testing, review, and regression checks. They are not an in
 
 ```tsx
 import { useSQLQuery } from "@motherduck/react-sql-query";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+const N = (v: unknown): number => (v != null ? Number(v) : 0);
 
 export default function TeamKpiView() {
-  const { data } = useSQLQuery(`
-    SELECT team, COUNT(*) AS total_accounts
+  const kpis = useSQLQuery(`
+    SELECT COUNT(DISTINCT team) AS team_count,
+           COUNT(*) AS total_accounts,
+           ROUND(SUM(arr), 0) AS total_arr
+    FROM "analytics"."main"."customer_health"
+  `);
+
+  const byTeam = useSQLQuery(`
+    SELECT team,
+           COUNT(*) AS accounts,
+           ROUND(SUM(arr), 0) AS arr
     FROM "analytics"."main"."customer_health"
     GROUP BY 1
-    ORDER BY total_accounts DESC
+    ORDER BY arr DESC
   `);
-  const rows = Array.isArray(data) ? data : [];
-  return <pre>{JSON.stringify(rows, null, 2)}</pre>;
+
+  const kpiRows = Array.isArray(kpis.data) ? kpis.data : [];
+  const teamData = (Array.isArray(byTeam.data) ? byTeam.data : []).map(r => ({
+    team: r.team as string,
+    arr: N(r.arr),
+  }));
+
+  return (
+    <div className="p-6" style={{ background: "#f8f8f8" }}>
+      <h1 className="text-2xl font-semibold" style={{ color: "#231f20" }}>Team Health</h1>
+      <p className="text-sm mb-6" style={{ color: "#6a6a6a" }}>Account and ARR overview by team</p>
+
+      <div className="grid grid-cols-3 gap-8 mb-8">
+        {[
+          { label: "Teams", value: kpiRows[0]?.team_count, fmt: (v: number) => String(v) },
+          { label: "Accounts", value: kpiRows[0]?.total_accounts, fmt: (v: number) => v.toLocaleString() },
+          { label: "Total ARR", value: kpiRows[0]?.total_arr, fmt: (v: number) => `$${(v / 1000).toFixed(0)}K` },
+        ].map(({ label, value, fmt }) => (
+          <div key={label}>
+            {kpis.isLoading ? (
+              <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
+            ) : (
+              <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{fmt(N(value))}</p>
+            )}
+            <p className="text-sm mt-2" style={{ color: "#6a6a6a" }}>{label}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="text-lg font-semibold mb-2" style={{ color: "#231f20" }}>ARR by Team</h2>
+      {byTeam.isLoading ? (
+        <div className="bg-gray-100 animate-pulse rounded" style={{ height: 220 }} />
+      ) : (
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={teamData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis dataKey="team" fontSize={11} />
+            <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} fontSize={11} />
+            <Tooltip formatter={(v: number) => `$${v.toLocaleString()}`} />
+            <Bar dataKey="arr" fill="#0777b3" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
 }
 ```
 
@@ -122,7 +177,19 @@ Do not start by exposing raw tables across the whole organization.
 
 - use `explore` to discover source tables
 - use `query` to confirm metrics and dimensions
+- **check date ranges and row counts** before writing filters -- source tables may not cover the period you expect, and building a rollout on stale or empty data wastes effort
 - use `model-data` to publish a wide, analytics-ready table or view
+
+A quick data freshness check before curating:
+
+```sql
+SELECT min(created_date) AS earliest,
+       max(created_date) AS latest,
+       count(*) AS total_rows
+FROM "analytics"."main"."source_table";
+```
+
+If the latest date is older than expected, confirm with the user before proceeding.
 
 ### Step 2: Publish The First Asset
 

@@ -181,9 +181,33 @@ For Node.js or TypeScript services, use a backend-only pattern:
 4. Generate a **Read/Write token** only for accounts that need write access (data ingestion).
 5. Store all tokens in a secrets manager (AWS Secrets Manager, HashiCorp Vault, Doppler). Never store tokens in application config files or environment variables on shared machines.
 
-### Step 3: Connect Backend via PG Endpoint
+### Step 3: Connect the Backend to MotherDuck
 
-Use the `connect` skill patterns. Each incoming customer request routes to that customer's database using their dedicated token.
+Use the `connect` skill patterns. Each incoming customer request routes to that customer's database using their dedicated token. Choose the connection approach that fits your backend.
+
+#### Option A: Native DuckDB (recommended for Python backends)
+
+Native DuckDB gives full SQL support, cross-database queries, and no driver translation. Use this for FastAPI, Flask, or any Python service.
+
+```python
+# Python backend example (FastAPI + duckdb)
+import duckdb
+
+CFA_USER_AGENT = "agent-skills/1.0.0(harness-unknown;llm-unknown)"
+
+def get_customer_connection(customer_db: str, customer_token: str):
+    """Create a native DuckDB connection to a customer's MotherDuck database."""
+    return duckdb.connect(
+        f"md:{customer_db}?motherduck_token={customer_token}"
+        f"&custom_user_agent={CFA_USER_AGENT}"
+    )
+```
+
+Install: `pip install duckdb`
+
+#### Option B: PG Endpoint (for existing PostgreSQL stacks)
+
+Use the PG endpoint when your backend already has PostgreSQL drivers, connection pooling, or runs in a serverless environment where installing native DuckDB is impractical.
 
 ```ts
 // TypeScript backend example (Express + pg)
@@ -205,10 +229,9 @@ function getCustomerPool(database: string, token: string) {
 # Python backend example (FastAPI + psycopg2)
 import psycopg2
 import certifi
-import os
 
 def get_customer_connection(customer_db: str, customer_token: str):
-    """Create a connection to a specific customer's MotherDuck database."""
+    """Create a PG endpoint connection to a customer's MotherDuck database."""
     return psycopg2.connect(
         host="pg.us-east-1-aws.motherduck.com",
         port=5432,
@@ -220,7 +243,7 @@ def get_customer_connection(customer_db: str, customer_token: str):
     )
 ```
 
-Install dependencies: `pip install psycopg2-binary certifi`
+Install: `pip install psycopg2-binary certifi`
 
 ### Step 4: Implement Query Routing
 

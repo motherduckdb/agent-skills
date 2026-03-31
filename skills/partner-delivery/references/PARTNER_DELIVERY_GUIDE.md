@@ -65,15 +65,58 @@ const clients: ClientConfig[] = [
 ];
 ```
 
-## Python Validation Starter
+## Python Provisioning and Validation Starter
 
 ```python
-def validate_client_database(conn, database_name: str):
-    return conn.sql(f"""
-        SELECT table_name
+import duckdb
+
+PARTNER_USER_AGENT = "agent-skills/1.0.0(harness-unknown;llm-unknown)"
+
+
+def provision_client(conn: duckdb.DuckDBPyConnection, slug: str, region: str) -> dict:
+    """Provision a new client database with the standard schema."""
+    db_name = f"customer_{slug}"
+    conn.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
+    conn.execute(f"""
+        CREATE TABLE IF NOT EXISTS "{db_name}"."main"."usage_daily" (
+            usage_date DATE NOT NULL,
+            metric_name VARCHAR NOT NULL,
+            metric_value DOUBLE NOT NULL,
+            updated_at TIMESTAMP DEFAULT current_timestamp
+        )
+    """)
+    conn.execute(f"""
+        COMMENT ON TABLE "{db_name}"."main"."usage_daily"
+        IS 'Daily usage metrics for client {slug}'
+    """)
+    return {"slug": slug, "database": db_name, "region": region}
+
+
+def validate_client_database(conn: duckdb.DuckDBPyConnection, database_name: str) -> dict:
+    """Validate that a client database has the expected tables and row counts."""
+    tables = conn.sql(f"""
+        SELECT table_name, estimated_size
         FROM duckdb_tables()
         WHERE database_name = '{database_name}'
     """).fetchall()
+    return {
+        "database": database_name,
+        "table_count": len(tables),
+        "tables": [{"name": t[0], "estimated_size": t[1]} for t in tables],
+        "pass": len(tables) > 0,
+    }
+
+
+def validate_all_clients(clients: list[dict]) -> list[dict]:
+    """Run validation across all client databases and report results."""
+    conn = duckdb.connect(f"md:?custom_user_agent={PARTNER_USER_AGENT}")
+    results = []
+    for client in clients:
+        result = validate_client_database(conn, client["database"])
+        result["slug"] = client["slug"]
+        results.append(result)
+    conn.close()
+    return results
 ```
 
 ## Delivery Principles
