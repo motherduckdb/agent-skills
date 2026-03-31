@@ -2,14 +2,6 @@
 name: create-dive
 description: Create interactive MotherDuck Dives — persistent React data apps with live queries and visualizations. Use when building charts, dashboards, KPI displays, or any data visualization that should be saved and shareable.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: workflow
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - explore
-    - query
 ---
 
 # Create MotherDuck Dives
@@ -20,10 +12,19 @@ Use this skill when building interactive data visualizations, charts, dashboards
 
 - Prefer the current MotherDuck Dive guide and public Dives docs first.
 - If MotherDuck MCP is available, call `get_dive_guide` before generating or saving a Dive.
+- Keep these docs in scope when the task touches their surface area:
+  - theming and styling Dives
+  - Dive theme gallery
+  - managing Dives as code
+  - embedding Dives
+  - the public Dive gallery for composition examples
 - Keep Dive guidance aligned with the documented product posture:
   - Dives are live workspace artifacts
   - queries should stay fully qualified and SQL-heavy
-  - preview with small subsets during iteration, then save live `useSQLQuery` hooks
+  - iterate with real data as small static subsets, then save live `useSQLQuery` hooks only after preview approval
+  - theme prompts should be explicit and usually start from a named gallery direction
+  - Git-backed local development is the right path when the user wants a team workflow or repeatable preview/deploy flow
+  - embedded Dives are a lightweight, read-only integration path rather than a replacement for a full analytics app
   - for full customer-facing analytics with per-customer isolation, see `build-cfa-app`
 
 ## What Is a Dive?
@@ -102,13 +103,36 @@ const rows = Array.isArray(data) ? data : [];
 ## Authoring Workflow
 
 1. Explore and validate the SQL first.
-2. When iterating locally, use aggregates or `LIMIT`ed subsets so the preview stays cheap and fast.
-3. After the user approves the shape, wire the final component to live `useSQLQuery` calls.
-4. Save only once the live queries, loading states, and fully qualified table names are in place.
+2. During iteration, query real data but keep the component on small static subsets or aggregates so the preview stays cheap and fast.
+3. Add the visual direction early: choose a named theme, set palette and typography, and decide whether this should be a compact Dive or a larger dashboard.
+4. After the user approves the shape, wire the final component to live `useSQLQuery` calls.
+5. Save only once the live queries, loading states, and fully qualified table names are in place.
+
+## 2. Theme Prompt Structure and Gallery Patterns
+
+Good Dive theming is promptable. Do not ask for a "nice dashboard" or "modern chart" and hope the model invents a coherent visual system.
+
+Structure the styling prompt around these fields:
+
+- **Feel.** One line that defines the visual direction, such as `Tufte Minimal`, `Corporate Dashboard`, or `FT Salmon`.
+- **Colors.** Background, primary text, muted text, and a 3-5 color chart palette.
+- **Typography.** Title weight, body density, capitalization, and label tone.
+- **Chart rules.** Gridline visibility, stroke width, bar radius, and whether to favor line, bar, table, or composition views.
+- **Layout.** Single-column vs split layout, KPI row shape, table position, and whether the Dive should feel compact or editorial.
+- **Interactivity.** Filters, toggles, drill-downs, or cross-filtering where shared dimensions justify it.
+
+Use a named theme from the gallery as a starting point, then adapt it to the data question. Good defaults from the current docs:
+
+- `Corporate Dashboard` for straightforward KPI-and-trend business views
+- `Tufte Minimal` for dense analytical reads with restrained styling
+- `FT Salmon` for editorial or narrative business reporting
+- `Knowledge Beautiful` when the Dive needs a more layered exploratory feel
+
+Use the public Dive gallery as a composition reference, not as something to clone blindly. Current examples like `NYC Taxi Operations Dashboard`, `Spotify Tracks Explorer`, and `KPI Dashboard using Tableau Superstore Data` are useful for understanding how compact Dives mix KPI rows, one primary chart, and one supporting table or chart.
 
 ---
 
-## 2. The N() Helper -- REQUIRED for All Numeric Values
+## 3. The N() Helper -- REQUIRED for All Numeric Values
 
 Query results return values as `unknown` types. Passing them directly to Recharts produces `NaN`.
 
@@ -121,7 +145,7 @@ Never skip the `N()` wrapper. Forgetting it is the most common cause of broken c
 
 ---
 
-## 3. Available Libraries
+## 4. Available Libraries
 
 | Library | Version | Purpose |
 |---|---|---|
@@ -141,7 +165,7 @@ import { Loader2 } from "lucide-react";
 
 ---
 
-## 4. Design Rules
+## 5. Design Rules
 
 ### Layout and Background
 
@@ -162,6 +186,7 @@ import { Loader2 } from "lucide-react";
 - Max 1-2 charts per Dive, each 200-280px height.
 - Use `<ResponsiveContainer width="100%" height={260}>`.
 - Prefer tables over charts for fewer than 8 categories.
+- Prefer one clear primary visual plus one supporting visual or table.
 
 ### Color Palette
 
@@ -211,7 +236,7 @@ Every Dive MUST have a default export: `export default function MyDive() { ... }
 
 ---
 
-## 5. Creating a Dive
+## 6. Creating a Dive
 
 ### Via SQL
 
@@ -227,8 +252,9 @@ Inside SQL strings, escape single quotes by doubling them (`''`).
 ### Via MCP
 
 1. Call `get_dive_guide` to retrieve the latest authoring reference.
-2. Write the React component code.
-3. Call `save_dive` with the component code and a title.
+2. Iterate on a preview component first using real data as static constants or small subsets.
+3. Convert approved sections to live `useSQLQuery` hooks.
+4. Call `save_dive` with the final component code and a title.
 
 ### Updating
 
@@ -242,9 +268,31 @@ Or use MCP `update_dive` tool.
 
 Use MCP `delete_dive` tool.
 
+### Managing Dives as Code
+
+When the user wants repeatable team development rather than one-off save/update calls:
+
+- keep Dive source in Git
+- develop locally with a hot-reload React workflow
+- use PR previews for review
+- deploy approved changes through CI or a scripted save/update flow
+
+Treat the saved Dive as the deployed artifact, and the repo copy as the source of truth.
+
+### Embedding Dives
+
+Embedded Dives are useful when the user needs a lightweight, read-only live dashboard inside an existing product or website.
+
+- Embedding is currently a Business-plan feature.
+- The embed session must be created on the backend using an admin-level token or service-account-backed flow.
+- Only the short-lived embed session reaches the browser.
+- Embedded Dives are read-only.
+- Sessions expire; do not treat them as permanent credentials.
+- If the product needs stronger app-level auth, richer interactivity, or per-customer backend control, use `build-cfa-app` instead of treating an embedded Dive as the whole architecture.
+
 ---
 
-## 6. Complete Minimal Example
+## 7. Complete Minimal Example
 
 ```tsx
 import { useSQLQuery } from "@motherduck/react-sql-query";
@@ -321,12 +369,15 @@ export default function SalesDashboard() {
 
 ---
 
-## 7. Key Rules
+## 8. Key Rules
 
 - Every Dive MUST have a default export (`export default function ...`).
+- Start with preview iteration and save only after the user approves the rendered component.
 - ALWAYS define and use the `N()` helper for numeric values from queries.
 - ALWAYS format dates in SQL with `strftime()`, never in JavaScript.
 - ALWAYS use fully qualified table names: `"database"."schema"."table"`.
+- Use an explicit theme prompt: feel, colors, typography, chart rules, layout, and interactivity.
+- Start from a named theme or gallery example when visual direction matters.
 - NEVER use Tailwind bracket syntax. Use inline styles for custom values.
 - Keep charts to 1-2 per Dive, 200-280px height.
 - Use tables instead of charts when there are fewer than 8 categories.
@@ -336,28 +387,33 @@ export default function SalesDashboard() {
 
 ---
 
-## 8. Common Mistakes
+## 9. Common Mistakes
 
 - **Forgetting N().** Charts display `NaN` and arithmetic fails silently.
 - **Parsing dates in JavaScript.** Use `strftime()` in SQL, not `new Date()` in JS.
 - **Using `data.rows`.** The hook returns `data` as a flat array. There is no `.rows` property.
+- **Skipping preview iteration.** Save the live-query version only after the layout, hierarchy, and theme are approved.
+- **Vague visual prompts.** Ask for specific feel, palette, typography, and chart behavior instead of generic "make it look good" requests.
 - **Card borders or shadows.** Data floats on the `#f8f8f8` background without containers.
 - **Too many charts.** Limit to 1-2 per Dive. Use `build-dashboard` for more.
 - **Tailwind bracket syntax.** `w-[200px]` does not work. Use inline `style`.
 - **Not guarding `data` with `Array.isArray`.** Calling `.map()` on undefined crashes the Dive.
 - **Unqualified table names.** Causes ambiguity errors with multiple databases attached.
 - **Single full-page loader.** Each query loads independently; show per-section placeholders.
+- **Treating embedded Dives like a full app backend.** Embedded Dives are read-only and session-based; use `build-cfa-app` for stronger serving architecture.
 
 ---
 
-## 9. Workflow Summary
+## 10. Workflow Summary
 
 1. Use `explore` to identify tables and columns.
 2. Use `query` to verify SQL returns expected data.
-3. Write the React component following design rules above.
-4. Create via `MD_CREATE_DIVE` (SQL) or `save_dive` (MCP).
-5. Verify the Dive renders at the returned URL.
-6. Update with `MD_UPDATE_DIVE_CONTENT` or `update_dive` if needed.
+3. Choose a named theme direction and write the preview component against small real-data subsets.
+4. Review and refine the rendered preview.
+5. Convert approved sections to live `useSQLQuery` hooks.
+6. Create via `MD_CREATE_DIVE` (SQL) or `save_dive` (MCP).
+7. Verify the Dive renders at the returned URL.
+8. Update with `MD_UPDATE_DIVE_CONTENT` or `update_dive` if needed.
 
 ---
 

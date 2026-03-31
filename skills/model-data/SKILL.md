@@ -2,15 +2,6 @@
 name: model-data
 description: Design database schemas and data models in MotherDuck. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: workflow
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - duckdb-sql
-    - query
-    - explore
 ---
 
 # Model Data in MotherDuck

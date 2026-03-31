@@ -4,7 +4,7 @@ Use this file for shared Python patterns that should stay consistent across skil
 
 ## Default Choices
 
-- Start with one connection unless concurrency or lifecycle requirements prove otherwise.
+- Start with the simplest connection topology that fits the workload: one connection for serial work, or one root connection with per-thread cursors when several threads need concurrent reads.
 - Prefer native `duckdb` connections when local files, hybrid execution, or Arrow/Parquet workflows matter.
 - Prefer the PG endpoint when the application already assumes PostgreSQL drivers or SQLAlchemy-compatible connections.
 - Prefer batch loading and SQL-driven transforms over row-by-row insert loops.
@@ -104,14 +104,14 @@ conn = duckdb.connect(
 
 ## Threading and Pooling
 
-- A single DuckDB connection runs one query at a time and is a good starting point.
-- A Python DuckDB connection is not thread-safe for concurrent direct use. If multiple threads share a connection, create a thread-local copy with `.cursor()`.
-- For long-lived read-only concurrency, use a pool of read-only connections instead of re-creating a new connection for every query burst.
+- Multiple DuckDB connections are supported. Pick the topology that matches the service lifecycle instead of assuming there can be only one.
+- A single DuckDB connection still executes one query at a time, so it remains the simplest starting point.
+- If several threads need shared access to the same root connection, hand each thread its own `.cursor()` copy instead of issuing concurrent work on the exact same connection object.
+- For long-lived read-heavy concurrency, use a small pool of read-only connections instead of re-creating a connection for every burst.
 
-Minimal thread pattern:
+Shared-root thread pattern:
 
 ```python
-from threading import Thread
 import duckdb
 
 root = duckdb.connect("md:analytics")

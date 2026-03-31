@@ -2,23 +2,5 @@
   "name": "motherduck-skills",
   "version": "1.0.0",
   "description": "Skills for building applications with MotherDuck, the serverless DuckDB-powered data warehouse.",
-  "skills": [
-    "skills/connect",
-    "skills/query",
-    "skills/explore",
-    "skills/duckdb-sql",
-    "skills/load-data",
-    "skills/create-dive",
-    "skills/model-data",
-    "skills/share-data",
-    "skills/ducklake",
-    "skills/security-governance",
-    "skills/pricing-roi",
-    "skills/build-cfa-app",
-    "skills/build-dashboard",
-    "skills/build-data-pipeline",
-    "skills/migrate-to-motherduck",
-    "skills/enable-self-serve-analytics",
-    "skills/partner-delivery"
-  ]
+  "skills": "./skills/"
 }

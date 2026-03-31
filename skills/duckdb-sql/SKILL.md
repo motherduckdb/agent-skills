@@ -2,12 +2,6 @@
 name: duckdb-sql
 description: DuckDB SQL syntax reference for MotherDuck. Use when you need to look up DuckDB-specific syntax, data types, functions, extensions, or resolve SQL errors. Covers friendly SQL, complex types, pre-installed extensions, and MotherDuck-specific SQL.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: utility
-  language_focus: "typescript|javascript|python"
-  depends_on: []
 ---
 
 # DuckDB SQL Reference for MotherDuck

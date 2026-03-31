@@ -1,56 +1,77 @@
 <h1><img src="assets/duck_skills.png" alt="MotherDuck Skills" height="80" align="center" /> MotherDuck Skills for AI Agents</h1>
 
-Opinionated AI agent skills for building applications with [MotherDuck](https://motherduck.com) -- the serverless, DuckDB-powered cloud data warehouse.
+MotherDuck Skills is the public skill catalog for agents building on MotherDuck.
 
-These skills help both users and coding agents make better decisions when working with MotherDuck: how to connect, how to query, how to model data, how to build Dives, and how to ship production patterns like customer-facing analytics and data pipelines.
+It gives coding agents durable, opinionated guidance for the work people actually do on MotherDuck: connecting applications, exploring live data, writing DuckDB SQL, modeling analytics tables, building Dives, and shipping larger end-to-end patterns like customer-facing analytics, dashboards, migrations, and data pipelines.
 
-> This project is public and evolving. MotherDuck, Dives, MCP workflows, and DuckLake continue to improve quickly, so the skills are designed to stay opinionated while still pointing agents toward current product guidance.
+This repo is intentionally agent-oriented:
 
-## Quick Install
+- it assumes the agent may have MotherDuck MCP access
+- it prefers live schema discovery over invented schemas when a server is available
+- it keeps detailed guidance in `references/`
+- it packages runnable use-case artifacts inside the skill folders
+- it now tests those artifacts against temporary real MotherDuck databases, not just local DuckDB
+
+## Install
 
 ```bash
 npx skills add motherduckdb/agent-skills
 ```
 
-## What Are Skills?
+Claude Code plugin install:
 
-Skills are instruction files that AI coding agents use to understand how to work with MotherDuck. When installed, they give your agent durable knowledge of MotherDuck's connection options, SQL dialect, data loading patterns, product surfaces, and application architecture -- so you can go from prompt to production without constantly correcting the model.
-
-Skills follow the open [Agent Skills specification](https://agentskills.io) and work across tools like Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, and other compatible coding agents.
-
-## The Skill Pyramid
-
-MotherDuck Skills are organized in three layers. Higher layers build on lower ones.
-
-```text
-                        USE-CASE
-        ┌──────────────────────────────────────────────┐
-        │  build-cfa-app                              │
-        │  build-dashboard                            │
-        │  build-data-pipeline                        │
-        │  migrate-to-motherduck                      │
-        │  enable-self-serve-analytics                │
-        │  partner-delivery                           │
-        └─────────────────────┬────────────────────────┘
-                              │
-                        WORKFLOW
-  ┌──────────────────┼────────────────────────────────────────────┐
-  │  load-data       │  create-dive                              │
-  │  model-data      │  ducklake                                 │
-  │  share-data      │  security-governance                      │
-  │  pricing-roi     │                                            │
-  └─────────┬────────┴───────────────────────┬────────────────────┘
-            │                                │
-                   UTILITY
-          ┌──────────┼─────────────────┼──────────┐
-          │ connect  │  query          │ duckdb-sql │
-          │          │  explore        │            │
-          └──────────┴─────────────────┴────────────┘
+```bash
+/plugin marketplace add motherduckdb/agent-skills
+/plugin install motherduck-skills@motherduck-agent-skills
 ```
 
-- **Utility** -- Foundational capabilities: connecting, querying, exploring data, and DuckDB SQL.
-- **Workflow** -- Task-specific MotherDuck workflows: loading data, modeling schemas, building Dives, sharing data, and working with DuckLake.
-- **Use-case** -- End-to-end application patterns: customer-facing analytics, dashboards, and data pipelines.
+Codex plugin install:
+
+1. Clone or open this repo in Codex.
+2. Restart Codex if it was already running for the repo.
+3. Open `/plugins`.
+4. Install **MotherDuck Skills** from the repo marketplace.
+
+## What Agents Can Build With This Repo
+
+- connect apps and services to MotherDuck with the right connection path
+- inspect real databases and shape work around the actual schema
+- write and validate DuckDB SQL for analytics workloads
+- model analytics-ready tables and views
+- create, theme, and save Dives
+- build full use cases like dashboards, pipelines, migrations, self-serve analytics, partner delivery, and customer-facing analytics
+
+## How Agents Should Use This Repo
+
+For most real tasks, the right flow is:
+
+1. `connect`
+2. `explore`
+3. `query`
+4. move into the workflow or use-case skill that matches the job
+
+That sequence is deliberate:
+
+- `connect` decides PG endpoint vs native DuckDB vs other paths
+- `explore` establishes the real MotherDuck data model in scope
+- `query` validates the actual SQL shape before higher-level orchestration
+- the higher-level skill should then stay focused on architecture and delivery
+
+When a use-case skill is involved and a remote or local MotherDuck server is active, the agent should not guess the schema:
+
+1. ask which database or workspace is in scope if unclear
+2. inspect databases, schemas, tables, columns, joins, and date fields
+3. let the actual data model drive the architecture, implementation plan, and examples
+
+## Featured Skills
+
+- `connect` -- choose PG endpoint, native DuckDB, `pg_duckdb`, or Wasm
+- `query` -- write and validate DuckDB SQL against MotherDuck
+- `create-dive` -- build, theme, preview, save, and update Dives
+- `build-dashboard` -- compose one coherent multi-section Dive-backed dashboard
+- `build-cfa-app` -- design serious customer-facing analytics with isolation and serving boundaries
+- `build-data-pipeline` -- land, transform, and publish analytics-ready data
+- `migrate-to-motherduck` -- move off legacy warehouses and validate cutover
 
 ## Skills Overview
 
@@ -74,146 +95,116 @@ MotherDuck Skills are organized in three layers. Higher layers build on lower on
 | `enable-self-serve-analytics` | Use-case | Roll out self-serve analytics, sharing, and Dive-backed dashboards for internal teams |
 | `partner-delivery` | Use-case | Deliver repeatable multi-client MotherDuck architectures for consultants and partners |
 
-## How the Skills Work Together
+## Repo Shape
 
-This repo is meant to be used as a system, not just as a list of isolated files.
+Each skill folder can contain:
 
-- `connect`, `query`, `explore`, and `duckdb-sql` form the foundation for everything else.
-- `create-dive` builds on exploration and query work rather than replacing it.
-- `build-dashboard` composes exploration, query design, and Dive creation into one workflow.
-- `build-cfa-app` combines connection, modeling, and serving patterns for product teams embedding analytics into their apps.
-- `build-data-pipeline` ties together ingestion, transformation, and publishing decisions.
-- `migrate-to-motherduck` is the migration-specific orchestration layer for platform teams moving from existing warehouses or PostgreSQL estates.
-- `enable-self-serve-analytics` is the rollout layer for analytics leads who need governed access, fast adoption, and shareable Dives.
-- `partner-delivery` packages the repeatable patterns consultants need for multi-client delivery, isolation, and regional deployment choices.
+- `SKILL.md` -- the concise router the agent should load first
+- `references/` -- preserved detailed guidance and playbooks
+- `artifacts/` -- runnable local examples or helpers
 
-The general flow for most agents is:
+Some use-case skills also ship a fuller runnable reference project under `references/` when the local artifact is intentionally smaller than the real workflow.
 
-1. connect
-2. explore
-3. query
-4. switch to the workflow or use-case skill that matches the job
+The machine-readable index lives at:
 
-## Installation
+- `skills/catalog.json`
 
-### Local Install
+That catalog tracks:
 
-Install the skills into the current project:
+- skill names and descriptions
+- layer and dependencies
+- reference files
+- runnable artifacts
+- source docs
+- whether a use-case should begin with live MotherDuck discovery
 
-```bash
-npx skills add motherduckdb/agent-skills --skill '*'
-```
+## Runnable Use-Case Artifacts
 
-### Global Install
-
-Install once for all projects:
+These are local-first examples packaged with the skills:
 
 ```bash
-npx skills add motherduckdb/agent-skills --skill '*' --global
+uv run --with duckdb python skills/build-cfa-app/artifacts/customer_routing_example.py
+uv run --with duckdb python skills/build-dashboard/artifacts/dashboard_story_example.py
+uv run --with duckdb python skills/build-data-pipeline/artifacts/pipeline_stage_example.py
+uv run --with duckdb python skills/migrate-to-motherduck/artifacts/migration_validation_example.py
+uv run --with duckdb python skills/enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
+uv run --with duckdb python skills/partner-delivery/artifacts/client_delivery_example.py
 ```
 
-### Claude Code Plugin
+They are not meant to replace production code. They are small runnable patterns that help an agent move from plan to implementation faster.
 
-Install directly as a Claude Code plugin:
+To run the whole artifact suite against temporary real MotherDuck databases with your token:
 
 ```bash
-/plugin marketplace add motherduckdb/agent-skills
+uv run scripts/test_motherduck_artifacts.py
 ```
 
-### Install a Single Skill
+That suite:
+
+- runs all six use-case artifacts against temporary MotherDuck databases
+- runs the full `dlt + dbt + MotherDuck` reference pipeline
+- drops the temporary databases afterward
+
+For a fuller MotherDuck pipeline example, `build-data-pipeline` also includes:
 
 ```bash
-npx skills add motherduckdb/agent-skills --skill connect
+cd skills/build-data-pipeline/references/dlt-dbt-motherduck-project
+export MOTHERDUCK_TOKEN=...
+export MOTHERDUCK_PIPELINE_DB=md_skills_pipeline_demo
+uv sync --python 3.12
+uv run python pipeline/run_all.py
+uv run python pipeline/cleanup.py
 ```
 
-### Manual
+## Why This Repo Is Opinionated
+
+These skills are not a neutral encyclopedia.
+
+They preserve a few strong defaults:
+
+- DuckDB SQL, not PostgreSQL SQL
+- fully qualified table names
+- PG endpoint for thin-client interoperability paths
+- native DuckDB APIs when local files or hybrid execution matter
+- Parquet over CSV when the format is under our control
+- native MotherDuck storage unless DuckLake is explicitly required
+- structural isolation over query-time tenant filtering for serious customer-facing analytics
+- MCP-first exploration and Dive workflows when MotherDuck MCP is available
+
+## Authoring and Sync
+
+If you are editing the repo itself:
+
+- `docs/skill-authoring.md` -- how skills should be structured here
+- `docs/skills-sync.md` -- how product docs, skills, references, and artifacts should stay aligned
+
+## Validation
 
 ```bash
-git clone https://github.com/motherduckdb/agent-skills.git
+uv run scripts/validate_skills.py
+uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+uv run scripts/test_motherduck_artifacts.py
 ```
-
-## Getting Started
-
-1. Create a [MotherDuck account](https://motherduck.com) (free tier available).
-2. Create an access token: **Settings > Access Tokens**.
-3. Set the environment variable:
-   ```bash
-   export MOTHERDUCK_TOKEN=<your_token>
-   ```
-4. Install the skills.
-5. Ask your AI agent something concrete.
-
-Examples:
-
-```text
-Connect to MotherDuck and show me what databases are available.
-```
-
-```text
-Explore my analytics database, then create a Dive showing weekly revenue trends.
-```
-
-```text
-I want to build customer-facing analytics for my SaaS product. Which MotherDuck architecture should I start with?
-```
-
-## Prerequisites
-
-- A MotherDuck account ([sign up free](https://motherduck.com))
-- A MotherDuck access token
-- An AI coding agent that supports the [Agent Skills specification](https://agentskills.io)
-
-## Compatible AI Tools
-
-These skills work with any AI coding agent that supports the Agent Skills spec, including:
-
-- **Claude Code**
-- **Codex**
-- **Cursor**
-- **GitHub Copilot**
-- **Gemini CLI**
-- **Windsurf**
-- **Junie**
-- **Kiro**
-- **Goose**
-- **Roo Code**
-- **OpenCode**
-- And many others via the Agent Skills ecosystem
-
-## Opinionated By Design
-
-These skills are intentionally opinionated. They encode practical defaults drawn from real MotherDuck usage so your AI agent does not have to guess.
-
-- **The Postgres endpoint is the practical default for many applications.** It works with common PostgreSQL drivers and is especially useful for thin-client, serverless, and interoperability-heavy environments. The `connect` skill also teaches when native DuckDB, `pg_duckdb`, or Wasm are better fits.
-- **DuckDB SQL for all queries, not PostgreSQL SQL.** MotherDuck runs DuckDB -- the skills teach the correct dialect and the DuckDB features that matter most in practice.
-- **Parquet over CSV** when you control the format.
-- **Wide analytical tables over unnecessary normalization** for common analytics and dashboard workloads.
-- **3-tier architecture for serious customer-facing analytics** with stronger isolation and cleaner scaling paths.
-- **MCP-first workflows for exploration and Dives** when an agent has MotherDuck MCP access.
-- **DuckLake is supported, but not assumed.** It belongs in the catalog, but native MotherDuck storage remains the simpler default for most projects.
 
 ## Contributing
 
-Contributions are welcome. Whether you are fixing a typo, improving an existing skill, or proposing a new one, we appreciate the help.
+Contributions are welcome.
 
 1. Fork the repository.
-2. Create a feature branch: `git checkout -b my-skill-improvement`.
-3. Make your changes and ensure they follow the existing skill structure.
-4. Run `uv run scripts/validate_skills.py`.
-5. Submit a pull request with a clear description of what changed and why.
-
-Please open an issue first if you are planning a large change -- it helps us coordinate and provide early feedback.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+2. Create a branch.
+3. Make the skill, reference, artifact, or catalog change.
+4. Run the validators.
+5. Open a PR with a clear explanation of what changed and why.
 
 ## Links
 
 - [MotherDuck Documentation](https://motherduck.com/docs/)
-- [MotherDuck Getting Started](https://motherduck.com/docs/getting-started/)
-- [MotherDuck Examples](https://github.com/motherduckdb/motherduck-examples)
+- [MotherDuck MCP Server](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-setup/)
+- [MotherDuck Dive Gallery](https://motherduck.com/dive-gallery/)
 - [DuckDB Documentation](https://duckdb.org/docs/)
 - [DuckLake](https://ducklake.select/)
 - [Agent Skills Specification](https://agentskills.io)
-- [MotherDuck MCP Server](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-setup/)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

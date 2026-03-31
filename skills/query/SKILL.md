@@ -2,12 +2,6 @@
 name: query
 description: Execute DuckDB SQL queries against MotherDuck databases. Use when running analytics, aggregations, transformations, or any SQL operation. Covers query best practices, CTEs, window functions, QUALIFY, and performance optimization.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: utility
-  language_focus: "sql|typescript|javascript|python"
-  depends_on: []
 ---
 
 # Query MotherDuck
@@ -44,6 +38,7 @@ For reusable language patterns, see `references/typescript.md` and `references/p
 - Prefer curated tables, views, or pre-aggregated summary tables for repeated dashboards and app-serving queries.
 - Use `LIMIT` or aggregates during exploration; do not scan wide raw tables blindly when a smaller preview will answer the question.
 - Tag long-lived integrations with `custom_user_agent` so query history can attribute cost and workload shape later.
+- When validating multi-database patterns in the native DuckDB API, use a workspace connection (`md:`) and fully qualified `database.schema.table` names.
 
 ## TypeScript/Javascript Starter
 

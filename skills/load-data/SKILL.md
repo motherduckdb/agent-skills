@@ -2,15 +2,6 @@
 name: load-data
 description: Load and ingest data into MotherDuck from files, cloud storage, HTTP, or other databases. Use when importing CSV, Parquet, JSON, Excel files or setting up data ingestion from S3, GCS, Azure, or external sources.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: workflow
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - connect
-    - query
-    - explore
 ---
 
 # Load Data into MotherDuck
@@ -106,6 +97,8 @@ Use these defaults unless the workload proves they are wrong:
 3. Batch API or event ingestion in memory or queues before writing.
 4. Validate row counts and core aggregates immediately after each load.
 5. Move into curated staging or analytics tables only after the raw landing succeeds.
+
+If the ingestion tool expects an existing MotherDuck database, bootstrap that database first instead of assuming the destination adapter will create it for you.
 
 ---
 

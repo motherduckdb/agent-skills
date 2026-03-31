@@ -2,15 +2,6 @@
 name: share-data
 description: Create and manage MotherDuck data shares for zero-copy data distribution. Use when sharing databases with team members, other organizations, or making data publicly available.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: workflow
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - connect
-    - explore
-    - query
 ---
 
 # Share Data with MotherDuck

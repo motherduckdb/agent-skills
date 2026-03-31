@@ -1,10 +1,36 @@
 {
-  "name": "motherduck-skills",
-  "display_name": "MotherDuck Skills",
-  "description": "Opinionated app-builder skills for connecting to MotherDuck, shipping Dives, pipelines, CFA apps, and DuckLake-backed workflows.",
-  "author": "motherduck",
-  "repository": "https://github.com/motherduckdb/agent-skills",
-  "homepage": "https://motherduck.com",
-  "tags": ["motherduck", "duckdb", "data-warehouse", "analytics", "sql", "postgres", "dives", "ducklake", "mcp"],
-  "license": "MIT"
+  "name": "motherduck-agent-skills",
+  "owner": {
+    "name": "MotherDuck"
+  },
+  "metadata": {
+    "description": "Opinionated app-builder skills for connecting to MotherDuck, shipping Dives, pipelines, CFA apps, and DuckLake-backed workflows.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "motherduck-skills",
+      "source": "./",
+      "description": "Skills for building applications with MotherDuck, the serverless DuckDB-powered data warehouse.",
+      "version": "1.0.0",
+      "author": {
+        "name": "MotherDuck"
+      },
+      "homepage": "https://motherduck.com",
+      "repository": "https://github.com/motherduckdb/agent-skills",
+      "license": "MIT",
+      "category": "Productivity",
+      "tags": [
+        "motherduck",
+        "duckdb",
+        "data-warehouse",
+        "analytics",
+        "sql",
+        "postgres",
+        "dives",
+        "ducklake",
+        "mcp"
+      ]
+    }
+  ]
 }

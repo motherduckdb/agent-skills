@@ -2,12 +2,6 @@
 name: explore
 description: Discover and explore databases, tables, columns, and data shares in MotherDuck. Use when you need to understand what data is available, preview table contents, or search the data catalog.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: utility
-  language_focus: "typescript|javascript|python"
-  depends_on: []
 ---
 
 # Explore MotherDuck Data
@@ -60,7 +54,7 @@ await client.end();
 ```python
 import duckdb
 
-conn = duckdb.connect("md:analytics")
+conn = duckdb.connect("md:")
 databases = conn.sql("SELECT alias, type FROM MD_ALL_DATABASES()").fetchall()
 columns = conn.sql("""
     SELECT column_name, data_type, comment
@@ -180,6 +174,8 @@ FROM "my_database"."main"."my_table" LIMIT 10;
 ```
 
 Always use fully qualified table names (`database.schema.table`) to avoid ambiguity when multiple databases are attached.
+
+When you are exploring several MotherDuck databases in one session, prefer a workspace connection (`md:`) instead of reconnecting once per database.
 
 ---
 

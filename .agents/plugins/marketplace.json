@@ -1,0 +1,20 @@
+{
+  "name": "motherduck-agent-skills",
+  "interface": {
+    "displayName": "MotherDuck Skills"
+  },
+  "plugins": [
+    {
+      "name": "motherduck-skills",
+      "source": {
+        "source": "local",
+        "path": "./plugins/motherduck-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

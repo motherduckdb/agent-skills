@@ -4,6 +4,17 @@ Detailed architecture patterns, complete code examples, and scaling playbook for
 
 ---
 
+## Choose the Connection Posture First
+
+There are two valid backend shapes for customer-facing analytics on MotherDuck:
+
+- **Thin-client / backend API**: the browser talks to your backend, and the backend talks to MotherDuck through the PG endpoint. This is the practical default for most product teams because it fits existing API stacks, auth middleware, and connection-pooling patterns.
+- **Native DuckDB backend**: the backend already runs on `duckdb` or `@duckdb/node-api`, and uses MotherDuck through the native API. Use this when the service also needs local files, hybrid local/cloud execution, or direct DuckDB control.
+
+This reference leads with the thin-client 3-tier pattern because it is the most common multi-tenant production shape. Keep the native backend path in play when the application is already DuckDB-native.
+
+---
+
 ## 3-Tier Architecture Diagram
 
 ```

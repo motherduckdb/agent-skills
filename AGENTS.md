@@ -1,82 +1,105 @@
-# MotherDuck Skills -- Agent Context
+# MotherDuck Skills -- Agent Guide
 
-## What MotherDuck Is
+This repo publishes public MotherDuck skills for AI coding agents.
 
-MotherDuck is a serverless cloud data warehouse built on DuckDB.
+Optimize for:
 
-Agents working in this repo should optimize for app builders using MotherDuck through one of four paths:
+- clear, opinionated MotherDuck guidance
+- low-drift docs and manifests
+- runnable examples that reflect real MotherDuck behavior
+- small, mechanical changes over broad prose rewrites
 
-- Postgres endpoint for thin clients and broad driver compatibility
-- native DuckDB API for local execution and hybrid queries
-- pg_duckdb when extending an existing PostgreSQL estate
-- DuckDB-Wasm for deliberate browser-side analytics
+## Repo Shape
 
-## Non-Negotiable Rules
+The catalog is a 3-layer graph:
 
-- Always write **DuckDB SQL**, not PostgreSQL SQL.
+- `utility`: `connect`, `query`, `explore`, `duckdb-sql`
+- `workflow`: `load-data`, `model-data`, `share-data`, `create-dive`, `ducklake`, `security-governance`, `pricing-roi`
+- `use-case`: `build-cfa-app`, `build-dashboard`, `build-data-pipeline`, `migrate-to-motherduck`, `enable-self-serve-analytics`, `partner-delivery`
+
+Primary source-of-truth files:
+
+- `skills/*/SKILL.md`: actual skill content and frontmatter
+- `skills/catalog.json`: machine-readable skill index and source-doc map
+- `README.md`: public catalog and install docs
+- `ARCHITECTURE.md`: invariants and dependency rules
+- `docs/skill-authoring.md`: repo-specific authoring guidance
+- `docs/skills-sync.md`: docs-to-skills drift workflow
+- `CLAUDE.md`: Claude-facing catalog/context
+- `.claude-plugin/plugin.json`: Claude plugin manifest
+- `.codex-plugin/plugin.json`: Codex plugin manifest
+- `.agents/plugins/marketplace.json`: repo-local Codex marketplace wiring
+
+Important supporting surfaces:
+
+- `skills/*/references/`: preserved deep guidance and fuller runnable reference projects
+- `skills/*/artifacts/`: small runnable examples, now expected to support local-first and MotherDuck-backed validation where appropriate
+- `scripts/test_motherduck_artifacts.py`: end-to-end MotherDuck-backed artifact test runner
+
+## Non-Negotiable Content Rules
+
+- Always write DuckDB SQL, not PostgreSQL SQL.
 - Prefer fully qualified table names: `"database"."schema"."table"`.
-- Never hardcode access tokens; use `MOTHERDUCK_TOKEN`.
-- Never assume runtime extension installation is available.
-- Treat DuckLake as opt-in, not the default storage path.
+- Never hardcode tokens; use `MOTHERDUCK_TOKEN` or the documented read-scaling variants.
+- Never imply runtime extension installation is generally available.
+- Treat DuckLake as opt-in, not the default storage posture.
+- Keep related-skill guidance in prose sections like `Related Skills`; do not invent repo-specific frontmatter fields for it.
 
-## Connection Guidance
+## Product Defaults to Preserve
 
-Pick the connection path by scenario:
+- Lead with the Postgres endpoint for thin-client and PostgreSQL-driver interoperability.
+- Keep native DuckDB APIs in the guidance when local files, hybrid execution, or direct DuckDB control matter.
+- Prefer MCP-assisted exploration when MotherDuck MCP is available.
+- For use-case skills, if a remote or local MotherDuck server is active, start from the user's real database/schema instead of inventing one.
+- Prefer a native `md:` workspace connection for multi-database exploration, bootstrap flows, and temporary validation environments.
+- Call `get_dive_guide` before save/update Dive flows when MCP is available.
+- Prefer Parquet over CSV when the format is under our control.
+- Prefer structural isolation over query-time tenant filtering for serious customer-facing analytics.
 
-- Use the **Postgres endpoint** when the environment already speaks PostgreSQL wire protocol or cannot run DuckDB directly.
-- Use the **native DuckDB API** when you need local file access, hybrid local/cloud execution, or richer DuckDB control.
-- Use **pg_duckdb** when the app already has PostgreSQL and wants MotherDuck as an analytical extension.
-- Use **Wasm** only for explicit browser-side analytics designs.
+## Editing Rules
 
-Postgres endpoint quick shape:
+- Keep changes targeted. This repo is mostly documentation and manifests; broad rewrites create drift.
+- When updating one catalog surface, check the others in the same pass.
+- Prefer deduplicating repeated guidance by pointing to the owning skill instead of copying blocks between skills.
+- If you shrink a skill, move preserved detail into `references/`; do not silently delete useful content.
+- If a change affects real MotherDuck behavior, update the runnable artifact or reference project, not just the prose.
+- Preserve the layer graph:
+  - utility skills cannot depend on other skills
+  - workflow skills can depend only on utility skills
+  - use-case skills can depend only on utility and workflow skills
 
-```text
-postgresql://postgres:<MOTHERDUCK_TOKEN>@<pg-endpoint-host>:5432/<database>?sslmode=verify-full&sslrootcert=system
+## Required Checks
+
+Run these when changing skills, catalogs, or manifests:
+
+```bash
+uv run scripts/validate_skills.py
 ```
 
-Use the documented regional hostname for the target organization, for example `pg.us-east-1-aws.motherduck.com` or `pg.eu-central-1-aws.motherduck.com`. SSL is required.
+Run this when editing markdown examples or code fences:
 
-## Product-Level Defaults
+```bash
+uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+```
 
-- Prefer MCP-assisted exploration when an agent has MotherDuck MCP access.
-- Prefer `get_dive_guide` before saving or updating Dives.
-- Prefer Parquet when choosing file formats.
-- Prefer comments on analytical tables and columns.
-- Prefer structural isolation over query-time tenant filtering for serious B2B CFA.
-- Prefer native MotherDuck storage unless DuckLake requirements are explicit.
+Run this when changing artifact behavior, reference projects, or any guidance that claims to be validated against real MotherDuck:
 
-## Skill Catalog
+```bash
+uv run scripts/test_motherduck_artifacts.py
+```
 
-### Utility
+## Common Drift Traps
 
-- `connect`: choose and configure a connection path
-- `query`: structure and optimize DuckDB SQL for MotherDuck
-- `explore`: discover databases, schemas, tables, columns, views, and shares
-- `duckdb-sql`: DuckDB SQL reference and MotherDuck-specific constraints
+- `README.md`, `CLAUDE.md`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.agents/plugins/marketplace.json` falling out of sync with `skills/`
+- `skills/catalog.json` no longer matching the actual `references/` and `artifacts/` paths
+- `build-dashboard` reintroducing duplicated `create-dive` mechanics
+- accidental PostgreSQL-specific claims in SQL examples
+- artifacts drifting into local-only behavior when the repo now claims MotherDuck-backed validation
+- overcommitting to a single connection path when the guidance should stay scenario-based
 
-### Workflow
+## When Unsure
 
-- `load-data`: ingest data from files, cloud storage, and upstream systems
-- `model-data`: design analytics-ready schemas and tables
-- `share-data`: distribute data with shares and share Dive data safely
-- `create-dive`: build, theme, preview, save, and update Dives
-- `ducklake`: use DuckLake when open-table-format storage is actually warranted
-- `security-governance`: answer residency, access control, and governance questions
-- `pricing-roi`: frame pricing, workload cost, and ROI tradeoffs
-
-### Use-case
-
-- `build-cfa-app`: build customer-facing analytics products on MotherDuck
-- `build-dashboard`: create a coherent Dive-backed analytics dashboard
-- `build-data-pipeline`: build ingestion-to-serving workflows on MotherDuck
-- `migrate-to-motherduck`: plan and sequence warehouse or Postgres migrations
-- `enable-self-serve-analytics`: roll out governed self-serve analytics for internal teams
-- `partner-delivery`: package repeatable multi-client delivery patterns for partners
-
-## Layering Rule
-
-- Utility skills do not require other skills.
-- Workflow skills depend only on utility skills.
-- Use-case skills depend only on utility and workflow skills.
-
-If a change violates this, fix the graph instead of explaining it away in prose.
+- Check `README.md` for the public story.
+- Check `ARCHITECTURE.md` for repo invariants.
+- Prefer the simpler, more maintainable wording.
+- If two skills overlap, keep the shared mechanics in the lower-level skill and let the higher-level skill focus on orchestration.

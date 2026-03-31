@@ -2,16 +2,6 @@
 name: security-governance
 description: Explain MotherDuck security, governance, and access-control patterns. Use when a security_compliance_owner, technical_owner, or application_builder is asking about residency, access boundaries, service accounts, isolation, sharing, or governance posture.
 license: MIT
-metadata:
-  author: motherduck
-  version: "1.0"
-  layer: workflow
-  surface: security_and_governance
-  answer_style: "crisp-controls, evidence-oriented, low-noise"
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - connect
-    - explore
 ---
 
 # Security and Governance

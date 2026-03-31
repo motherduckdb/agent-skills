@@ -13,8 +13,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
+SKILL_CATALOG = SKILLS_DIR / "catalog.json"
 README = ROOT / "README.md"
-PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
+CLAUDE_CONTEXT = ROOT / "CLAUDE.md"
+CLAUDE_PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
+CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
+CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
 
@@ -34,72 +38,113 @@ def parse_frontmatter(path: Path) -> dict[str, object]:
 
     frontmatter = text[4:end].splitlines()
 
-    name = None
-    description = None
-    metadata: dict[str, object] = {}
-    in_metadata = False
-    in_depends_on = False
-    depends_on: list[str] = []
+    data: dict[str, object] = {}
+    allowed_keys = {"name", "description", "license"}
 
     for raw_line in frontmatter:
         if not raw_line.strip():
             continue
 
-        if raw_line.startswith("metadata:"):
-            in_metadata = True
-            in_depends_on = False
-            continue
+        if raw_line.startswith("  "):
+            raise ValidationError(f"{path}: nested frontmatter is not supported; move repo-only metadata elsewhere")
 
-        if not raw_line.startswith("  "):
-            in_metadata = False
-            in_depends_on = False
-            key, _, value = raw_line.partition(":")
-            value = value.strip()
-            if key == "name":
-                name = value
-            elif key == "description":
-                description = value
-            continue
+        key, _, value = raw_line.partition(":")
+        key = key.strip()
+        value = value.strip()
+        if key not in allowed_keys:
+            raise ValidationError(
+                f"{path}: unsupported frontmatter key {key!r}; keep SKILL.md frontmatter portable"
+            )
+        data[key] = value
 
-        if not in_metadata:
-            continue
-
-        if raw_line.startswith("  depends_on:"):
-            in_depends_on = True
-            inline = raw_line.split(":", 1)[1].strip()
-            if inline == "[]":
-                depends_on = []
-                in_depends_on = False
-            metadata["depends_on"] = depends_on
-            continue
-
-        if in_depends_on:
-            match = re.match(r"^\s*-\s+([a-z0-9-]+)\s*$", raw_line)
-            if not match:
-                raise ValidationError(f"{path}: invalid depends_on entry: {raw_line!r}")
-            depends_on.append(match.group(1))
-            continue
-
-        key, _, value = raw_line.strip().partition(":")
-        metadata[key] = value.strip().strip('"')
-
-    if not name:
+    if "name" not in data:
         raise ValidationError(f"{path}: missing name")
-    if not description:
+    if "description" not in data:
         raise ValidationError(f"{path}: missing description")
-    if "layer" not in metadata:
-        raise ValidationError(f"{path}: missing metadata.layer")
-    if "depends_on" not in metadata:
-        raise ValidationError(f"{path}: missing metadata.depends_on")
-
-    return {
-        "name": name,
-        "description": description,
-        "metadata": metadata,
-    }
+    return data
 
 
-def read_catalog_skills() -> list[str]:
+def read_skill_catalog() -> dict[str, dict[str, object]]:
+    if not SKILL_CATALOG.exists():
+        raise ValidationError(f"Missing required skill catalog: {SKILL_CATALOG}")
+
+    payload = json.loads(SKILL_CATALOG.read_text())
+    if not isinstance(payload, dict) or not payload:
+        raise ValidationError(f"{SKILL_CATALOG}: expected a non-empty object")
+
+    catalog: dict[str, dict[str, object]] = {}
+    for skill_name, entry in payload.items():
+        if not isinstance(entry, dict):
+            raise ValidationError(f"{SKILL_CATALOG}: entry for {skill_name!r} must be an object")
+        name = entry.get("name")
+        description = entry.get("description")
+        layer = entry.get("layer")
+        depends_on = entry.get("depends_on")
+        references = entry.get("references")
+        artifacts = entry.get("artifacts")
+        source_docs = entry.get("source_docs")
+        needs_live_discovery = entry.get("needs_live_discovery")
+        if name != skill_name:
+            raise ValidationError(
+                f"{SKILL_CATALOG}: entry name mismatch for {skill_name!r}: {name!r}"
+            )
+        if not isinstance(description, str) or not description.strip():
+            raise ValidationError(f"{SKILL_CATALOG}: description for {skill_name!r} must be a non-empty string")
+        if layer not in LAYERS:
+            raise ValidationError(f"{SKILL_CATALOG}: invalid layer for {skill_name!r}: {layer!r}")
+        if not isinstance(depends_on, list) or not all(isinstance(dep, str) for dep in depends_on):
+            raise ValidationError(f"{SKILL_CATALOG}: depends_on for {skill_name!r} must be a list of strings")
+        if not isinstance(references, list) or not all(isinstance(path, str) for path in references):
+            raise ValidationError(f"{SKILL_CATALOG}: references for {skill_name!r} must be a list of strings")
+        if not isinstance(artifacts, list) or not all(isinstance(path, str) for path in artifacts):
+            raise ValidationError(f"{SKILL_CATALOG}: artifacts for {skill_name!r} must be a list of strings")
+        if not isinstance(source_docs, list) or not all(isinstance(url, str) for url in source_docs):
+            raise ValidationError(f"{SKILL_CATALOG}: source_docs for {skill_name!r} must be a list of strings")
+        if not isinstance(needs_live_discovery, bool):
+            raise ValidationError(
+                f"{SKILL_CATALOG}: needs_live_discovery for {skill_name!r} must be a boolean"
+            )
+        catalog[skill_name] = {
+            "description": description,
+            "layer": layer,
+            "depends_on": depends_on,
+            "references": references,
+            "artifacts": artifacts,
+            "source_docs": source_docs,
+            "needs_live_discovery": needs_live_discovery,
+        }
+
+    return catalog
+
+
+def validate_skill_paths(skill_name: str, path_strings: list[str], field_name: str) -> None:
+    skill_root = SKILLS_DIR / skill_name
+    for relative_path in path_strings:
+        candidate = skill_root / relative_path
+        if not candidate.exists():
+            raise ValidationError(
+                f"{SKILL_CATALOG}: {field_name} entry for {skill_name!r} does not exist: {relative_path}"
+            )
+
+
+def validate_live_discovery_language(skill_name: str, text: str) -> None:
+    required_heading = "## Start Here: Is a MotherDuck Server Active?"
+    required_phrases = [
+        "remote MotherDuck MCP server",
+        "local MotherDuck server",
+    ]
+    if required_heading not in text:
+        raise ValidationError(
+            f"{skill_name}: skills with needs_live_discovery=true must include the '{required_heading}' section"
+        )
+    for phrase in required_phrases:
+        if phrase not in text:
+            raise ValidationError(
+                f"{skill_name}: live-discovery skill is missing required phrase {phrase!r}"
+            )
+
+
+def read_readme_catalog_skills() -> list[str]:
     text = README.read_text()
     found = re.findall(r"^\| `([a-z0-9-]+)` \| (?:Utility|Workflow|Use-case) \|", text, re.MULTILINE)
     if not found:
@@ -107,9 +152,156 @@ def read_catalog_skills() -> list[str]:
     return found
 
 
-def read_plugin_skills() -> list[str]:
-    payload = json.loads(PLUGIN.read_text())
-    return [entry.removeprefix("skills/") for entry in payload["skills"]]
+def read_claude_context_skills() -> list[str]:
+    text = CLAUDE_CONTEXT.read_text()
+    found = re.findall(r"^\| ([a-z0-9-]+) \| `\/[a-z0-9-]+` \|", text, re.MULTILINE)
+    if not found:
+        raise ValidationError("CLAUDE.md: could not parse skill catalog table")
+    return found
+
+
+def validate_claude_plugin() -> str:
+    payload = json.loads(CLAUDE_PLUGIN.read_text())
+    plugin_name = payload.get("name")
+    if not plugin_name:
+        raise ValidationError(f"{CLAUDE_PLUGIN}: missing name")
+
+    skills_path = payload.get("skills")
+    if skills_path != "./skills/":
+        raise ValidationError(f"{CLAUDE_PLUGIN}: expected skills to be './skills/', found {skills_path!r}")
+
+    resolved_skills_dir = (ROOT / skills_path).resolve()
+    if resolved_skills_dir != SKILLS_DIR.resolve():
+        raise ValidationError(
+            f"{CLAUDE_PLUGIN}: skills path does not resolve to repo skills directory: {resolved_skills_dir}"
+        )
+
+    return plugin_name
+
+
+def validate_claude_marketplace(expected_plugin_name: str) -> None:
+    marketplace_path = ROOT / ".claude-plugin" / "marketplace.json"
+    if not marketplace_path.exists():
+        raise ValidationError(f"Missing required Claude marketplace manifest: {marketplace_path}")
+
+    payload = json.loads(marketplace_path.read_text())
+    if not payload.get("name"):
+        raise ValidationError(f"{marketplace_path}: missing name")
+
+    owner = payload.get("owner")
+    if not isinstance(owner, dict) or not owner.get("name"):
+        raise ValidationError(f"{marketplace_path}: owner.name is required")
+
+    plugins = payload.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        raise ValidationError(f"{marketplace_path}: plugins must be a non-empty list")
+
+    entry = next((plugin for plugin in plugins if plugin.get("name") == expected_plugin_name), None)
+    if entry is None:
+        raise ValidationError(f"{marketplace_path}: missing plugin entry for {expected_plugin_name!r}")
+
+    source = entry.get("source")
+    if not isinstance(source, str) or not source.startswith("./"):
+        raise ValidationError(f"{marketplace_path}: plugin source must be a relative path starting with './'")
+
+    marketplace_root = marketplace_path.parents[1]
+    resolved_plugin_root = (marketplace_root / source).resolve()
+    if resolved_plugin_root != ROOT.resolve():
+        raise ValidationError(
+            f"{marketplace_path}: plugin source must resolve to repo root, found {resolved_plugin_root}"
+        )
+    if not (resolved_plugin_root / ".claude-plugin" / "plugin.json").exists():
+        raise ValidationError(
+            f"{marketplace_path}: plugin source does not point at a valid Claude plugin root"
+        )
+
+
+def validate_codex_plugin(skills: list[str]) -> str:
+    if not CODEX_PLUGIN.exists():
+        raise ValidationError(f"Missing required Codex plugin manifest: {CODEX_PLUGIN}")
+
+    payload = json.loads(CODEX_PLUGIN.read_text())
+    plugin_name = payload.get("name")
+    if not plugin_name:
+        raise ValidationError(f"{CODEX_PLUGIN}: missing name")
+    if not payload.get("version"):
+        raise ValidationError(f"{CODEX_PLUGIN}: missing version")
+    if not payload.get("description"):
+        raise ValidationError(f"{CODEX_PLUGIN}: missing description")
+
+    skills_path = payload.get("skills")
+    if skills_path != "./skills/":
+        raise ValidationError(f"{CODEX_PLUGIN}: expected skills to be './skills/', found {skills_path!r}")
+
+    resolved_skills_dir = (ROOT / skills_path).resolve()
+    if resolved_skills_dir != SKILLS_DIR.resolve():
+        raise ValidationError(
+            f"{CODEX_PLUGIN}: skills path does not resolve to repo skills directory: {resolved_skills_dir}"
+        )
+
+    interface = payload.get("interface")
+    if not isinstance(interface, dict) or not interface.get("displayName"):
+        raise ValidationError(f"{CODEX_PLUGIN}: missing interface.displayName")
+
+    codex_skills = sorted(p.parent.name for p in resolved_skills_dir.glob("*/SKILL.md"))
+    if codex_skills != skills:
+        raise ValidationError(
+            f"{CODEX_PLUGIN}: skills directory mismatch\nexpected: {skills}\nfound:    {codex_skills}"
+        )
+
+    return plugin_name
+
+
+def validate_codex_marketplace(expected_plugin_name: str) -> None:
+    if not CODEX_MARKETPLACE.exists():
+        raise ValidationError(f"Missing required Codex marketplace: {CODEX_MARKETPLACE}")
+
+    payload = json.loads(CODEX_MARKETPLACE.read_text())
+    if not payload.get("name"):
+        raise ValidationError(f"{CODEX_MARKETPLACE}: missing top-level name")
+
+    interface = payload.get("interface")
+    if not isinstance(interface, dict) or not interface.get("displayName"):
+        raise ValidationError(f"{CODEX_MARKETPLACE}: missing interface.displayName")
+
+    plugins = payload.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        raise ValidationError(f"{CODEX_MARKETPLACE}: plugins must be a non-empty list")
+
+    entry = next((plugin for plugin in plugins if plugin.get("name") == expected_plugin_name), None)
+    if entry is None:
+        raise ValidationError(f"{CODEX_MARKETPLACE}: missing plugin entry for {expected_plugin_name!r}")
+
+    source = entry.get("source")
+    if not isinstance(source, dict) or source.get("source") != "local":
+        raise ValidationError(f"{CODEX_MARKETPLACE}: plugin source must be local")
+
+    source_path = source.get("path")
+    if not isinstance(source_path, str) or not source_path.startswith("./"):
+        raise ValidationError(f"{CODEX_MARKETPLACE}: source.path must start with './'")
+
+    marketplace_root = CODEX_MARKETPLACE.parents[2]
+    resolved_plugin_root = (marketplace_root / source_path).resolve()
+    if resolved_plugin_root == marketplace_root.resolve():
+        raise ValidationError(
+            f"{CODEX_MARKETPLACE}: source.path must point to a plugin subdirectory, not the marketplace root"
+        )
+    if resolved_plugin_root != ROOT.resolve():
+        expected_plugin_root = ROOT / "plugins" / expected_plugin_name
+        if resolved_plugin_root != expected_plugin_root.resolve():
+            raise ValidationError(
+                f"{CODEX_MARKETPLACE}: source.path must resolve to {expected_plugin_root}, found {resolved_plugin_root}"
+            )
+    if not (resolved_plugin_root / ".codex-plugin" / "plugin.json").exists():
+        raise ValidationError(f"{CODEX_MARKETPLACE}: source.path does not point at a valid Codex plugin root")
+
+    policy = entry.get("policy")
+    if not isinstance(policy, dict):
+        raise ValidationError(f"{CODEX_MARKETPLACE}: plugin policy is required")
+    if "installation" not in policy or "authentication" not in policy:
+        raise ValidationError(f"{CODEX_MARKETPLACE}: policy.installation and policy.authentication are required")
+    if "category" not in entry:
+        raise ValidationError(f"{CODEX_MARKETPLACE}: category is required on each plugin entry")
 
 
 def main() -> int:
@@ -117,20 +309,41 @@ def main() -> int:
     if not skills:
         raise ValidationError("No skills found")
 
+    catalog = read_skill_catalog()
+    if sorted(catalog) != skills:
+        raise ValidationError(
+            f"{SKILL_CATALOG}: skill catalog mismatch\nexpected: {skills}\nfound:    {sorted(catalog)}"
+        )
+
     parsed: dict[str, dict[str, object]] = {}
     for skill_name in skills:
         path = SKILLS_DIR / skill_name / "SKILL.md"
         data = parse_frontmatter(path)
         if data["name"] != skill_name:
             raise ValidationError(f"{path}: name {data['name']!r} does not match directory {skill_name!r}")
-        layer = data["metadata"]["layer"]
-        if layer not in LAYERS:
-            raise ValidationError(f"{path}: invalid layer {layer!r}")
-        parsed[skill_name] = data
+        catalog_entry = catalog[skill_name]
+        if data["description"] != catalog_entry["description"]:
+            raise ValidationError(
+                f"{path}: description does not match skills/catalog.json for {skill_name!r}"
+            )
+        skill_text = path.read_text()
+        validate_skill_paths(skill_name, catalog_entry["references"], "references")
+        validate_skill_paths(skill_name, catalog_entry["artifacts"], "artifacts")
+        if catalog_entry["needs_live_discovery"]:
+            if catalog_entry["layer"] != "use-case":
+                raise ValidationError(
+                    f"{skill_name}: needs_live_discovery=true is only valid for use-case skills"
+                )
+            validate_live_discovery_language(skill_name, skill_text)
+        parsed[skill_name] = {
+            **data,
+            "layer": catalog_entry["layer"],
+            "depends_on": catalog_entry["depends_on"],
+        }
 
     for skill_name, data in parsed.items():
-        layer = data["metadata"]["layer"]
-        depends_on = data["metadata"]["depends_on"]
+        layer = data["layer"]
+        depends_on = data["depends_on"]
         if not isinstance(depends_on, list):
             raise ValidationError(f"{skill_name}: depends_on must be a list")
 
@@ -140,7 +353,7 @@ def main() -> int:
         for dep in depends_on:
             if dep not in parsed:
                 raise ValidationError(f"{skill_name}: unknown dependency {dep!r}")
-            dep_layer = parsed[dep]["metadata"]["layer"]
+            dep_layer = parsed[dep]["layer"]
             if layer == "workflow" and dep_layer != "utility":
                 raise ValidationError(
                     f"{skill_name}: workflow skills may depend only on utility skills, found {dep} ({dep_layer})"
@@ -150,20 +363,25 @@ def main() -> int:
                     f"{skill_name}: use-case skills may not depend on other use-case skills"
                 )
 
-    catalog_skills = read_catalog_skills()
-    if sorted(catalog_skills) != skills:
+    readme_skills = read_readme_catalog_skills()
+    if sorted(readme_skills) != skills:
         raise ValidationError(
-            f"README.md: skill catalog mismatch\nexpected: {skills}\nfound:    {catalog_skills}"
+            f"README.md: skill catalog mismatch\nexpected: {skills}\nfound:    {readme_skills}"
         )
 
-    if PLUGIN.exists():
-        plugin_skills = read_plugin_skills()
-        if sorted(plugin_skills) != skills:
-            raise ValidationError(
-                f".claude-plugin/plugin.json: skill list mismatch\nexpected: {skills}\nfound:    {plugin_skills}"
-            )
-    else:
-        print(f"Skipping plugin validation: {PLUGIN} not found")
+    claude_skills = read_claude_context_skills()
+    if sorted(claude_skills) != skills:
+        raise ValidationError(
+            f"CLAUDE.md: skill catalog mismatch\nexpected: {skills}\nfound:    {claude_skills}"
+        )
+
+    if not CLAUDE_PLUGIN.exists():
+        raise ValidationError(f"Missing required Claude plugin manifest: {CLAUDE_PLUGIN}")
+    claude_plugin_name = validate_claude_plugin()
+    validate_claude_marketplace(claude_plugin_name)
+
+    codex_plugin_name = validate_codex_plugin(skills)
+    validate_codex_marketplace(codex_plugin_name)
 
     print(f"Validated {len(skills)} skills successfully.")
     return 0

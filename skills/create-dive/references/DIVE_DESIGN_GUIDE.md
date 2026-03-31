@@ -1,10 +1,56 @@
 # Dive Design Guide
 
-Reference for Recharts components, Tailwind utilities, loading patterns, table components, color usage, interactive filters, and annotated examples.
+Reference for theming, Recharts components, Tailwind utilities, loading patterns, table components, color usage, interactive filters, and annotated examples.
 
 ---
 
-## 1. Recharts Component Reference
+## 1. Theme Prompt Template
+
+Use this structure when you want the model to reliably produce a coherent Dive style instead of generic dashboard output.
+
+```text
+Theme: Corporate Dashboard
+- Feel: crisp, compact business dashboard with restrained motion
+- Background: #f5f5f5
+- Text: #333333
+- Muted: #777777
+- Chart colors: ["#2563eb", "#16a34a", "#dc2626", "#d97706", "#7c3aed"]
+- Typography: strong title, quiet KPI labels, sentence-case headings
+- Chart rules: thin grid lines, 2px line strokes, 4px bar radius, no heavy card chrome
+- Layout: one KPI row, one primary chart, one supporting table
+- Interactivity: one time-range toggle, no redundant controls
+```
+
+Make the prompt concrete:
+
+- Name a theme or visual reference.
+- Specify palette roles, not just one accent color.
+- State chart density and layout intent.
+- Ask for cross-filtering only when the Dive has a shared drill-down dimension.
+- Keep the palette to roughly 5-7 colors.
+
+## 2. Theme Gallery Shortlist
+
+Use these named gallery directions as defaults:
+
+| Theme | Best For | Notes |
+|---|---|---|
+| `Corporate Dashboard` | KPI, finance, operations | Safe default for compact business dashboards |
+| `Tufte Minimal` | Dense analytical views | Strong when the Dive should feel editorial and restrained |
+| `FT Salmon` | Executive summaries, narrative analytics | Good for business storytelling with softer contrast |
+| `Knowledge Beautiful` | Exploratory visuals | Use when hierarchy and layering matter |
+
+The public Dive gallery is useful for composition cues:
+
+- `KPI Dashboard using Tableau Superstore Data` for standard KPI + trend structure
+- `NYC Taxi Operations Dashboard` for operations monitoring layout
+- `Spotify Tracks Explorer` for a slightly more exploratory interaction model
+
+Borrow structure and pacing, not pixel-perfect styling.
+
+---
+
+## 3. Recharts Component Reference
 
 All charts must be wrapped in `<ResponsiveContainer width="100%" height={260}>`.
 
@@ -126,7 +172,7 @@ Area props: `type`, `dataKey`, `stroke`, `fill`, `fillOpacity` (0.1-0.3), `stack
 
 ---
 
-## 2. Tailwind Utilities Commonly Used
+## 4. Tailwind Utilities Commonly Used
 
 ### Layout
 
@@ -160,7 +206,7 @@ For brand colors use inline `style`: `style={{ color: "#231f20" }}`, `style={{ b
 
 ---
 
-## 3. Loading State Patterns
+## 5. Loading State Patterns
 
 ### KPI Skeleton
 
@@ -210,7 +256,7 @@ For brand colors use inline `style`: `style={{ color: "#231f20" }}`, `style={{ b
 
 ---
 
-## 4. Multi-Query Dive Pattern
+## 6. Multi-Query Dive Pattern
 
 Use multiple `useSQLQuery` calls. Name destructured variables uniquely. Each section renders its own loading state.
 
@@ -237,7 +283,7 @@ export default function MultiQueryDive() {
 
 ---
 
-## 5. Table Component Pattern
+## 7. Table Component Pattern
 
 Use tables for fewer than 8 categories or when exact values matter.
 
@@ -269,7 +315,7 @@ Rules: left-align text, right-align numbers, `border-b` separators, alternating 
 
 ---
 
-## 6. Color Usage
+## 8. Color Usage
 
 ### Chart Series (in order)
 
@@ -302,7 +348,7 @@ const deltaColor = delta >= 0 ? "#2d7a00" : "#bd4e35";
 
 ---
 
-## 7. Interactive Filters
+## 9. Interactive Filters
 
 ### Period Selector
 
@@ -349,7 +395,7 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 8. Formatting Patterns
+## 10. Formatting Patterns
 
 ```tsx
 // Currency
@@ -367,11 +413,11 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 9. Choosing the Right Chart
+## 11. Choosing the Right Chart
 
 | Data Shape | Chart | Notes |
 |---|---|---|
-| Values over time (single) | LineChart | `type="monotone"` for smooth curves |
+| Values over time (single) | LineChart | Prefer `type="linear"` unless smoothing is clearly useful |
 | Values over time (multi) | LineChart | Max 3-4 lines |
 | Volume over time | AreaChart | Low `fillOpacity` (0.15-0.3) |
 | Comparing categories (8+) | BarChart | Horizontal if names are long |
@@ -382,7 +428,33 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 10. Complete Annotated Example
+## 12. Manage as Code and Embed
+
+### Manage Dives as Code
+
+Use a Git-backed workflow when the Dive is part of a real product or a shared team artifact:
+
+- store the Dive source in the repo
+- iterate locally with hot reload
+- review through PR previews
+- deploy with a scripted save/update step or CI pipeline
+
+This is the right path when multiple people will maintain the Dive or when preview and production should be reviewable separately.
+
+### Embed Dives
+
+Use embedding when you need a lightweight live dashboard in an existing app or site:
+
+- backend creates the embed session
+- browser receives only the short-lived session string
+- the embedded Dive is read-only
+- `embed-motherduck.com` may need to be added to `frame-src` if CSP is strict
+
+Do not put admin tokens in the browser. If the user needs richer application behavior, stronger per-customer control, or backend-side policy enforcement, move to the `build-cfa-app` patterns instead.
+
+---
+
+## 13. Complete Annotated Example
 
 ```tsx
 import { useSQLQuery } from "@motherduck/react-sql-query";

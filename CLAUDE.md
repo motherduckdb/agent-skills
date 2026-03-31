@@ -24,6 +24,9 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 ## Product-Level Defaults
 
 - Use MCP-assisted exploration when available.
+- For use-case skills, if a remote MotherDuck MCP server or local MotherDuck server is active, start from the real database in scope.
+- If the database or workspace is unclear, ask which one should back the project before designing the solution.
+- Inspect schemas, tables, columns, joins, and time dimensions before inventing example models or rollout steps.
 - Call `get_dive_guide` before `save_dive` or `update_dive`.
 - Prefer Parquet when choosing formats.
 - Prefer comments on analytical tables and columns.
@@ -43,9 +46,14 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | share-data | `/share-data` | Distribute data with shares and share Dive-backed data safely. |
 | create-dive | `/create-dive` | Build, theme, preview, save, and update Dives. |
 | ducklake | `/ducklake` | Decide when DuckLake is appropriate and how to use it safely. |
+| security-governance | `/security-governance` | Answer security, governance, access, and residency questions. |
+| pricing-roi | `/pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |
 | build-cfa-app | `/build-cfa-app` | Build customer-facing analytics products on MotherDuck. |
 | build-dashboard | `/build-dashboard` | Create a coherent Dive-backed analytics dashboard. |
 | build-data-pipeline | `/build-data-pipeline` | Build ingestion-to-serving workflows on MotherDuck. |
+| migrate-to-motherduck | `/migrate-to-motherduck` | Plan migrations from legacy warehouses and Postgres estates. |
+| enable-self-serve-analytics | `/enable-self-serve-analytics` | Roll out governed self-serve analytics for internal teams. |
+| partner-delivery | `/partner-delivery` | Deliver repeatable MotherDuck architectures for clients and partners. |
 
 ## Layering Rule
 

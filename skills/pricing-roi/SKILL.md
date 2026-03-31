@@ -2,14 +2,6 @@
 name: pricing-roi
 description: Explain MotherDuck pricing and ROI tradeoffs. Use when an economic_buyer, technical_owner, or analytics_lead is asking about spend, budget guardrails, workload cost drivers, plan fit, or whether MotherDuck is worth adopting.
 license: MIT
-metadata:
-  author: motherduck
-  version: "1.0"
-  layer: workflow
-  surface: pricing_and_roi
-  answer_style: "direct-cost-clarity, concrete, decision-support"
-  language_focus: "typescript|javascript|python"
-  depends_on: []
 ---
 
 # Pricing and ROI

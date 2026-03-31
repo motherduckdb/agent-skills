@@ -2,15 +2,6 @@
 name: ducklake
 description: Decide when DuckLake is the right fit and how to use it on MotherDuck. Use when evaluating open-table-format storage, object storage-backed databases, or DuckLake-specific capabilities such as BYOB, time travel, maintenance functions, and file-level ingestion.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: workflow
-  language_focus: "typescript|javascript|python"
-  depends_on:
-    - connect
-    - query
-    - explore
 ---
 
 # Use DuckLake on MotherDuck

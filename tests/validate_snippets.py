@@ -16,6 +16,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -310,15 +311,8 @@ def validate_typescript_batch(
         index_map[batch_idx] = orig_idx
 
     try:
-        result = subprocess.run(
-            ["node", str(TS_CHECK_SCRIPT)],
-            input=json.dumps(batch),
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
+        result = _run_typescript_check(batch)
     except FileNotFoundError:
-        # Node.js or typescript not installed
         return {
             idx: ["  TypeScript/Node.js not available for syntax checking"]
             for idx in [orig_idx for _, (orig_idx, _) in enumerate(snippets)]
@@ -349,6 +343,44 @@ def validate_typescript_batch(
             ]
 
     return errors_by_index
+
+
+def _run_typescript_check(batch: list[dict[str, str]]) -> subprocess.CompletedProcess[str]:
+    """Run the Node-based checker, bootstrapping TypeScript if needed."""
+    result = _invoke_ts_checker(batch)
+    missing_ts = "Cannot find module 'typescript'" in (result.stderr or "") or "Cannot find module 'typescript'" in (
+        result.stdout or ""
+    )
+    if not missing_ts:
+        return result
+
+    with tempfile.TemporaryDirectory(prefix="md-skills-ts-") as temp_dir:
+        temp_path = Path(temp_dir)
+        subprocess.run(
+            ["npm", "install", "--silent", "--prefix", str(temp_path), "typescript"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=True,
+        )
+        env = os.environ.copy()
+        node_path = str(temp_path / "node_modules")
+        existing_node_path = env.get("NODE_PATH")
+        env["NODE_PATH"] = node_path if not existing_node_path else f"{node_path}{os.pathsep}{existing_node_path}"
+        return _invoke_ts_checker(batch, env=env)
+
+
+def _invoke_ts_checker(
+    batch: list[dict[str, str]], env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["node", str(TS_CHECK_SCRIPT)],
+        input=json.dumps(batch),
+        capture_output=True,
+        text=True,
+        timeout=30,
+        env=env,
+    )
 
 
 # ---------------------------------------------------------------------------

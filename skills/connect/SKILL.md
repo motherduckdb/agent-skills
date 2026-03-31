@@ -2,12 +2,6 @@
 name: connect
 description: Connect to MotherDuck from any application. Use when setting up database connectivity via the Postgres endpoint (recommended), pg_duckdb, native DuckDB API, or JDBC. Covers connection strings, authentication, SSL, and environment variable configuration.
 license: MIT
-metadata:
-  author: motherduck
-  version: "2.0"
-  layer: utility
-  language_focus: "typescript|javascript|python"
-  depends_on: []
 ---
 
 # Connect to MotherDuck
@@ -46,6 +40,7 @@ Is this a backend app or script?
 - Add **read scaling** only when many concurrent read-only users on the same account are actually the bottleneck.
 - Use **single attach mode** for narrow app or BI connections that should not persist attachment changes.
 - Use **workspace mode** only when the client intentionally wants shared, persistent attachment state across sessions.
+- Use a native `md:` **workspace connection** for database bootstrap, multi-database exploration, and temporary validation environments.
 
 ---
 
@@ -230,6 +225,14 @@ SELECT table_name FROM duckdb_tables() WHERE database_name = 'my_database';
 ## Native DuckDB API Alternative
 
 Use only when you need dual execution (hybrid local/cloud queries) or direct DuckDB features not available via the PG endpoint (local file access, extensions, SET statements).
+
+Use `duckdb.connect("md:")` when you need workspace-level operations such as:
+
+- creating or dropping databases
+- exploring multiple databases in one session
+- validating cross-database patterns with fully qualified names
+
+Use `duckdb.connect("md:my_database")` when the workload is scoped to one database and should look like a standard database connection.
 
 ### Python
 
