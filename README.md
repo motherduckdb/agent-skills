@@ -120,6 +120,17 @@ Install directly as a Claude Code plugin:
 /plugin marketplace add motherduckdb/agent-skills
 ```
 
+### OpenAI Codex Plugin
+
+Install as a Codex plugin for your repo:
+
+```bash
+mkdir -p ./plugins
+cp -R /path/to/agent-skills ./plugins/motherduck-skills
+```
+
+Then add a `.agents/plugins/marketplace.json` to your repo (see [Codex plugin docs](https://developers.openai.com/codex/plugins/build#package-and-distribute-plugins) for details).
+
 ### Install a Single Skill
 
 ```bash

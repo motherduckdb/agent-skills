@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 README = ROOT / "README.md"
 PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
+CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
 
@@ -164,6 +165,21 @@ def main() -> int:
             )
     else:
         print(f"Skipping plugin validation: {PLUGIN} not found")
+
+    if CODEX_PLUGIN.exists():
+        codex = json.loads(CODEX_PLUGIN.read_text())
+        for field in ("name", "version", "description", "skills"):
+            if field not in codex:
+                raise ValidationError(f".codex-plugin/plugin.json: missing required field {field!r}")
+        skills_path = codex["skills"]
+        resolved = (CODEX_PLUGIN.parent.parent / skills_path.lstrip("./")).resolve()
+        if resolved != SKILLS_DIR.resolve():
+            raise ValidationError(
+                f".codex-plugin/plugin.json: skills path {skills_path!r} does not resolve to {SKILLS_DIR}"
+            )
+        print("Codex plugin manifest validated.")
+    else:
+        print(f"Skipping Codex plugin validation: {CODEX_PLUGIN} not found")
 
     print(f"Validated {len(skills)} skills successfully.")
     return 0
