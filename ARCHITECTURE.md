@@ -44,6 +44,8 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
 - Related-skill discovery stays in prose sections like `Related Skills`; we do not add repo-specific frontmatter for that.
 - Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency in plugin-facing guidance.
+- In use-case skills, structured JSON is an explicit test/tooling contract, not the default human-facing response format.
+- `Validation Signals` sections are maintainer/reviewer guidance for testing and regression checks, not a required heading in normal user-facing replies.
 
 ## Product Positioning Invariants
 
@@ -54,6 +56,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Use-case skills should begin from the user's live MotherDuck data model when a remote or local server is active.
 - DuckLake is supported but opt-in; native MotherDuck storage remains the default posture.
 - Artifacts should be local-first where practical, but when the repo claims MotherDuck-specific validation, the corresponding artifact or reference project should also be runnable against temporary real MotherDuck databases.
+- Use-case skills should document a stable top-level JSON shape when structured output is explicitly requested.
 
 ## Enforcement
 
@@ -89,3 +92,16 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 
 - full use-case generation through the installed Codex plugin
 - required top-level output fields for use-case planning responses
+- the strict raw-JSON contract when structured output is explicitly requested
+
+## Validation Tiers
+
+Use two QA loops in this repo:
+
+- fast inner-loop checks:
+  - `scripts/validate_skills.py`
+  - snippet validation
+  - targeted artifact runs
+- slower regression checks:
+  - `scripts/test_codex_use_cases.py`
+  - `scripts/test_motherduck_artifacts.py`

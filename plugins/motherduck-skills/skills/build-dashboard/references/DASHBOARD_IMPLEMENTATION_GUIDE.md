@@ -26,6 +26,8 @@ The repeated repo runs point to a stable dashboard posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/dashboard_story_example.py` against a temporary MotherDuck database
 - verify the output contains the expected sections: `kpis`, `trend`, `breakdown`, and `detail`
 - verify the dashboard still tells one coherent story instead of several unrelated narratives

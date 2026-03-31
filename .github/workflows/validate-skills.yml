@@ -1,22 +1,39 @@
 name: Validate Skills Catalog
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
-      - '**/*.md'
+      - 'AGENTS.md'
+      - 'ARCHITECTURE.md'
+      - 'CLAUDE.md'
+      - 'README.md'
+      - 'docs/**'
+      - 'skills/**'
+      - 'plugins/motherduck-skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
       - '.agents/plugins/**'
+      - 'scripts/check_codex_plugin_sync.py'
+      - 'scripts/sync_codex_plugin.py'
       - 'scripts/validate_skills.py'
       - '.github/workflows/validate-skills.yml'
   push:
     branches: [main]
     paths:
-      - '**/*.md'
+      - 'AGENTS.md'
+      - 'ARCHITECTURE.md'
+      - 'CLAUDE.md'
+      - 'README.md'
+      - 'docs/**'
+      - 'skills/**'
+      - 'plugins/motherduck-skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
       - '.agents/plugins/**'
+      - 'scripts/check_codex_plugin_sync.py'
+      - 'scripts/sync_codex_plugin.py'
       - 'scripts/validate_skills.py'
       - '.github/workflows/validate-skills.yml'
 
@@ -32,8 +49,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
 
       - name: Run structural validator
         run: uv run scripts/validate_skills.py
+
+      - name: Verify packaged Codex plugin matches source skills
+        run: uv run scripts/check_codex_plugin_sync.py

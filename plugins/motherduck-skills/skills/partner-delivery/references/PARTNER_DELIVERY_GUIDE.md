@@ -22,6 +22,8 @@ The repeated repo runs point to a stable partner-delivery posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/client_delivery_example.py` against temporary MotherDuck databases
 - verify each client gets its own database entry in the output payload
 - verify the delivery pattern still states one database and one credential boundary per client

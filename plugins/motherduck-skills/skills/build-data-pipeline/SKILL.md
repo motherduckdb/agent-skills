@@ -67,6 +67,7 @@ The output of this skill should be:
 - the validation checks
 
 If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
+This is mainly for automated tests, regression checks, or downstream tooling that needs a stable machine-readable shape. Normal human-facing use of the skill can stay in prose unless JSON is explicitly requested.
 
 Use this exact top-level shape when JSON is requested:
 
