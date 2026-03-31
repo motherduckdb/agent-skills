@@ -1,0 +1,6 @@
+{
+  "name": "motherduck-skills",
+  "version": "1.0.0",
+  "description": "Skills for building applications with MotherDuck, the serverless DuckDB-powered data warehouse.",
+  "skills": "./skills/"
+}

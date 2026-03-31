@@ -1,0 +1,305 @@
+{
+  "build-cfa-app": {
+    "name": "build-cfa-app",
+    "description": "Build a customer-facing analytics application powered by MotherDuck. Use when someone is embedding analytics into a SaaS product and needs per-customer isolation, read scaling, and sub-second query latency.",
+    "layer": "use-case",
+    "depends_on": [
+      "connect",
+      "model-data",
+      "query",
+      "load-data",
+      "explore"
+    ],
+    "references": [
+      "references/CFA_IMPLEMENTATION_GUIDE.md",
+      "references/CFA_ARCHITECTURE.md"
+    ],
+    "artifacts": [
+      "artifacts/customer_routing_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/"
+    ],
+    "needs_live_discovery": true
+  },
+  "build-dashboard": {
+    "name": "build-dashboard",
+    "description": "Build a complete analytics dashboard using MotherDuck Dives. Use when an analytics_lead, champion_user, or consultant_partner needs a multi-chart, multi-KPI interactive dashboard with live MotherDuck data and a clear story for end users.",
+    "layer": "use-case",
+    "depends_on": [
+      "explore",
+      "query",
+      "create-dive"
+    ],
+    "references": [
+      "references/DASHBOARD_IMPLEMENTATION_GUIDE.md",
+      "references/DASHBOARD_PATTERNS.md"
+    ],
+    "artifacts": [
+      "artifacts/dashboard_story_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
+      "https://motherduck.com/dive-gallery/"
+    ],
+    "needs_live_discovery": true
+  },
+  "build-data-pipeline": {
+    "name": "build-data-pipeline",
+    "description": "Build an end-to-end data pipeline with MotherDuck. Use when someone is designing a workflow that ingests external data, transforms it with DuckDB SQL, and produces analytics-ready tables or visualizations.",
+    "layer": "use-case",
+    "depends_on": [
+      "connect",
+      "load-data",
+      "model-data",
+      "query",
+      "share-data",
+      "ducklake"
+    ],
+    "references": [
+      "references/PIPELINE_IMPLEMENTATION_GUIDE.md",
+      "references/dlt-dbt-motherduck-project/"
+    ],
+    "artifacts": [
+      "artifacts/pipeline_stage_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": true
+  },
+  "connect": {
+    "name": "connect",
+    "description": "Connect to MotherDuck from any application. Use when setting up database connectivity via the Postgres endpoint (recommended), pg_duckdb, native DuckDB API, or JDBC. Covers connection strings, authentication, SSL, and environment variable configuration.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "create-dive": {
+    "name": "create-dive",
+    "description": "Create interactive MotherDuck Dives \u2014 persistent React data apps with live queries and visualizations. Use when building charts, dashboards, KPI displays, or any data visualization that should be saved and shareable.",
+    "layer": "workflow",
+    "depends_on": [
+      "explore",
+      "query"
+    ],
+    "references": [
+      "references/DIVE_DESIGN_GUIDE.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
+      "https://motherduck.com/dive-gallery/"
+    ],
+    "needs_live_discovery": false
+  },
+  "duckdb-sql": {
+    "name": "duckdb-sql",
+    "description": "DuckDB SQL syntax reference for MotherDuck. Use when you need to look up DuckDB-specific syntax, data types, functions, extensions, or resolve SQL errors. Covers friendly SQL, complex types, pre-installed extensions, and MotherDuck-specific SQL.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [
+      "references/SYNTAX_REFERENCE.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://duckdb.org/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "ducklake": {
+    "name": "ducklake",
+    "description": "Decide when DuckLake is the right fit and how to use it on MotherDuck. Use when evaluating open-table-format storage, object storage-backed databases, or DuckLake-specific capabilities such as BYOB, time travel, maintenance functions, and file-level ingestion.",
+    "layer": "workflow",
+    "depends_on": [
+      "connect",
+      "query",
+      "explore"
+    ],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/",
+      "https://ducklake.select/"
+    ],
+    "needs_live_discovery": false
+  },
+  "enable-self-serve-analytics": {
+    "name": "enable-self-serve-analytics",
+    "description": "Roll out self-serve analytics on MotherDuck. Use when someone needs governed access, shareable dashboards, and a practical adoption plan for internal teams.",
+    "layer": "use-case",
+    "depends_on": [
+      "connect",
+      "explore",
+      "query",
+      "model-data",
+      "create-dive",
+      "share-data"
+    ],
+    "references": [
+      "references/SELF_SERVE_ROLLOUT_GUIDE.md"
+    ],
+    "artifacts": [
+      "artifacts/self_serve_rollout_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/"
+    ],
+    "needs_live_discovery": true
+  },
+  "explore": {
+    "name": "explore",
+    "description": "Discover and explore databases, tables, columns, and data shares in MotherDuck. Use when you need to understand what data is available, preview table contents, or search the data catalog.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "load-data": {
+    "name": "load-data",
+    "description": "Load and ingest data into MotherDuck from files, cloud storage, HTTP, or other databases. Use when importing CSV, Parquet, JSON, Excel files or setting up data ingestion from S3, GCS, Azure, or external sources.",
+    "layer": "workflow",
+    "depends_on": [
+      "connect",
+      "query",
+      "explore"
+    ],
+    "references": [
+      "references/INGESTION_PATTERNS.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "migrate-to-motherduck": {
+    "name": "migrate-to-motherduck",
+    "description": "Plan a migration to MotherDuck. Use when someone is moving from a datawarehouse (e.g Snowflake, Redshift, Postgres), dbt-heavy workflows, or mixed warehouse stacks and needs sequencing, cutover guidance, and blocker analysis.",
+    "layer": "use-case",
+    "depends_on": [
+      "connect",
+      "explore",
+      "load-data",
+      "model-data",
+      "query",
+      "ducklake"
+    ],
+    "references": [
+      "references/MIGRATION_PLAYBOOK.md",
+      "references/MIGRATION_VALIDATION.md"
+    ],
+    "artifacts": [
+      "artifacts/migration_validation_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": true
+  },
+  "model-data": {
+    "name": "model-data",
+    "description": "Design database schemas and data models in MotherDuck. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.",
+    "layer": "workflow",
+    "depends_on": [
+      "duckdb-sql",
+      "query",
+      "explore"
+    ],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "partner-delivery": {
+    "name": "partner-delivery",
+    "description": "Deliver repeatable MotherDuck solutions across multiple client accounts. Use when someone needs multi-client architecture, regional deployment guidance, sharing boundaries, and reusable implementation patterns.",
+    "layer": "use-case",
+    "depends_on": [
+      "connect",
+      "explore",
+      "model-data",
+      "query",
+      "share-data",
+      "create-dive"
+    ],
+    "references": [
+      "references/PARTNER_DELIVERY_GUIDE.md"
+    ],
+    "artifacts": [
+      "artifacts/client_delivery_example.py"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": true
+  },
+  "pricing-roi": {
+    "name": "pricing-roi",
+    "description": "Explain MotherDuck pricing and ROI tradeoffs. Use when an economic_buyer, technical_owner, or analytics_lead is asking about spend, budget guardrails, workload cost drivers, plan fit, or whether MotherDuck is worth adopting.",
+    "layer": "workflow",
+    "depends_on": [],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/pricing/"
+    ],
+    "needs_live_discovery": false
+  },
+  "query": {
+    "name": "query",
+    "description": "Execute DuckDB SQL queries against MotherDuck databases. Use when running analytics, aggregations, transformations, or any SQL operation. Covers query best practices, CTEs, window functions, QUALIFY, and performance optimization.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://duckdb.org/docs/",
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "security-governance": {
+    "name": "security-governance",
+    "description": "Explain MotherDuck security, governance, and access-control patterns. Use when a security_compliance_owner, technical_owner, or application_builder is asking about residency, access boundaries, service accounts, isolation, sharing, or governance posture.",
+    "layer": "workflow",
+    "depends_on": [
+      "connect",
+      "explore"
+    ],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  },
+  "share-data": {
+    "name": "share-data",
+    "description": "Create and manage MotherDuck data shares for zero-copy data distribution. Use when sharing databases with team members, other organizations, or making data publicly available.",
+    "layer": "workflow",
+    "depends_on": [
+      "connect",
+      "explore",
+      "query"
+    ],
+    "references": [],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/"
+    ],
+    "needs_live_discovery": false
+  }
+}

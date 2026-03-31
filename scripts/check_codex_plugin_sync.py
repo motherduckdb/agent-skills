@@ -1,0 +1,120 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# ///
+
+from __future__ import annotations
+
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
+SOURCE_SKILLS = ROOT / "skills"
+PACKAGED_ROOT = ROOT / "plugins" / json.loads(SOURCE_PLUGIN.read_text())["name"]
+PACKAGED_PLUGIN = PACKAGED_ROOT / ".codex-plugin" / "plugin.json"
+PACKAGED_SKILLS = PACKAGED_ROOT / "skills"
+
+IGNORED_PARTS = {".venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "target"}
+IGNORED_NAMES = {".DS_Store"}
+IGNORED_SUFFIXES = {".pyc"}
+
+
+class SyncError(Exception):
+    pass
+
+
+def should_ignore(relative_path: Path) -> bool:
+    if any(part in IGNORED_PARTS for part in relative_path.parts):
+        return True
+    if relative_path.name in IGNORED_NAMES:
+        return True
+    if relative_path.suffix in IGNORED_SUFFIXES:
+        return True
+    return False
+
+
+def file_digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def collect_files(root: Path) -> dict[Path, str]:
+    if not root.exists():
+        raise SyncError(f"Missing required directory: {root}")
+
+    files: dict[Path, str] = {}
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        relative_path = path.relative_to(root)
+        if should_ignore(relative_path):
+            continue
+        files[relative_path] = file_digest(path)
+    return files
+
+
+def main() -> int:
+    if not SOURCE_PLUGIN.exists():
+        raise SyncError(f"Missing required source plugin manifest: {SOURCE_PLUGIN}")
+    if not PACKAGED_PLUGIN.exists():
+        raise SyncError(f"Missing required packaged plugin manifest: {PACKAGED_PLUGIN}")
+
+    source_manifest = SOURCE_PLUGIN.read_text()
+    packaged_manifest = PACKAGED_PLUGIN.read_text()
+    if source_manifest != packaged_manifest:
+        raise SyncError(
+            "Packaged Codex plugin manifest is out of sync with .codex-plugin/plugin.json. "
+            "Run `uv run scripts/sync_codex_plugin.py`."
+        )
+
+    source_files = collect_files(SOURCE_SKILLS)
+    packaged_files = collect_files(PACKAGED_SKILLS)
+
+    source_paths = set(source_files)
+    packaged_paths = set(packaged_files)
+
+    missing_in_packaged = sorted(source_paths - packaged_paths)
+    extra_in_packaged = sorted(packaged_paths - source_paths)
+    content_mismatches = sorted(
+        relative_path
+        for relative_path in source_paths & packaged_paths
+        if source_files[relative_path] != packaged_files[relative_path]
+    )
+
+    if missing_in_packaged or extra_in_packaged or content_mismatches:
+        details: list[str] = []
+        if missing_in_packaged:
+            details.append(
+                "missing in packaged plugin: " + ", ".join(str(path) for path in missing_in_packaged[:10])
+            )
+        if extra_in_packaged:
+            details.append(
+                "extra in packaged plugin: " + ", ".join(str(path) for path in extra_in_packaged[:10])
+            )
+        if content_mismatches:
+            details.append(
+                "content mismatch: " + ", ".join(str(path) for path in content_mismatches[:10])
+            )
+        raise SyncError(
+            "Packaged Codex plugin skills are out of sync with /skills. "
+            + " | ".join(details)
+            + " | Run `uv run scripts/sync_codex_plugin.py`."
+        )
+
+    print(f"Codex plugin skills are in sync with source ({len(source_files)} files checked).")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except SyncError as exc:
+        print(f"Codex plugin sync check failed: {exc}", file=sys.stderr)
+        raise SystemExit(1)
