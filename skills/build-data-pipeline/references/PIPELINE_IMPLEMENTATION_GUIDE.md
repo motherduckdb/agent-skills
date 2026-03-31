@@ -87,6 +87,8 @@ The repeated repo runs point to a stable pipeline posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/pipeline_stage_example.py` against temporary MotherDuck databases
 - verify the output reports `ingestion_mode` as `bulk_parquet_stage`
 - verify the stage counts show raw > staging only when deduplication is expected

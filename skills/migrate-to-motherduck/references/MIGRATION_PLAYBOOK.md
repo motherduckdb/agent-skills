@@ -29,6 +29,8 @@ The repeated repo runs point to a stable migration posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/migration_validation_example.py` against temporary MotherDuck databases
 - verify the output contains metric comparison plus `new_records` and `deleted_records`
 - require an explicit acceptable variance posture for every migration slice

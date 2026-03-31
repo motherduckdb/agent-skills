@@ -22,6 +22,8 @@ The repeated repo runs point to a stable self-serve rollout posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/self_serve_rollout_example.py` against a temporary MotherDuck database
 - verify the output names exactly one `first_audience` and one `first_asset`
 - verify the first asset is backed by a governed dataset rather than an ad hoc raw table

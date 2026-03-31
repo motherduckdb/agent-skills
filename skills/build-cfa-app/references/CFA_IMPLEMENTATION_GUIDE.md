@@ -29,6 +29,8 @@ The repeated repo runs point to a stable CFA posture:
 
 ## Validation Signals
 
+Use these signals for testing, review, and regression checks. They are not an instruction to include a separate "Validation Signals" section in normal user-facing replies.
+
 - run `artifacts/customer_routing_example.py` against temporary MotherDuck databases
 - verify the result reports `routing_mode` as `per-customer database namespace`
 - verify separate customer database names are present in the `backend.databases` payload
