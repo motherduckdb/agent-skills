@@ -66,6 +66,12 @@ license: MIT
 
 Repo-only metadata belongs in `skills/catalog.json`.
 
+When changing the repo-level install and discovery story, also keep the Gemini extension surfaces aligned:
+
+- `gemini-extension.json`
+- `GEMINI.md`
+- `commands/motherduck/*.toml`
+
 ## Writing Style
 
 - prefer direct trigger phrases in descriptions
@@ -81,6 +87,7 @@ When changing skills, references, artifacts, or catalog surfaces:
 ```bash
 uv run scripts/validate_skills.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+python3 scripts/package_gemini_extension.py
 ```
 
 When a change affects use-case skills or their artifacts, also run:

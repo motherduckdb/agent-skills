@@ -14,7 +14,7 @@ This repo is intentionally agent-oriented:
 
 ## Install
 
-Choose one install path for each agent. For most users, the simplest default is the Skills CLI. Use the Claude Code or Codex plugin path only if you specifically want the packaged plugin experience.
+Choose one install path for each agent. For packaged installs, the order below is Claude Code first, Codex second, and Gemini CLI third. For cross-agent raw skill installs, the Skills CLI remains the simplest default.
 
 Avoid mixing plugin installs and raw skill installs for the same agent unless you are testing packaging behavior.
 
@@ -22,11 +22,75 @@ Avoid mixing plugin installs and raw skill installs for the same agent unless yo
 
 | Goal | Recommended path |
 |-------|------------------|
-| Install the whole MotherDuck catalog quickly | Skills CLI |
-| Install only one or two skills | Skills CLI with `--skill` |
 | Use the packaged Claude Code plugin from the repo marketplace | Claude Code plugin install |
 | Use the packaged Codex plugin from the repo marketplace | Codex plugin install |
+| Install the whole MotherDuck catalog in Gemini CLI | Gemini CLI extension install |
+| Install one or two skills in Gemini CLI without the packaged extension | Gemini CLI skills install |
+| Install the whole MotherDuck catalog quickly | Skills CLI |
+| Install only one or two skills | Skills CLI with `--skill` |
 | Vendor one skill directly into a repo or agent home without plugin tooling | Manual per-skill install |
+
+### Claude Code plugin install
+
+```bash
+/plugin marketplace add motherduckdb/agent-skills
+/plugin install motherduck-skills@motherduck-agent-skills
+```
+
+After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
+
+This plugin packages the whole MotherDuck catalog. You do not need to install each skill separately.
+
+### Codex plugin install
+
+1. Clone or open this repo in Codex.
+2. Restart Codex if it was already running for the repo.
+3. Open `/plugins`.
+4. Install **MotherDuck Skills** from the repo marketplace.
+
+This path installs the packaged repo-local Codex plugin. After installation, the skills are available automatically when relevant.
+
+### Gemini CLI extension install
+
+Install from GitHub:
+
+```bash
+gemini extensions install https://github.com/motherduckdb/agent-skills --consent
+```
+
+For local development from a checkout:
+
+```bash
+gemini extensions link .
+```
+
+After installation, restart Gemini CLI or reload your session. Useful follow-ups:
+
+```bash
+gemini extensions list
+gemini skills list
+```
+
+Inside Gemini CLI you can also use:
+
+- `/extensions list`
+- `/skills list`
+- `/motherduck:catalog`
+- `/motherduck:route build a dashboard over my MotherDuck analytics tables`
+
+### Gemini CLI skills install
+
+If you want only one specific MotherDuck skill in Gemini CLI, install it directly as an Agent Skill instead of installing the full extension:
+
+```bash
+gemini skills install https://github.com/motherduckdb/agent-skills.git --path skills/connect
+```
+
+You can also link the repo's skills locally:
+
+```bash
+gemini skills link skills
+```
 
 ### Skills CLI: install all skills
 
@@ -72,26 +136,6 @@ Best practices:
 - use `--skill <name>` when you want only a few skills instead of the whole catalog
 - prefer the repo-level install plus `--skill` over many one-off path installs when you want multiple MotherDuck skills from this catalog
 
-### Claude Code plugin install
-
-```bash
-/plugin marketplace add motherduckdb/agent-skills
-/plugin install motherduck-skills@motherduck-agent-skills
-```
-
-After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
-
-This plugin packages the whole MotherDuck catalog. You do not need to install each skill separately.
-
-### Codex plugin install
-
-1. Clone or open this repo in Codex.
-2. Restart Codex if it was already running for the repo.
-3. Open `/plugins`.
-4. Install **MotherDuck Skills** from the repo marketplace.
-
-This path installs the packaged repo-local Codex plugin. After installation, the skills are available automatically when relevant.
-
 ### Manual per-skill install
 
 Copy the whole skill directory, not just `SKILL.md`, so any bundled `references/`, `scripts/`, and `artifacts/` remain available.
@@ -124,8 +168,15 @@ Examples:
 - `Use MotherDuck skills to connect to my workspace and inspect the schema.`
 - `Use the connect, explore, and query skills to validate this analytics query.`
 - `Use MotherDuck skills to build a Dive-backed dashboard on these tables.`
+- `/motherduck:route migrate this Postgres analytics workload to MotherDuck`
 
 If you installed a single skill manually or through the Skills CLI, you can name it explicitly, but most agents should also discover it automatically from context.
+
+Maintainer note for Gemini gallery discovery:
+
+- keep `gemini-extension.json` at the repo root
+- keep the repo public
+- add the GitHub topic `gemini-cli-extension` in the repository settings so the Gemini gallery crawler can find it
 
 ## What Agents Can Build With This Repo
 

@@ -1,0 +1,12 @@
+description = "Summarize the installed MotherDuck skill catalog and the best entry points."
+
+prompt = """
+Summarize the installed MotherDuck skill catalog for the user.
+
+Required behavior:
+- Group the skills into utility, workflow, and use-case layers.
+- Give one short, practical sentence for when each layer matters.
+- Call out the default starting sequence: `connect` -> `explore` -> `query`.
+- Mention that `/motherduck:route <task>` can map a concrete task onto the right skill sequence.
+- Keep the answer concise and operational.
+"""

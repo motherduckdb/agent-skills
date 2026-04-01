@@ -8,7 +8,17 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
+
+from gemini_extension_config import (
+    GEMINI_COMMANDS,
+    GEMINI_CONTEXT,
+    GEMINI_CONTEXT_FILE_NAME,
+    GEMINI_EXTENSION,
+    GEMINI_PLAN_DIRECTORY,
+    GEMINI_REQUIRED_COMMANDS,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +32,11 @@ CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
+GEMINI_CATALOG_HEADINGS = {
+    "utility": "### Utility",
+    "workflow": "### Workflow",
+    "use-case": "### Use-case",
+}
 
 
 class ValidationError(Exception):
@@ -159,6 +174,37 @@ def read_claude_context_skills() -> list[str]:
     if not found:
         raise ValidationError("CLAUDE.md: could not parse skill catalog table")
     return found
+
+
+def read_gemini_context_skills() -> dict[str, list[str]]:
+    text = GEMINI_CONTEXT.read_text()
+    found_by_layer: dict[str, list[str]] = {}
+    ordered_layers = list(GEMINI_CATALOG_HEADINGS.items())
+
+    for index, (layer, heading) in enumerate(ordered_layers):
+        start = text.find(heading)
+        if start == -1:
+            raise ValidationError(f"{GEMINI_CONTEXT}: missing catalog heading {heading!r}")
+
+        section_start = text.find("\n", start)
+        if section_start == -1:
+            raise ValidationError(f"{GEMINI_CONTEXT}: malformed section for {heading!r}")
+        section_start += 1
+
+        section_end = len(text)
+        for _, next_heading in ordered_layers[index + 1 :]:
+            next_start = text.find(next_heading, section_start)
+            if next_start != -1:
+                section_end = next_start
+                break
+
+        section = text[section_start:section_end]
+        found = re.findall(r"^- `([a-z0-9-]+)`: ", section, re.MULTILINE)
+        if not found:
+            raise ValidationError(f"{GEMINI_CONTEXT}: could not parse skills under {heading!r}")
+        found_by_layer[layer] = found
+
+    return found_by_layer
 
 
 def validate_claude_plugin() -> str:
@@ -299,6 +345,59 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
         raise ValidationError(f"{CODEX_MARKETPLACE}: category is required on each plugin entry")
 
 
+def validate_command_file(path: Path) -> None:
+    try:
+        payload = tomllib.loads(path.read_text())
+    except tomllib.TOMLDecodeError as exc:
+        raise ValidationError(f"{path}: invalid TOML: {exc}") from exc
+
+    prompt = payload.get("prompt")
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValidationError(f"{path}: command must define a non-empty prompt")
+
+    description = payload.get("description")
+    if description is not None and (not isinstance(description, str) or not description.strip()):
+        raise ValidationError(f"{path}: description must be a non-empty string when provided")
+
+
+def validate_gemini_extension() -> str:
+    if not GEMINI_EXTENSION.exists():
+        raise ValidationError(f"Missing required Gemini extension manifest: {GEMINI_EXTENSION}")
+
+    payload = json.loads(GEMINI_EXTENSION.read_text())
+    extension_name = payload.get("name")
+    if not extension_name:
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing name")
+    if not payload.get("version"):
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing version")
+    if not payload.get("description"):
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing description")
+
+    context_file_name = payload.get("contextFileName")
+    if context_file_name != GEMINI_CONTEXT_FILE_NAME:
+        raise ValidationError(
+            f"{GEMINI_EXTENSION}: expected contextFileName to be {GEMINI_CONTEXT_FILE_NAME!r}, found {context_file_name!r}"
+        )
+    if not GEMINI_CONTEXT.exists():
+        raise ValidationError(f"{GEMINI_EXTENSION}: referenced context file is missing: {GEMINI_CONTEXT}")
+
+    plan = payload.get("plan")
+    if not isinstance(plan, dict) or plan.get("directory") != GEMINI_PLAN_DIRECTORY:
+        raise ValidationError(
+            f"{GEMINI_EXTENSION}: expected plan.directory to be {GEMINI_PLAN_DIRECTORY!r}"
+        )
+
+    if not GEMINI_COMMANDS.exists():
+        raise ValidationError(f"Missing required Gemini commands directory: {GEMINI_COMMANDS}")
+    for command_path in GEMINI_REQUIRED_COMMANDS:
+        if not command_path.exists():
+            raise ValidationError(f"Missing required Gemini discovery command: {command_path}")
+    for command_path in sorted(GEMINI_COMMANDS.rglob("*.toml")):
+        validate_command_file(command_path)
+
+    return extension_name
+
+
 def main() -> int:
     skills = sorted(p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md"))
     if not skills:
@@ -370,6 +469,15 @@ def main() -> int:
             f"CLAUDE.md: skill catalog mismatch\nexpected: {skills}\nfound:    {claude_skills}"
         )
 
+    gemini_skills = read_gemini_context_skills()
+    for layer in LAYERS:
+        expected = sorted(skill_name for skill_name, entry in catalog.items() if entry["layer"] == layer)
+        found = sorted(gemini_skills.get(layer, []))
+        if found != expected:
+            raise ValidationError(
+                f"{GEMINI_CONTEXT}: skill catalog mismatch for {layer}\nexpected: {expected}\nfound:    {found}"
+            )
+
     if not CLAUDE_PLUGIN.exists():
         raise ValidationError(f"Missing required Claude plugin manifest: {CLAUDE_PLUGIN}")
     claude_plugin_name = validate_claude_plugin()
@@ -377,6 +485,7 @@ def main() -> int:
 
     codex_plugin_name = validate_codex_plugin(skills)
     validate_codex_marketplace(codex_plugin_name)
+    validate_gemini_extension()
 
     print(f"Validated {len(skills)} skills successfully.")
     return 0
