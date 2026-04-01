@@ -7,23 +7,15 @@ import json
 import tarfile
 from pathlib import Path
 
+from gemini_extension_config import (
+    GEMINI_EXTENSION,
+    GEMINI_OPTIONAL_PACKAGING_ENTRIES,
+    GEMINI_REQUIRED_PACKAGING_ENTRIES,
+    ROOT,
+)
 
-ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "gemini-extension.json"
+
 DEFAULT_OUTPUT_DIR = ROOT / "release"
-
-REQUIRED_ENTRIES = [
-    "gemini-extension.json",
-    "GEMINI.md",
-    "skills",
-]
-
-OPTIONAL_ENTRIES = [
-    "commands",
-    "assets",
-    "LICENSE",
-    "README.md",
-]
 
 SKIP_NAMES = {
     ".DS_Store",
@@ -62,16 +54,15 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    manifest = json.loads(MANIFEST.read_text())
+    manifest = json.loads(GEMINI_EXTENSION.read_text())
     extension_name = manifest["name"]
     output_dir = Path(args.out_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     archive_path = output_dir / f"{extension_name}.tar.gz"
 
     include_paths: list[Path] = []
-    for entry_name in REQUIRED_ENTRIES + OPTIONAL_ENTRIES:
-        entry_path = ROOT / entry_name
-        if entry_name in REQUIRED_ENTRIES and not entry_path.exists():
+    for entry_path in GEMINI_REQUIRED_PACKAGING_ENTRIES + GEMINI_OPTIONAL_PACKAGING_ENTRIES:
+        if entry_path in GEMINI_REQUIRED_PACKAGING_ENTRIES and not entry_path.exists():
             raise FileNotFoundError(f"Missing required packaging input: {entry_path}")
         if entry_path.exists():
             include_paths.append(entry_path)

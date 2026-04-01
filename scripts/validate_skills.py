@@ -11,6 +11,15 @@ import sys
 import tomllib
 from pathlib import Path
 
+from gemini_extension_config import (
+    GEMINI_COMMANDS,
+    GEMINI_CONTEXT,
+    GEMINI_CONTEXT_FILE_NAME,
+    GEMINI_EXTENSION,
+    GEMINI_PLAN_DIRECTORY,
+    GEMINI_REQUIRED_COMMANDS,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
@@ -21,15 +30,13 @@ CLAUDE_PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
 CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
-GEMINI_EXTENSION = ROOT / "gemini-extension.json"
-GEMINI_CONTEXT = ROOT / "GEMINI.md"
-GEMINI_COMMANDS = ROOT / "commands"
-GEMINI_REQUIRED_COMMANDS = [
-    GEMINI_COMMANDS / "motherduck" / "catalog.toml",
-    GEMINI_COMMANDS / "motherduck" / "route.toml",
-]
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
+GEMINI_CATALOG_HEADINGS = {
+    "utility": "### Utility",
+    "workflow": "### Workflow",
+    "use-case": "### Use-case",
+}
 
 
 class ValidationError(Exception):
@@ -167,6 +174,37 @@ def read_claude_context_skills() -> list[str]:
     if not found:
         raise ValidationError("CLAUDE.md: could not parse skill catalog table")
     return found
+
+
+def read_gemini_context_skills() -> dict[str, list[str]]:
+    text = GEMINI_CONTEXT.read_text()
+    found_by_layer: dict[str, list[str]] = {}
+    ordered_layers = list(GEMINI_CATALOG_HEADINGS.items())
+
+    for index, (layer, heading) in enumerate(ordered_layers):
+        start = text.find(heading)
+        if start == -1:
+            raise ValidationError(f"{GEMINI_CONTEXT}: missing catalog heading {heading!r}")
+
+        section_start = text.find("\n", start)
+        if section_start == -1:
+            raise ValidationError(f"{GEMINI_CONTEXT}: malformed section for {heading!r}")
+        section_start += 1
+
+        section_end = len(text)
+        for _, next_heading in ordered_layers[index + 1 :]:
+            next_start = text.find(next_heading, section_start)
+            if next_start != -1:
+                section_end = next_start
+                break
+
+        section = text[section_start:section_end]
+        found = re.findall(r"^- `([a-z0-9-]+)`: ", section, re.MULTILINE)
+        if not found:
+            raise ValidationError(f"{GEMINI_CONTEXT}: could not parse skills under {heading!r}")
+        found_by_layer[layer] = found
+
+    return found_by_layer
 
 
 def validate_claude_plugin() -> str:
@@ -336,17 +374,17 @@ def validate_gemini_extension() -> str:
         raise ValidationError(f"{GEMINI_EXTENSION}: missing description")
 
     context_file_name = payload.get("contextFileName")
-    if context_file_name != "GEMINI.md":
+    if context_file_name != GEMINI_CONTEXT_FILE_NAME:
         raise ValidationError(
-            f"{GEMINI_EXTENSION}: expected contextFileName to be 'GEMINI.md', found {context_file_name!r}"
+            f"{GEMINI_EXTENSION}: expected contextFileName to be {GEMINI_CONTEXT_FILE_NAME!r}, found {context_file_name!r}"
         )
     if not GEMINI_CONTEXT.exists():
         raise ValidationError(f"{GEMINI_EXTENSION}: referenced context file is missing: {GEMINI_CONTEXT}")
 
     plan = payload.get("plan")
-    if not isinstance(plan, dict) or plan.get("directory") != ".gemini/plans":
+    if not isinstance(plan, dict) or plan.get("directory") != GEMINI_PLAN_DIRECTORY:
         raise ValidationError(
-            f"{GEMINI_EXTENSION}: expected plan.directory to be '.gemini/plans'"
+            f"{GEMINI_EXTENSION}: expected plan.directory to be {GEMINI_PLAN_DIRECTORY!r}"
         )
 
     if not GEMINI_COMMANDS.exists():
@@ -430,6 +468,15 @@ def main() -> int:
         raise ValidationError(
             f"CLAUDE.md: skill catalog mismatch\nexpected: {skills}\nfound:    {claude_skills}"
         )
+
+    gemini_skills = read_gemini_context_skills()
+    for layer in LAYERS:
+        expected = sorted(skill_name for skill_name, entry in catalog.items() if entry["layer"] == layer)
+        found = sorted(gemini_skills.get(layer, []))
+        if found != expected:
+            raise ValidationError(
+                f"{GEMINI_CONTEXT}: skill catalog mismatch for {layer}\nexpected: {expected}\nfound:    {found}"
+            )
 
     if not CLAUDE_PLUGIN.exists():
         raise ValidationError(f"Missing required Claude plugin manifest: {CLAUDE_PLUGIN}")
