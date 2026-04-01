@@ -1,31 +1,58 @@
-# MotherDuck Skills Extension Instructions
+# MotherDuck Skills for Gemini CLI
 
-You are an expert developer assistant specialized in MotherDuck and DuckDB. This extension provides a catalog of MotherDuck skills to help you build analytics apps, Dives, pipelines, and customer-facing data products.
+This extension bundles the MotherDuck skill catalog for Gemini CLI.
 
-## High-Level Guidance
+Use it when the task involves MotherDuck, DuckDB analytics, Dives, data pipelines, migrations, governance, pricing, self-serve analytics, or customer-facing analytics products.
 
-When the user asks about MotherDuck or DuckDB tasks, use the appropriate skill from the `skills/` directory.
+## Default Routing
 
-- **Utility Skills:** `connect`, `query`, `explore`, `duckdb-sql`. Use these for fundamental tasks like setting up connections or exploring databases.
-- **Workflow Skills:** `load-data`, `model-data`, `share-data`, `create-dive`, `ducklake`, `security-governance`, `pricing-roi`. Use these for common data engineering and governance workflows.
-- **Use-Case Skills:** `build-cfa-app`, `build-dashboard`, `build-data-pipeline`, `migrate-to-motherduck`, `enable-self-serve-analytics`, `partner-delivery`. Use these for higher-level architectural and business use cases.
+- For most technical work, start with `connect`, then `explore`, then `query`.
+- Add a workflow or use-case skill only after the connection path, live schema, and SQL shape are grounded.
+- If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the real workspace, schemas, tables, joins, and time dimensions before inventing SQL, models, or rollout plans.
+- If the database or workspace is unclear, ask which one is in scope before designing the solution.
 
-## Core Rules & Product Defaults
+## Skill Catalog
 
-- **Always write DuckDB SQL, not PostgreSQL SQL.** The MotherDuck Postgres endpoint translates the wire protocol, not the SQL dialect.
-- **Prefer fully qualified table names:** `"database"."schema"."table"`.
-- **Never hardcode tokens.** Use the `MOTHERDUCK_TOKEN` environment variable or the documented read-scaling variants.
-- **Lead with the Postgres endpoint** for thin-client and PostgreSQL-driver interoperability.
-- **Use the native DuckDB API (`md:` protocol)** when local files, hybrid execution, or direct DuckDB control matter.
-- **Tag production workloads with `custom_user_agent`.** This helps with cost attribution and workload analysis. Use the format `agent-skills/1.0.0(harness-<harness>;llm-<llm>)`.
-- **SSL is required** for the Postgres endpoint.
-- **Never imply runtime extension installation is generally available.** Only pre-installed extensions are available: `azure`, `delta`, `ducklake`, `encodings`, `excel`, `httpfs`, `iceberg`, `icu`, `json`, `parquet`, `spatial`, `h3`.
-- **Prefer Parquet over CSV** when the format is under your control.
+### Utility
 
-## Skill Precedence
+- `connect`: choose and configure the right connection path.
+- `explore`: inspect databases, schemas, tables, columns, views, and shares.
+- `query`: write, validate, and optimize DuckDB SQL for MotherDuck.
+- `duckdb-sql`: look up DuckDB SQL syntax and MotherDuck-specific constraints.
 
-- Utility skills cannot depend on other skills.
-- Workflow skills can depend only on utility skills.
-- Use-case skills can depend only on utility and workflow skills.
+### Workflow
 
-When providing guidance, prioritize simplicity and follow the opinionated patterns defined in the skills.
+- `load-data`: ingest files, cloud objects, or upstream systems into MotherDuck.
+- `model-data`: design analytics-ready schemas, tables, and views.
+- `share-data`: publish, consume, and govern MotherDuck shares safely.
+- `create-dive`: build, theme, preview, save, and update Dives.
+- `ducklake`: decide whether DuckLake fits and how to apply it safely.
+- `security-governance`: answer security, access, governance, and residency questions.
+- `pricing-roi`: frame workload cost drivers, pricing posture, and ROI tradeoffs.
+
+### Use-case
+
+- `build-cfa-app`: build customer-facing analytics products on MotherDuck.
+- `build-dashboard`: compose a coherent Dive-backed analytics dashboard.
+- `build-data-pipeline`: design ingestion-to-serving workflows on MotherDuck.
+- `migrate-to-motherduck`: move workloads from legacy warehouses or Postgres estates.
+- `enable-self-serve-analytics`: roll out governed self-serve analytics for internal teams.
+- `partner-delivery`: deliver repeatable MotherDuck architectures for customers or partners.
+
+## Core Rules
+
+- Always write DuckDB SQL, not PostgreSQL SQL.
+- Prefer fully qualified table names: `"database"."schema"."table"`.
+- Never hardcode tokens. Use `MOTHERDUCK_TOKEN` or documented read-scaling variants.
+- Lead with the Postgres endpoint for thin-client and PostgreSQL-driver interoperability.
+- Use the native DuckDB `md:` path when local files, hybrid execution, or direct DuckDB control matter.
+- For multi-database exploration, bootstrap flows, and temporary validation environments, prefer a native `md:` workspace connection.
+- Call `get_dive_guide` before save or update Dive flows when MCP is available.
+- Treat DuckLake as opt-in, not the default storage posture.
+- Never imply runtime extension installation is broadly available.
+- Prefer Parquet over CSV when the format is under your control.
+
+## Discovery Helpers
+
+- `/motherduck:catalog` explains the catalog and where to start.
+- `/motherduck:route <task>` maps a concrete task onto the right skill or skill sequence.

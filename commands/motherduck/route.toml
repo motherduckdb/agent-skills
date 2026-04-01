@@ -1,0 +1,16 @@
+description = "Map a MotherDuck task onto the right skill or skill sequence."
+
+prompt = """
+Route this task onto the installed MotherDuck skill catalog: {{args}}
+
+Required behavior:
+- Recommend the best single skill or ordered skill sequence.
+- For most tasks, prefer `connect`, `explore`, and `query` before higher-level skills.
+- If a use-case skill applies and a remote MotherDuck MCP server or local MotherDuck server is likely active, say what live workspace or schema details should be inspected first.
+- Keep the answer short and actionable.
+
+Output format:
+1. Recommended skill or sequence
+2. Why
+3. First concrete next step
+"""

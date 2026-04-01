@@ -1,6 +1,9 @@
 {
   "name": "motherduck-skills",
   "version": "1.0.0",
-  "description": "Opinionated MotherDuck skills for AI coding agents building analytics apps, Dives, pipelines, and customer-facing data products.",
-  "contextFileName": "GEMINI.md"
+  "description": "Opinionated MotherDuck skills for Gemini CLI: connection setup, schema discovery, DuckDB SQL, Dives, pipelines, dashboards, migrations, and customer-facing analytics.",
+  "contextFileName": "GEMINI.md",
+  "plan": {
+    "directory": ".gemini/plans"
+  }
 }

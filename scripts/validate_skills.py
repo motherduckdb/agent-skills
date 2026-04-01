@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 
@@ -20,6 +21,13 @@ CLAUDE_PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
 CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
+GEMINI_EXTENSION = ROOT / "gemini-extension.json"
+GEMINI_CONTEXT = ROOT / "GEMINI.md"
+GEMINI_COMMANDS = ROOT / "commands"
+GEMINI_REQUIRED_COMMANDS = [
+    GEMINI_COMMANDS / "motherduck" / "catalog.toml",
+    GEMINI_COMMANDS / "motherduck" / "route.toml",
+]
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
 
@@ -299,6 +307,59 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
         raise ValidationError(f"{CODEX_MARKETPLACE}: category is required on each plugin entry")
 
 
+def validate_command_file(path: Path) -> None:
+    try:
+        payload = tomllib.loads(path.read_text())
+    except tomllib.TOMLDecodeError as exc:
+        raise ValidationError(f"{path}: invalid TOML: {exc}") from exc
+
+    prompt = payload.get("prompt")
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValidationError(f"{path}: command must define a non-empty prompt")
+
+    description = payload.get("description")
+    if description is not None and (not isinstance(description, str) or not description.strip()):
+        raise ValidationError(f"{path}: description must be a non-empty string when provided")
+
+
+def validate_gemini_extension() -> str:
+    if not GEMINI_EXTENSION.exists():
+        raise ValidationError(f"Missing required Gemini extension manifest: {GEMINI_EXTENSION}")
+
+    payload = json.loads(GEMINI_EXTENSION.read_text())
+    extension_name = payload.get("name")
+    if not extension_name:
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing name")
+    if not payload.get("version"):
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing version")
+    if not payload.get("description"):
+        raise ValidationError(f"{GEMINI_EXTENSION}: missing description")
+
+    context_file_name = payload.get("contextFileName")
+    if context_file_name != "GEMINI.md":
+        raise ValidationError(
+            f"{GEMINI_EXTENSION}: expected contextFileName to be 'GEMINI.md', found {context_file_name!r}"
+        )
+    if not GEMINI_CONTEXT.exists():
+        raise ValidationError(f"{GEMINI_EXTENSION}: referenced context file is missing: {GEMINI_CONTEXT}")
+
+    plan = payload.get("plan")
+    if not isinstance(plan, dict) or plan.get("directory") != ".gemini/plans":
+        raise ValidationError(
+            f"{GEMINI_EXTENSION}: expected plan.directory to be '.gemini/plans'"
+        )
+
+    if not GEMINI_COMMANDS.exists():
+        raise ValidationError(f"Missing required Gemini commands directory: {GEMINI_COMMANDS}")
+    for command_path in GEMINI_REQUIRED_COMMANDS:
+        if not command_path.exists():
+            raise ValidationError(f"Missing required Gemini discovery command: {command_path}")
+    for command_path in sorted(GEMINI_COMMANDS.rglob("*.toml")):
+        validate_command_file(command_path)
+
+    return extension_name
+
+
 def main() -> int:
     skills = sorted(p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md"))
     if not skills:
@@ -377,6 +438,7 @@ def main() -> int:
 
     codex_plugin_name = validate_codex_plugin(skills)
     validate_codex_marketplace(codex_plugin_name)
+    validate_gemini_extension()
 
     print(f"Validated {len(skills)} skills successfully.")
     return 0

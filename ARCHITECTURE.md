@@ -38,8 +38,9 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Use-case skills may depend only on utility and workflow skills.
 - SKILL frontmatter stays portable and limited to broadly supported fields like `name`, `description`, and `license`.
 - Repo-only skill graph data lives in `skills/catalog.json`, not in SKILL frontmatter.
-- The README catalog, `CLAUDE.md` catalog, Claude plugin manifest, Claude marketplace manifest, Codex plugin manifest, and Codex marketplace entry must stay in sync with the `skills/` directory.
+- The README catalog, `CLAUDE.md` catalog, Gemini extension surfaces (`gemini-extension.json`, `GEMINI.md`, `commands/`), Claude plugin manifest, Claude marketplace manifest, Codex plugin manifest, and Codex marketplace entry must stay in sync with the `skills/` directory.
 - The Codex marketplace must point at the packaged plugin under `plugins/motherduck-skills`, not the repo root.
+- Gemini release archives must keep `gemini-extension.json` at the archive root and include the bundled `skills/` and Gemini-specific discovery surfaces.
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
 - Related-skill discovery stays in prose sections like `Related Skills`; we do not add repo-specific frontmatter for that.
@@ -71,10 +72,17 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - `skills/catalog.json` reference and artifact path integrity
 - live-discovery section requirements for use-case skills that declare them
 - README and assistant catalog consistency
+- Gemini extension manifest and command wiring
 - Claude and Codex plugin consistency
 - Claude marketplace wiring
 - Codex marketplace wiring
 - packaged Codex plugin sync and non-symlink packaging
+
+`scripts/package_gemini_extension.py` is the packaging layer for:
+
+- self-contained Gemini CLI release archives
+- keeping `gemini-extension.json` at archive root
+- bundling the skills plus Gemini-specific context and commands without repo-only noise
 
 `scripts/test_motherduck_artifacts.py` is the runtime verification layer for:
 
