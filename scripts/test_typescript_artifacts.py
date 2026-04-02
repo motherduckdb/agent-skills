@@ -5,24 +5,22 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
 import tempfile
 from pathlib import Path
 
-from motherduck_artifact_support import expected_user_agent
-from repo_support import ROOT
+from _lib.motherduck_artifacts import expected_user_agent, selected_artifacts
+from _lib.repo import ROOT
 
 
-TS_ARTIFACTS = [
-    ROOT / "skills" / "build-cfa-app" / "artifacts" / "customer_routing_example.ts",
-    ROOT / "skills" / "build-dashboard" / "artifacts" / "dashboard_story_example.ts",
-    ROOT / "skills" / "build-data-pipeline" / "artifacts" / "pipeline_stage_example.ts",
-    ROOT / "skills" / "migrate-to-motherduck" / "artifacts" / "migration_validation_example.ts",
-    ROOT / "skills" / "enable-self-serve-analytics" / "artifacts" / "self_serve_rollout_example.ts",
-    ROOT / "skills" / "partner-delivery" / "artifacts" / "client_delivery_example.ts",
-]
+def typescript_artifact_paths(selected_slugs: list[str] | None = None) -> list[Path]:
+    return [
+        artifact.path.with_suffix(".ts")
+        for artifact in selected_artifacts(selected_slugs)
+    ]
 
 
 def run_checked(command: list[str], *, cwd: Path = ROOT, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
@@ -37,12 +35,21 @@ def run_checked(command: list[str], *, cwd: Path = ROOT, env: dict[str, str]) ->
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Compile and run TypeScript companion artifacts.")
+    parser.add_argument(
+        "--artifacts",
+        nargs="*",
+        help="Optional subset of artifact slugs to run.",
+    )
+    args = parser.parse_args()
+
     env = os.environ.copy()
     expected_agent = expected_user_agent(env)
+    artifact_paths = typescript_artifact_paths(args.artifacts)
 
     with tempfile.TemporaryDirectory(prefix="md_ts_artifacts_") as tmpdir:
         out_dir = Path(tmpdir)
-        for artifact in TS_ARTIFACTS:
+        for artifact in artifact_paths:
             artifact_out_dir = out_dir / artifact.stem
             compile_command = [
                 "npx",
@@ -73,7 +80,7 @@ def main() -> int:
                     f"{artifact.name} returned user_agent={actual!r}, expected {expected_agent!r}"
                 )
 
-    print(f"Validated {len(TS_ARTIFACTS)} TypeScript artifacts.")
+    print(f"Validated {len(artifact_paths)} TypeScript artifacts.")
     return 0
 
 

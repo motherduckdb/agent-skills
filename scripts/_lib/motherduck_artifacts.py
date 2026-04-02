@@ -8,8 +8,8 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
+from _lib.motherduck_user_agent import build_use_case_user_agent
 from _lib.repo import ROOT
-from motherduck_user_agent import build_use_case_user_agent
 
 
 @dataclass(frozen=True)

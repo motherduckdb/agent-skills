@@ -9,7 +9,7 @@ from typing import Iterator
 
 import duckdb
 
-from scripts.motherduck_user_agent import build_use_case_user_agent
+from scripts._lib.motherduck_user_agent import build_use_case_user_agent
 
 TRUTHY = {"1", "true", "yes", "on"}
 
@@ -58,10 +58,7 @@ class ArtifactSession:
 
 def _local_session(database_keys: list[str], *, user_agent: str) -> Iterator[ArtifactSession]:
     conn = duckdb.connect()
-    attached = {
-        key: sanitize_identifier(key)
-        for key in database_keys
-    }
+    attached = {key: sanitize_identifier(key) for key in database_keys}
     try:
         for database_name in attached.values():
             conn.execute(f"ATTACH ':memory:' AS {quote_ident(database_name)}")
