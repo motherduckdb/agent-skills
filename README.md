@@ -184,17 +184,19 @@ These are the end-to-end use-case skills in the catalog:
 ## Skills Overview
 
 ```text
-                           Use Cases
-    build-cfa-app • build-dashboard • build-data-pipeline
-      migrate-to-motherduck • enable-self-serve-analytics
-                        • partner-delivery
-
-                            Workflows
-   load-data • model-data • share-data • create-dive • ducklake
-            security-governance • pricing-roi
-
-                            Utilities
-           connect • explore • query • duckdb-sql
++---------------------------------------------------------------+
+|                           Use Cases                           |
+| build-cfa-app | build-dashboard | build-data-pipeline         |
+| migrate-to-motherduck | enable-self-serve-analytics           |
+| partner-delivery                                            |
++---------------------------------------------------------------+
+|                           Workflows                           |
+| load-data | model-data | share-data | create-dive             |
+| ducklake | security-governance | pricing-roi                  |
++---------------------------------------------------------------+
+|                           Utilities                           |
+| connect | explore | query | duckdb-sql                        |
++---------------------------------------------------------------+
 ```
 
 | Skill | Layer | Use it when |
