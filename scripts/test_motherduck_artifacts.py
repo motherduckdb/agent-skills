@@ -6,83 +6,74 @@
 
 from __future__ import annotations
 
-import json
+import argparse
 import os
-import subprocess
 import sys
-import uuid
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
-
-from scripts.motherduck_user_agent import build_use_case_user_agent
-
-ARTIFACTS = [
-    ROOT / "skills" / "build-cfa-app" / "artifacts" / "customer_routing_example.py",
-    ROOT / "skills" / "build-dashboard" / "artifacts" / "dashboard_story_example.py",
-    ROOT / "skills" / "build-data-pipeline" / "artifacts" / "pipeline_stage_example.py",
-    ROOT / "skills" / "migrate-to-motherduck" / "artifacts" / "migration_validation_example.py",
-    ROOT / "skills" / "enable-self-serve-analytics" / "artifacts" / "self_serve_rollout_example.py",
-    ROOT / "skills" / "partner-delivery" / "artifacts" / "client_delivery_example.py",
-]
-REFERENCE_PROJECT = ROOT / "skills" / "build-data-pipeline" / "references" / "dlt-dbt-motherduck-project"
+from _lib.motherduck_artifacts import (
+    REFERENCE_PROJECT,
+    artifact_env,
+    expected_user_agent,
+    pipeline_env,
+    require_motherduck_token,
+    run_command,
+    selected_artifacts,
+    verify_artifact_output,
+)
+from _lib.repo import ROOT
 
 
-def run(command: list[str], *, env: dict[str, str], cwd: Path | None = None) -> str:
+def run_checked(command: list[str], *, env: dict[str, str], cwd=ROOT) -> str:
     print(f"$ {' '.join(command)}")
-    result = subprocess.run(
-        command,
-        check=True,
-        cwd=cwd or ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
-    )
+    result = run_command(command, cwd=cwd, env=env)
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:
         print(result.stderr, end="", file=sys.stderr)
+    if result.exit_code != 0:
+        raise RuntimeError(
+            f"Command failed with exit code {result.exit_code}: {' '.join(command)}"
+        )
     return result.stdout
 
 
-def verify_artifact_output(artifact: Path, stdout: str, *, expected_user_agent: str) -> None:
-    payload = json.loads(stdout)
-    actual = payload.get("backend", {}).get("user_agent")
-    if actual != expected_user_agent:
-        raise RuntimeError(
-            f"{artifact.name} returned user_agent={actual!r}, expected {expected_user_agent!r}"
-        )
-
-
 def main() -> int:
-    if not os.environ.get("MOTHERDUCK_TOKEN"):
-        raise RuntimeError("Missing MOTHERDUCK_TOKEN")
+    parser = argparse.ArgumentParser(description="Run MotherDuck-backed artifact smoke tests.")
+    parser.add_argument(
+        "--artifacts",
+        nargs="*",
+        help="Optional subset of artifact slugs to run.",
+    )
+    parser.add_argument(
+        "--skip-reference-project",
+        action="store_true",
+        help="Skip the dlt+dbt reference project smoke test.",
+    )
+    args = parser.parse_args()
+
+    require_motherduck_token()
 
     env = os.environ.copy()
-    env["MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK"] = "1"
-    expected_user_agent = build_use_case_user_agent(
-        harness=env.get("MOTHERDUCK_AGENT_HARNESS"),
-        llm=env.get("MOTHERDUCK_AGENT_LLM"),
-    )
+    expected_agent = expected_user_agent(env)
 
-    for artifact in ARTIFACTS:
-        stdout = run(["uv", "run", "--with", "duckdb", "python", str(artifact)], env=env)
+    for artifact in selected_artifacts(args.artifacts):
+        stdout = run_checked(
+            ["uv", "run", "--with", "duckdb", "python", str(artifact.path)],
+            env=artifact_env(artifact.slug, env),
+        )
         verify_artifact_output(
-            artifact,
+            artifact.path,
             stdout,
-            expected_user_agent=expected_user_agent,
+            expected_agent=expected_agent,
         )
 
-    pipeline_env = env.copy()
-    pipeline_env["MOTHERDUCK_PIPELINE_DB"] = f"tmp_agent_skills_pipeline_{uuid.uuid4().hex[:8]}"
-    pipeline_env.pop("VIRTUAL_ENV", None)
-    try:
-        run(["uv", "sync", "--python", "3.12"], env=pipeline_env, cwd=REFERENCE_PROJECT)
-        run(["uv", "run", "python", "pipeline/run_all.py"], env=pipeline_env, cwd=REFERENCE_PROJECT)
-    finally:
-        run(["uv", "run", "python", "pipeline/cleanup.py"], env=pipeline_env, cwd=REFERENCE_PROJECT)
+    if not args.skip_reference_project:
+        reference_env = pipeline_env(env)
+        try:
+            run_checked(["uv", "sync", "--python", "3.12"], env=reference_env, cwd=REFERENCE_PROJECT)
+            run_checked(["uv", "run", "python", "pipeline/run_all.py"], env=reference_env, cwd=REFERENCE_PROJECT)
+        finally:
+            run_checked(["uv", "run", "python", "pipeline/cleanup.py"], env=reference_env, cwd=REFERENCE_PROJECT)
 
     return 0
 

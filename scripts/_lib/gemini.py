@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
+from _lib.repo import ROOT
 
 
-ROOT = Path(__file__).resolve().parents[1]
 GEMINI_EXTENSION = ROOT / "gemini-extension.json"
 GEMINI_CONTEXT = ROOT / "GEMINI.md"
 GEMINI_CONTEXT_FILE_NAME = GEMINI_CONTEXT.name

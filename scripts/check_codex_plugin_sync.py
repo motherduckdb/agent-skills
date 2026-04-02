@@ -5,69 +5,30 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 import sys
-from pathlib import Path
 
+from _lib.repo import ROOT, collect_files, read_json_file
 
-ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 SOURCE_SKILLS = ROOT / "skills"
-PACKAGED_ROOT = ROOT / "plugins" / json.loads(SOURCE_PLUGIN.read_text())["name"]
-PACKAGED_PLUGIN = PACKAGED_ROOT / ".codex-plugin" / "plugin.json"
-PACKAGED_SKILLS = PACKAGED_ROOT / "skills"
-
-IGNORED_PARTS = {".venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "target"}
-IGNORED_NAMES = {".DS_Store"}
-IGNORED_SUFFIXES = {".pyc"}
 
 
 class SyncError(Exception):
     pass
 
 
-def should_ignore(relative_path: Path) -> bool:
-    if any(part in IGNORED_PARTS for part in relative_path.parts):
-        return True
-    if relative_path.name in IGNORED_NAMES:
-        return True
-    if relative_path.suffix in IGNORED_SUFFIXES:
-        return True
-    return False
-
-
-def file_digest(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(65536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def collect_files(root: Path) -> dict[Path, str]:
-    if not root.exists():
-        raise SyncError(f"Missing required directory: {root}")
-
-    files: dict[Path, str] = {}
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
-        relative_path = path.relative_to(root)
-        if should_ignore(relative_path):
-            continue
-        files[relative_path] = file_digest(path)
-    return files
-
-
 def main() -> int:
     if not SOURCE_PLUGIN.exists():
         raise SyncError(f"Missing required source plugin manifest: {SOURCE_PLUGIN}")
-    if not PACKAGED_PLUGIN.exists():
-        raise SyncError(f"Missing required packaged plugin manifest: {PACKAGED_PLUGIN}")
+
+    packaged_root = ROOT / "plugins" / str(read_json_file(SOURCE_PLUGIN)["name"])
+    packaged_plugin = packaged_root / ".codex-plugin" / "plugin.json"
+    packaged_skills = packaged_root / "skills"
+    if not packaged_plugin.exists():
+        raise SyncError(f"Missing required packaged plugin manifest: {packaged_plugin}")
 
     source_manifest = SOURCE_PLUGIN.read_text()
-    packaged_manifest = PACKAGED_PLUGIN.read_text()
+    packaged_manifest = packaged_plugin.read_text()
     if source_manifest != packaged_manifest:
         raise SyncError(
             "Packaged Codex plugin manifest is out of sync with .codex-plugin/plugin.json. "
@@ -75,7 +36,7 @@ def main() -> int:
         )
 
     source_files = collect_files(SOURCE_SKILLS)
-    packaged_files = collect_files(PACKAGED_SKILLS)
+    packaged_files = collect_files(packaged_skills)
 
     source_paths = set(source_files)
     packaged_paths = set(packaged_files)

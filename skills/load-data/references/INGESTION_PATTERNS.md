@@ -4,6 +4,114 @@ Advanced reference for data ingestion into MotherDuck. Covers format-specific op
 
 ---
 
+## Choose the client path first
+
+Before choosing a file format or SQL shape, choose the ingestion surface:
+
+- **Node.js with `@duckdb/node-api`** is a native DuckDB client path
+- **Python with `duckdb`** is a native DuckDB client path
+- **Node.js with `pg`**, **Python with `psycopg`**, or any other PostgreSQL driver talking to MotherDuck is a **Postgres-endpoint thin client path**
+
+That distinction matters more than the programming language itself.
+
+### Native DuckDB client paths
+
+Treat these as full DuckDB-capable ingestion surfaces.
+
+Use them when you need:
+
+- local-file `COPY`
+- loading from local DuckDB files
+- dataframe or Arrow registration
+- `CREATE SECRET`
+- extension-backed reads
+- local execution behavior such as `MD_RUN = LOCAL`
+
+In practice:
+
+- Node.js `@duckdb/node-api` and Python `duckdb` can use the richer DuckDB ingestion patterns
+- these paths are the default when the data starts on local disk, in memory, or in a local DuckDB workflow
+
+### Postgres-endpoint thin client paths
+
+Treat these as SQL submission paths, not as full DuckDB clients.
+
+Use them when:
+
+- the environment already speaks PostgreSQL
+- the source files already live in object storage or HTTPS
+- the app only needs to send SQL to MotherDuck
+
+Do not expect the PG endpoint to behave like a native DuckDB client. It is best for:
+
+- `CREATE TABLE AS SELECT` from remote files with `MD_RUN = REMOTE`
+- `INSERT INTO ... SELECT` from remote files with `MD_RUN = REMOTE`
+- explicit multi-row `INSERT` batches when the source exists only in application memory
+
+Do not use the PG endpoint for:
+
+- local-file `COPY`
+- `CREATE SECRET`
+- local DuckDB attachments
+- extension install/load workflows
+- local execution paths
+
+### Best-practice decision guide
+
+| Situation | Best path |
+| --- | --- |
+| Local file on disk | Native DuckDB client |
+| Dataframe or Arrow buffer in memory | Native DuckDB client |
+| Existing Node.js service already built on PostgreSQL drivers | PG endpoint, but prefer remote-read CTAS or batched multi-row inserts |
+| Existing Python service already built on PostgreSQL drivers | PG endpoint, but prefer remote-read CTAS or batched multi-row inserts |
+| Files already in S3, GCS, R2, Azure, or HTTPS | PG endpoint or native DuckDB client; default to remote-read SQL |
+| Need `CREATE SECRET` before loading | Native DuckDB client first, then PG endpoint is optional |
+
+### SQL patterns for the PG endpoint
+
+Preferred remote-read pattern:
+
+```sql
+CREATE OR REPLACE TABLE "my_db"."ingest"."orders_stage" AS
+SELECT *
+FROM read_parquet(
+    's3://bucket/orders/*.parquet',
+    MD_RUN = REMOTE
+);
+```
+
+Preferred publish-after-stage pattern:
+
+```sql
+CREATE OR REPLACE TABLE "my_db"."main"."orders_curated" AS
+SELECT
+    order_id,
+    customer_id,
+    order_ts,
+    total_amount
+FROM "my_db"."ingest"."orders_stage";
+```
+
+If the source exists only in application memory, use larger multi-row batches instead of one-row-at-a-time inserts:
+
+```sql
+INSERT INTO "my_db"."main"."orders_batch" VALUES
+  (1, 'a', 10.0),
+  (2, 'b', 20.0),
+  (3, 'c', 30.0);
+```
+
+For the PG endpoint, think in classic thin-client terms:
+
+- fewer round trips
+- larger batches
+- append into staging first
+- transactions that stay comfortably bounded
+
+If you find yourself trying to simulate a local DuckDB ingestion workflow over the PG wire, switch to a native DuckDB client path instead.
+
+---
+
 ## CSV Advanced Options
 
 Use these parameters when `read_csv()` auto-detection fails or produces incorrect results.

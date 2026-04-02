@@ -6,7 +6,7 @@ license: MIT
 
 # Share Data with MotherDuck
 
-Use this skill when you need to distribute a MotherDuck database without copying data. Shares are read-only, zero-copy database clones and should be treated as explicit provisioning operations, not as ad hoc query hacks.
+Use this skill when you need to distribute a MotherDuck database without copying data. Shares are read-only, zero-copy database clones and should be treated as explicit provisioning operations.
 
 ## Source Of Truth
 

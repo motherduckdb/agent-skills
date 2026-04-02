@@ -1,6 +1,6 @@
 ---
 name: migrate-to-motherduck
-description: Plan a migration to MotherDuck. Use when someone is moving from a datawarehouse (e.g Snowflake, Redshift, Postgres), dbt-heavy workflows, or mixed warehouse stacks and needs sequencing, cutover guidance, and blocker analysis.
+description: Plan a migration onto MotherDuck. Use when moving from Snowflake, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, validation, rollback, and native-versus-DuckLake posture.
 license: MIT
 ---
 
@@ -38,6 +38,7 @@ If no server is active, ask for representative source and target schemas before 
 - The user is moving from Snowflake, Redshift, Postgres, or similar.
 - The user needs cutover sequencing and validation.
 - The user needs to decide between native MotherDuck, `pg_duckdb`, or DuckLake.
+- The migration plan needs rollback, not just a list of copy commands.
 
 ## Migration Defaults
 
@@ -90,7 +91,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/migration_validation_example.py` -- local DuckDB example for source-vs-target validation and variance reporting
+- `artifacts/migration_validation_example.py` -- MotherDuck-backed Python example for source-vs-target validation and variance reporting
+- `artifacts/migration_validation_example.ts` -- TypeScript companion artifact with the same validation output contract
 
 Run it with:
 
@@ -103,6 +105,12 @@ Run the same validation flow against temporary MotherDuck databases:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/migrate-to-motherduck/artifacts/migration_validation_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 ## Related Skills

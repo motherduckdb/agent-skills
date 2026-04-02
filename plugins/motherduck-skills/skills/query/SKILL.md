@@ -18,7 +18,7 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 - Write DuckDB SQL, not PostgreSQL SQL, even when using the PG endpoint.
 - Always use fully qualified `"database"."schema"."table"` names.
 - Filter early, aggregate early, and prefer serving tables or summaries for repeated reads.
-- Use parameterized values in language wrappers and keep SQL obvious and multi-line.
+- Keep SQL obvious, multi-line, and explicit about grain, filters, and output shape.
 - Tag long-lived integrations with `custom_user_agent` when the connection path supports it.
 
 ## Workflow

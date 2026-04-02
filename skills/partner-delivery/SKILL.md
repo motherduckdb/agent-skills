@@ -1,6 +1,6 @@
 ---
 name: partner-delivery
-description: Deliver repeatable MotherDuck solutions across multiple client accounts. Use when someone needs multi-client architecture, regional deployment guidance, sharing boundaries, and reusable implementation patterns.
+description: Deliver repeatable MotherDuck architectures across multiple clients. Use when standardizing isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions for a consultancy or partner delivery model.
 license: MIT
 ---
 
@@ -31,6 +31,7 @@ If no server is active, ask for representative client patterns and regions befor
 - The user is delivering MotherDuck solutions across multiple clients.
 - The user needs region-aware, repeatable architecture.
 - The user needs standard provisioning with explicit client exceptions.
+- The goal is a reusable delivery pattern, not a one-off single-client implementation.
 
 ## Delivery Defaults
 
@@ -80,7 +81,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/client_delivery_example.py` -- local DuckDB example showing one database namespace per client and a simple validation pass across client environments
+- `artifacts/client_delivery_example.py` -- MotherDuck-backed Python example showing one database namespace per client and a simple validation pass across client environments
+- `artifacts/client_delivery_example.ts` -- TypeScript companion artifact with the same delivery output contract
 
 Run it with:
 
@@ -93,6 +95,12 @@ Run the same artifact against temporary MotherDuck databases:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/partner-delivery/artifacts/client_delivery_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 ## Related Skills

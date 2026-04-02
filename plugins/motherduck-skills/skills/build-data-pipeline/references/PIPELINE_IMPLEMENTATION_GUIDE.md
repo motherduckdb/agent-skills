@@ -30,7 +30,30 @@ Use this skill when designing an end-to-end workflow that moves data from raw so
 
 ## TypeScript/Javascript Orchestration Starter
 
-Use the PG endpoint for TypeScript pipeline orchestration. This integrates with existing Node.js stacks without installing native DuckDB bindings.
+For Node.js pipelines, prefer the native DuckDB path when you need any of these:
+
+- local-file ingestion
+- extension-backed reads
+- hybrid local and remote execution
+- tighter control over DuckDB behavior
+
+Use the PG endpoint only when the pipeline already lives in a PostgreSQL-driver environment and the work is limited to server-side SQL against MotherDuck-managed data or remote object reads.
+
+Native DuckDB path for Node.js:
+
+```ts
+import { DuckDBInstance } from "@duckdb/node-api";
+import { readFile } from "node:fs/promises";
+
+const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/1.0.0");
+const conn = await instance.connect();
+for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
+  await conn.run(await readFile(`sql/pipeline/${file}`, "utf8"));
+}
+conn.close();
+```
+
+PG endpoint path for existing PostgreSQL-driver stacks:
 
 ```ts
 import pg from "pg";
@@ -52,19 +75,7 @@ for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
 await client.end();
 ```
 
-For Node.js services that already use `@duckdb/node-api`, use the native DuckDB connection instead:
-
-```ts
-import { DuckDBInstance } from "@duckdb/node-api";
-import { readFile } from "node:fs/promises";
-
-const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/1.0.0");
-const conn = await instance.connect();
-for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
-  await conn.run(await readFile(`sql/pipeline/${file}`, "utf8"));
-}
-conn.close();
-```
+Do not use the PG endpoint for local-file `COPY`, extension installation, or other client-only DuckDB behaviors.
 
 ## Prerequisites
 

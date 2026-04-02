@@ -248,7 +248,12 @@ That catalog tracks:
 
 ## Runnable Use-Case Artifacts
 
-These are local-first examples packaged with the skills:
+These are packaged per use-case as paired artifacts:
+
+- a MotherDuck-backed Python artifact used by the existing smoke tests
+- a TypeScript companion artifact with the same output contract for app/backend-oriented implementations
+
+Python artifact commands:
 
 ```bash
 uv run --with duckdb python skills/build-cfa-app/artifacts/customer_routing_example.py
@@ -259,7 +264,13 @@ uv run --with duckdb python skills/enable-self-serve-analytics/artifacts/self_se
 uv run --with duckdb python skills/partner-delivery/artifacts/client_delivery_example.py
 ```
 
-They are not meant to replace production code. They are small runnable patterns that help an agent move from plan to implementation faster.
+Validate the TypeScript companion artifacts:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
+```
+
+They are not meant to replace production code. They are small patterns that help an agent move from plan to implementation faster.
 
 To run the whole artifact suite against temporary real MotherDuck databases with your token:
 
@@ -311,6 +322,7 @@ If you are editing the repo itself:
 ```bash
 uv run scripts/validate_skills.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+uv run scripts/test_typescript_artifacts.py
 uv run scripts/test_codex_plugin.py
 uv run scripts/test_codex_use_cases.py
 uv run scripts/test_motherduck_artifacts.py

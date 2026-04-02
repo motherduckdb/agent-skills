@@ -1,6 +1,6 @@
 ---
 name: enable-self-serve-analytics
-description: Roll out self-serve analytics on MotherDuck. Use when someone needs governed access, shareable dashboards, and a practical adoption plan for internal teams.
+description: Roll out self-serve analytics on MotherDuck for internal teams. Use when deciding the first governed dataset, the first Dive or share, ownership boundaries, and the rollout path from one audience to broader adoption.
 license: MIT
 ---
 
@@ -32,6 +32,7 @@ If no server is active, ask for a table list and target audience before drafting
 - The user wants internal teams to answer their own questions.
 - The user needs a first rollout plan for Dives, dashboards, or shares.
 - The user needs adoption plus governance, not just chart creation.
+- The audience is internal; for external users or embedded product analytics, use `build-cfa-app`.
 
 ## Rollout Defaults
 
@@ -82,7 +83,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/self_serve_rollout_example.py` -- local DuckDB example that publishes a curated view and produces team KPI output for a first rollout asset
+- `artifacts/self_serve_rollout_example.py` -- MotherDuck-backed Python example that publishes a curated view and produces team KPI output for a first rollout asset
+- `artifacts/self_serve_rollout_example.ts` -- TypeScript companion artifact with the same rollout output contract
 
 Run it with:
 
@@ -95,6 +97,12 @@ Run the same artifact against a temporary MotherDuck database:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 ## Related Skills

@@ -56,55 +56,58 @@ class ArtifactSession:
         }
 
 
-@contextmanager
-def artifact_session(
-    *,
-    slug: str,
-    database_keys: list[str],
-    user_agent: str | None = None,
-) -> Iterator[ArtifactSession]:
-    effective_user_agent = user_agent or build_use_case_user_agent()
-    use_motherduck = env_flag("MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK")
-    if not use_motherduck:
-        conn = duckdb.connect()
-        attached: dict[str, str] = {}
-        try:
-            for key in database_keys:
-                name = sanitize_identifier(key)
-                attached[key] = name
-                conn.execute(f"ATTACH ':memory:' AS {quote_ident(name)}")
-            yield ArtifactSession(
-                conn=conn,
-                mode="local",
-                databases=attached,
-                created_databases=[],
-                user_agent=effective_user_agent,
-            )
-        finally:
-            conn.close()
-        return
-
-    token = os.environ.get("MOTHERDUCK_TOKEN")
-    if not token:
-        raise RuntimeError(
-            "MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK is set but MOTHERDUCK_TOKEN is missing"
+def _local_session(database_keys: list[str], *, user_agent: str) -> Iterator[ArtifactSession]:
+    conn = duckdb.connect()
+    attached = {
+        key: sanitize_identifier(key)
+        for key in database_keys
+    }
+    try:
+        for database_name in attached.values():
+            conn.execute(f"ATTACH ':memory:' AS {quote_ident(database_name)}")
+        yield ArtifactSession(
+            conn=conn,
+            mode="local",
+            databases=attached,
+            created_databases=[],
+            user_agent=user_agent,
         )
+    finally:
+        conn.close()
 
+
+def _resolve_motherduck_prefix(slug: str) -> str:
     prefix = os.environ.get("MOTHERDUCK_ARTIFACT_PREFIX")
     if prefix:
-        prefix = sanitize_identifier(prefix)
-    else:
-        prefix = f"tmp_agent_skills_{sanitize_identifier(slug)}_{uuid.uuid4().hex[:8]}"
+        return sanitize_identifier(prefix)
+    return f"tmp_agent_skills_{sanitize_identifier(slug)}_{uuid.uuid4().hex[:8]}"
 
+
+def _require_motherduck_token() -> str:
+    token = os.environ.get("MOTHERDUCK_TOKEN")
+    if token:
+        return token
+    raise RuntimeError(
+        "MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK is set but MOTHERDUCK_TOKEN is missing"
+    )
+
+
+def _motherduck_session(
+    slug: str,
+    database_keys: list[str],
+    *,
+    user_agent: str,
+) -> Iterator[ArtifactSession]:
     conn = duckdb.connect(
         "md:",
         config={
-            "motherduck_token": token,
-            "custom_user_agent": effective_user_agent,
+            "motherduck_token": _require_motherduck_token(),
+            "custom_user_agent": user_agent,
         },
     )
     created_databases: list[str] = []
     databases: dict[str, str] = {}
+    prefix = _resolve_motherduck_prefix(slug)
     try:
         for key in database_keys:
             name = f"{prefix}_{sanitize_identifier(key)}"
@@ -116,9 +119,28 @@ def artifact_session(
             mode="motherduck",
             databases=databases,
             created_databases=created_databases,
-            user_agent=effective_user_agent,
+            user_agent=user_agent,
         )
     finally:
         for database_name in reversed(created_databases):
             conn.execute(f"DROP DATABASE IF EXISTS {quote_ident(database_name)}")
         conn.close()
+
+
+@contextmanager
+def artifact_session(
+    *,
+    slug: str,
+    database_keys: list[str],
+    user_agent: str | None = None,
+) -> Iterator[ArtifactSession]:
+    effective_user_agent = user_agent or build_use_case_user_agent()
+    if not env_flag("MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK"):
+        yield from _local_session(database_keys, user_agent=effective_user_agent)
+        return
+
+    yield from _motherduck_session(
+        slug,
+        database_keys,
+        user_agent=effective_user_agent,
+    )

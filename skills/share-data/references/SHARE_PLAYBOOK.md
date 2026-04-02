@@ -14,54 +14,12 @@ Key properties:
 - **Owner-controlled updates**: use `UPDATE MANUAL` for explicit snapshots or `UPDATE AUTOMATIC` for periodic propagation
 - **Access-controlled**: restrict who can attach the share by organization, ACL, or share URL pattern
 
-## Language Defaults
+## SQL-First Posture
 
-- Prefer **Python** for recurring share creation, validation scripts, and operational checks.
-- Prefer **TypeScript/Javascript** when share creation is part of partner provisioning, admin surfaces, or app delivery tooling.
-- In both languages, keep share SQL explicit and auditable.
-
-### TypeScript/Javascript Starter
-
-```ts
-import pg from "pg";
-
-const createShareSql = `
-  CREATE SHARE IF NOT EXISTS partner_share FROM analytics (
-    ACCESS RESTRICTED,
-    VISIBILITY HIDDEN,
-    UPDATE MANUAL
-  )
-`;
-
-const client = new pg.Client({
-  host: "pg.us-east-1-aws.motherduck.com",
-  port: 5432,
-  database: "analytics",
-  user: "postgres",
-  password: process.env.MOTHERDUCK_TOKEN,
-  ssl: { rejectUnauthorized: true },
-});
-
-await client.connect();
-await client.query(createShareSql);
-await client.end();
-```
-
-### Python Starter
-
-```python
-import duckdb
-
-conn = duckdb.connect("md:analytics")
-conn.sql("""
-CREATE SHARE IF NOT EXISTS partner_share FROM analytics (
-  ACCESS RESTRICTED,
-  VISIBILITY HIDDEN,
-  UPDATE MANUAL
-)
-""")
-conn.close()
-```
+- Keep share creation and maintenance as explicit SQL, even when the caller is an application or provisioning tool.
+- Make access, visibility, and update mode explicit in every `CREATE SHARE`.
+- Treat share operations as auditable database changes, not as hidden driver logic.
+- Use SQL to verify the share state after every create, update, grant, revoke, or attach step.
 
 ## Default Workflow
 
@@ -71,6 +29,33 @@ conn.close()
 4. Distribute the share URL if the share is hidden or external.
 5. Have recipients attach and query the data.
 6. For manual shares, run `UPDATE SHARE` on the owner side and `REFRESH DATABASE` on the consumer side.
+
+## SQL Workflow Template
+
+Use this sequence as the default shape:
+
+```sql
+-- owner side
+CREATE SHARE IF NOT EXISTS partner_share FROM analytics (
+  ACCESS RESTRICTED,
+  VISIBILITY HIDDEN,
+  UPDATE MANUAL
+);
+
+GRANT READ ON SHARE partner_share TO duck1, duck2;
+
+LIST SHARES;
+FROM MD_INFORMATION_SCHEMA.OWNED_SHARES;
+
+-- later, when publishing a new manual snapshot
+UPDATE SHARE partner_share;
+
+-- consumer side
+ATTACH '<share_url>' AS partner_data;
+REFRESH DATABASE partner_data;
+
+SELECT * FROM "partner_data"."main"."customers" LIMIT 10;
+```
 
 ## Create a Share
 

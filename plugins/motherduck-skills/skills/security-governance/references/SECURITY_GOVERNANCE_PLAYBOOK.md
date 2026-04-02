@@ -8,36 +8,35 @@ Reference for discussing MotherDuck security posture, access-control boundaries,
 - The user is reviewing a proposed architecture for tenant isolation or token handling.
 - The user needs a secure default pattern for an app, pipeline, or analytics rollout.
 
-## Language Focus
+## SQL Review Checks
 
-- Prefer **TypeScript/Javascript** security examples for backend APIs, serverless functions, and product-side token handling.
-- Prefer **Python** security examples for data automation, backend services, and operational scripts.
-- In both languages, keep credentials in environment variables or a secret manager and avoid browser-exposed or hardcoded token patterns.
+Use SQL to validate the governance boundary that the architecture claims to have.
 
-### TypeScript/Javascript Secure Config Starter
+Check what databases and aliases are actually in scope:
 
-```ts
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}`);
-  return value;
-}
-
-const mdToken = requireEnv("MOTHERDUCK_TOKEN");
+```sql
+SELECT alias AS database_name, type
+FROM MD_ALL_DATABASES();
 ```
 
-### Python Secure Config Starter
+Check what shares are owned:
 
-```python
-import os
+```sql
+FROM MD_INFORMATION_SCHEMA.OWNED_SHARES;
+```
 
-def require_env(name: str) -> str:
-    value = os.environ.get(name)
-    if not value:
-        raise RuntimeError(f"Missing required env var: {name}")
-    return value
+Check what shares are attached from others:
 
-md_token = require_env("MOTHERDUCK_TOKEN")
+```sql
+FROM MD_INFORMATION_SCHEMA.SHARED_WITH_ME;
+```
+
+Check whether a proposed consumer path is reading from a curated shared database instead of a raw internal database:
+
+```sql
+SELECT *
+FROM "shared_partner_data"."main"."approved_metrics"
+LIMIT 10;
 ```
 
 ## Secure Defaults
@@ -46,6 +45,7 @@ md_token = require_env("MOTHERDUCK_TOKEN")
 - Prefer backend-held credentials over browser-exposed credentials.
 - Prefer structural isolation over query-time tenant filtering for serious B2B or CFA workloads.
 - Prefer region-specific guidance when residency matters.
+- Use shares as database-level read-only publication boundaries, not as row-level security.
 
 ## Publicly Documented Security Anchors
 
@@ -68,6 +68,12 @@ Answer these questions:
 3. Who can read, write, share, or administer data?
 4. Does the design require region or residency constraints?
 5. What proof or documentation still needs to come from current public trust or compliance material?
+
+If the design claims governed distribution, also ask:
+
+6. Which database is actually being shared?
+7. Is the shared database curated or just a raw internal workspace?
+8. Does the plan rely on query-time tenant filtering where a stronger database or service-account boundary is warranted?
 
 ## Region and Residency Guidance
 

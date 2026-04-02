@@ -2,14 +2,12 @@
 
 Reference for writing DuckDB SQL against MotherDuck, choosing the right query patterns, and avoiding common analytical-query mistakes.
 
-## Language Focus
+## SQL-First Posture
 
-- Prefer **Python** examples for analytics scripts, transformations, notebooks, and orchestration.
-- Prefer **TypeScript/Javascript** examples for backend APIs, web analytics serving, and internal tools.
-- In both languages:
-  - parameterize values instead of interpolating strings
-  - keep SQL in multi-line strings with obvious formatting
-  - return pre-aggregated results to the application layer
+- Keep the query logic in SQL rather than pushing grouping, filtering, and reshaping into the caller.
+- Write multi-line SQL with explicit aliases, explicit grain, and explicit fully qualified table names.
+- Leave value binding to the caller, but keep the SQL itself obvious and production-readable.
+- Return pre-aggregated results when the workload is a repeated dashboard, app-serving endpoint, or shared analytical surface.
 
 ## Compute and Storage Posture
 
@@ -19,58 +17,17 @@ Reference for writing DuckDB SQL against MotherDuck, choosing the right query pa
 - Tag long-lived integrations with `custom_user_agent` so query history can attribute cost and workload shape later.
 - When validating multi-database patterns in the native DuckDB API, use a workspace connection (`md:`) and fully qualified names.
 
-### TypeScript/Javascript Starter
+## SQL Starter
 
-```ts
-import pg from "pg";
-
-const pool = new pg.Pool({
-  host: "pg.us-east-1-aws.motherduck.com",
-  port: 5432,
-  database: "analytics",
-  user: "postgres",
-  password: process.env.MOTHERDUCK_TOKEN,
-  ssl: { rejectUnauthorized: true },
-});
-
-const sql = `
-  SELECT customer_id, SUM(amount) AS total_spent
-  FROM "analytics"."main"."orders"
-  WHERE order_date >= $1
-  GROUP BY customer_id
-  ORDER BY total_spent DESC
-  LIMIT 20
-`;
-
-const { rows } = await pool.query(sql, ["2025-01-01"]);
-```
-
-### Python Starter
-
-```python
-import os
-import certifi
-import psycopg
-
-sql = """
-SELECT customer_id, SUM(amount) AS total_spent
+```sql
+SELECT
+    customer_id,
+    SUM(amount) AS total_spent
 FROM "analytics"."main"."orders"
-WHERE order_date >= %s
+WHERE order_date >= DATE '2025-01-01'
 GROUP BY customer_id
 ORDER BY total_spent DESC
-LIMIT 20
-"""
-
-with psycopg.connect(
-    host="pg.us-east-1-aws.motherduck.com",
-    port=5432,
-    dbname="analytics",
-    user="postgres",
-    password=os.environ["MOTHERDUCK_TOKEN"],
-    sslmode="verify-full",
-    sslrootcert=certifi.where(),
-) as conn:
-    rows = conn.execute(sql, ("2025-01-01",)).fetchall()
+LIMIT 20;
 ```
 
 ## Always Use Fully Qualified Table Names

@@ -137,6 +137,12 @@ Do not design the destination before classifying the current stack.
   - hybrid workload optimization so OLTP stays in PostgreSQL while OLAP moves to DuckDB
 - Use DuckLake only when open-table-format requirements are explicit.
 
+Important migration gotcha:
+
+- the PG endpoint still runs DuckDB SQL, not PostgreSQL SQL
+- do not assume PostgreSQL-specific syntax, temp-table habits, local-file imports, or extension management will survive unchanged over the PG endpoint
+- when the migration depends on local DuckDB features, use a native DuckDB client path instead of forcing everything through PostgreSQL drivers
+
 ## Migration Decision Matrix
 
 - Source is PostgreSQL and the team wants minimal disruption:

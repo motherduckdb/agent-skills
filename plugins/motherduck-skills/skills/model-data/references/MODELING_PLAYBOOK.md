@@ -2,57 +2,23 @@
 
 Reference for analytical schema design, data-type selection, CTAS and view patterns, complex types, and DuckDB constraint behavior in MotherDuck.
 
-## Language Focus
+## SQL-First Modeling Posture
 
-- Prefer **Python** examples when schema design is tied to ETL, ELT, dbt-like modeling work, notebooks, or migration scripts.
-- Prefer **TypeScript/Javascript** examples when schema design is tied to product backends, analytics APIs, or customer-facing analytics control planes.
-- In both languages, keep DDL as explicit SQL checked into the repo rather than generated dynamically at runtime unless there is a strong reason not to.
+- Keep model definitions as explicit SQL DDL or CTAS statements, not dynamic code generation.
+- Make grain, lifecycle stage, and output shape obvious in the SQL itself.
+- Prefer checked-in SQL that can be reviewed, rebuilt, and rerun.
+- Use comments, fully qualified names, and explicit data types so the model remains understandable outside the application code that executes it.
 
-### TypeScript/Javascript Starter
+### SQL Starter
 
-```ts
-import pg from "pg";
-
-const ddl = `
-  CREATE OR REPLACE TABLE "analytics"."main"."daily_metrics" AS
-  SELECT date_trunc('day', event_timestamp) AS day,
-         event_type,
-         COUNT(*) AS event_count
-  FROM "raw"."main"."events"
-  GROUP BY ALL
-`;
-
-const client = new pg.Client({
-  host: "pg.us-east-1-aws.motherduck.com",
-  port: 5432,
-  database: "analytics",
-  user: "postgres",
-  password: process.env.MOTHERDUCK_TOKEN,
-  ssl: { rejectUnauthorized: true },
-});
-
-await client.connect();
-await client.query(ddl);
-await client.end();
-```
-
-### Python Starter
-
-```python
-import duckdb
-
-ddl = """
+```sql
 CREATE OR REPLACE TABLE "analytics"."main"."daily_metrics" AS
-SELECT date_trunc('day', event_timestamp) AS day,
-       event_type,
-       COUNT(*) AS event_count
+SELECT
+    date_trunc('day', event_timestamp) AS day,
+    event_type,
+    COUNT(*) AS event_count
 FROM "raw"."main"."events"
-GROUP BY ALL
-"""
-
-conn = duckdb.connect("md:analytics")
-conn.sql(ddl)
-conn.close()
+GROUP BY ALL;
 ```
 
 ## Schema Design Principles

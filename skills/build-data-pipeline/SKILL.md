@@ -1,6 +1,6 @@
 ---
 name: build-data-pipeline
-description: Build an end-to-end data pipeline with MotherDuck. Use when someone is designing a workflow that ingests external data, transforms it with DuckDB SQL, and produces analytics-ready tables or visualizations.
+description: Design an end-to-end MotherDuck pipeline. Use when choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, publication targets, or whether DuckLake is actually required.
 license: MIT
 ---
 
@@ -35,6 +35,7 @@ If no server is active, ask for source shape and target shape before drafting th
 - The user needs ingestion plus transformation plus serving output.
 - The work spans raw landing, curation, and publication.
 - The user needs a stage-by-stage pipeline pattern rather than one command.
+- The problem is bigger than a single import step or one ad hoc transformation.
 
 ## Pipeline Defaults
 
@@ -89,7 +90,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/pipeline_stage_example.py` -- local DuckDB example that stages a Parquet extract, lands it into raw, deduplicates it, and publishes analytics output across raw/staging/analytics databases
+- `artifacts/pipeline_stage_example.py` -- MotherDuck-backed Python example that stages a Parquet extract, lands it into raw, deduplicates it, and publishes analytics output across raw/staging/analytics databases
+- `artifacts/pipeline_stage_example.ts` -- TypeScript companion artifact with the same stage layout and output contract
 - `references/dlt-dbt-motherduck-project/` -- end-to-end MotherDuck example that bootstraps the target database, lands raw data with `dlt`, builds staging and analytics models with `dbt`, and validates the final mart
 
 Run it with:
@@ -103,6 +105,12 @@ Run the same stage pattern against temporary MotherDuck databases:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/build-data-pipeline/artifacts/pipeline_stage_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 For the full MotherDuck project:

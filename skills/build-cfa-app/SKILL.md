@@ -1,6 +1,6 @@
 ---
 name: build-cfa-app
-description: Build a customer-facing analytics application powered by MotherDuck. Use when someone is embedding analytics into a SaaS product and needs per-customer isolation, read scaling, and sub-second query latency.
+description: Design a MotherDuck-backed customer-facing analytics app. Use when building embedded or product analytics for external users and the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.
 license: MIT
 ---
 
@@ -35,6 +35,7 @@ If no server is active, ask for a representative schema excerpt or table list an
 - Tenant isolation or blast radius matters.
 - Read concurrency and latency matter.
 - The project needs a backend contract, not just a Dive.
+- The requirement is stronger than an internal dashboard or a read-only embed.
 
 ## Default Serving Choices
 
@@ -95,7 +96,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/customer_routing_example.py` -- local DuckDB example showing per-customer routing with separate database namespaces
+- `artifacts/customer_routing_example.py` -- MotherDuck-backed Python example showing per-customer routing with separate database namespaces
+- `artifacts/customer_routing_example.ts` -- TypeScript companion artifact with the same routing contract and output shape
 
 Run it with:
 
@@ -108,6 +110,12 @@ Run the same artifact against temporary MotherDuck databases:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/build-cfa-app/artifacts/customer_routing_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 ## Related Skills
