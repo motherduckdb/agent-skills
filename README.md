@@ -4,7 +4,7 @@ MotherDuck Skills is the public skill catalog for agents building on MotherDuck.
 
 It gives agents practical guidance for the most common work on the platform: connecting to MotherDuck, exploring live data, writing DuckDB SQL, modeling tables, building Dives, and shipping larger workflows like dashboards, migrations, and data pipelines.
 
-The repo is intentionally opinionated and agent-friendly:
+The repo is intentionally opinionated and agent-oriented:
 
 - prefer live schema discovery over invented schemas
 - keep deeper guidance in `references/`
@@ -16,7 +16,7 @@ The repo is intentionally opinionated and agent-friendly:
 Choose one install path per agent.
 
 - want the packaged experience: use the Claude Code, Codex, or Gemini CLI install
-- want a cross-agent install path for Claude Code, Codex, or Gemini: use the Skills CLI
+- want only a few skills or a cross-agent install: use the Skills CLI
 - want full manual control: copy a skill directory directly
 
 Avoid mixing packaged installs and raw skill installs for the same agent unless you are testing packaging behavior.
@@ -36,7 +36,7 @@ Avoid mixing packaged installs and raw skill installs for the same agent unless 
 
 ```bash
 /plugin marketplace add motherduckdb/agent-skills
-/plugin install motherduck-skills@motherduck-skills
+/plugin install motherduck-skills@motherduck-agent-skills
 ```
 
 After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
@@ -88,7 +88,7 @@ gemini skills link skills
 npx skills add motherduckdb/agent-skills
 ```
 
-The `skills` package is interactive, so use the repo-level install and follow the prompts. It can install MotherDuck skills into Claude Code, Codex, or Gemini.
+The `skills` package is interactive, so use the repo-level install and follow the prompts.
 
 Best practices:
 
