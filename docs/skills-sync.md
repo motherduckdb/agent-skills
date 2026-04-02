@@ -27,6 +27,7 @@ The intended review loop is:
    - the skill router in `SKILL.md`
    - the detailed content in `references/`
    - the runnable examples in `artifacts/`
+   - the TypeScript companion artifact when the catalog or skill references one
    - any fuller reference project shipped under `references/`
    - optional maintainer-only comparison inputs such as `motherduck-examples`
 4. update the skill and references
@@ -55,6 +56,7 @@ When updating a skill, treat `skills/catalog.json` as the first stop:
 - check `source_docs`
 - update `references/`
 - rerun the `artifacts/`
+- rerun `scripts/test_typescript_artifacts.py` when the skill ships TS companion artifacts
 - rerun any bundled reference project that represents the use case more completely
 - rerun the MotherDuck-backed artifact suite when the change affects real MotherDuck behavior
 

@@ -36,6 +36,13 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - `Validation Signals` sections in references are maintainer/reviewer guidance, not a required heading in normal user-facing replies.
 - Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency.
 
+## Repo Maintenance Layout
+
+- Treat root `scripts/` as executable entrypoints only.
+- Shared script implementation lives under `scripts/_lib/`.
+- Shared test implementation lives under `tests/_lib/`.
+- When artifact behavior changes, keep the Python and TypeScript companion artifacts aligned when both exist.
+
 ## Skill Catalog
 
 | Skill | Invoke | Description |
