@@ -2,21 +2,24 @@
 
 MotherDuck Skills is the public skill catalog for agents building on MotherDuck.
 
-It gives coding agents durable, opinionated guidance for the work people actually do on MotherDuck: connecting applications, exploring live data, writing DuckDB SQL, modeling analytics tables, building Dives, and shipping larger end-to-end patterns like customer-facing analytics, dashboards, migrations, and data pipelines.
+It gives agents practical guidance for the most common work on the platform: connecting to MotherDuck, exploring live data, writing DuckDB SQL, modeling tables, building Dives, and shipping larger workflows like dashboards, migrations, and data pipelines.
 
-This repo is intentionally agent-oriented:
+The repo is intentionally opinionated and agent-friendly:
 
-- it assumes the agent may have MotherDuck MCP access
-- it prefers live schema discovery over invented schemas when a server is available
-- it keeps detailed guidance in `references/`
-- it packages runnable use-case artifacts inside the skill folders
-- it now tests those artifacts against temporary real MotherDuck databases, not just local DuckDB
+- prefer live schema discovery over invented schemas
+- keep deeper guidance in `references/`
+- ship runnable examples inside the skill folders
+- validate important artifacts against temporary real MotherDuck databases
 
 ## Install
 
-Choose one install path for each agent. For packaged installs, the order below is Claude Code first, Codex second, and Gemini CLI third. For cross-agent raw skill installs, the Skills CLI remains the simplest default.
+Choose one install path per agent.
 
-Avoid mixing plugin installs and raw skill installs for the same agent unless you are testing packaging behavior.
+- want the packaged experience: use the Claude Code, Codex, or Gemini CLI install
+- want a cross-agent install path for Claude Code, Codex, or Gemini: use the Skills CLI
+- want full manual control: copy a skill directory directly
+
+Avoid mixing packaged installs and raw skill installs for the same agent unless you are testing packaging behavior.
 
 ### Choose an install path
 
@@ -27,14 +30,13 @@ Avoid mixing plugin installs and raw skill installs for the same agent unless yo
 | Install the whole MotherDuck catalog in Gemini CLI | Gemini CLI extension install |
 | Install one or two skills in Gemini CLI without the packaged extension | Gemini CLI skills install |
 | Install the whole MotherDuck catalog quickly | Skills CLI |
-| Install only one or two skills | Skills CLI with `--skill` |
 | Vendor one skill directly into a repo or agent home without plugin tooling | Manual per-skill install |
 
 ### Claude Code plugin install
 
 ```bash
 /plugin marketplace add motherduckdb/agent-skills
-/plugin install motherduck-skills@motherduck-agent-skills
+/plugin install motherduck-skills@motherduck-skills
 ```
 
 After install, restart Claude Code if it was already running. The skills load automatically and should trigger when relevant.
@@ -64,19 +66,7 @@ For local development from a checkout:
 gemini extensions link .
 ```
 
-After installation, restart Gemini CLI or reload your session. Useful follow-ups:
-
-```bash
-gemini extensions list
-gemini skills list
-```
-
-Inside Gemini CLI you can also use:
-
-- `/extensions list`
-- `/skills list`
-- `/motherduck:catalog`
-- `/motherduck:route build a dashboard over my MotherDuck analytics tables`
+After installation, restart Gemini CLI or reload your session. `gemini extensions list` and `gemini skills list` can help confirm the install.
 
 ### Gemini CLI skills install
 
@@ -98,43 +88,13 @@ gemini skills link skills
 npx skills add motherduckdb/agent-skills
 ```
 
-### Skills CLI: install one or more specific skills
-
-```bash
-npx skills add motherduckdb/agent-skills --skill connect --skill explore --skill query
-```
-
-You can also install directly from a single skill path in the repo:
-
-```bash
-npx skills add https://github.com/motherduckdb/agent-skills/tree/main/skills/connect
-```
-
-Useful variants:
-
-```bash
-# list the skills in this repo without installing
-npx skills add motherduckdb/agent-skills --list
-
-# install only selected skills
-npx skills add motherduckdb/agent-skills --skill connect --skill explore --skill query
-
-# install only to Claude Code, globally
-npx skills add motherduckdb/agent-skills --skill connect -a claude-code -g
-
-# install only to Codex, globally
-npx skills add motherduckdb/agent-skills --skill connect -a codex -g
-
-# install one skill from the repo path, to Claude Code only
-npx skills add https://github.com/motherduckdb/agent-skills/tree/main/skills/connect -a claude-code -g
-```
+The `skills` package is interactive, so use the repo-level install and follow the prompts. It can install MotherDuck skills into Claude Code, Codex, or Gemini.
 
 Best practices:
 
 - the default install scope is project-local; use that when the skills should travel with the repo
 - add `-g` when you want a personal cross-project install
-- use `--skill <name>` when you want only a few skills instead of the whole catalog
-- prefer the repo-level install plus `--skill` over many one-off path installs when you want multiple MotherDuck skills from this catalog
+- use manual per-skill install when you want only one skill from this repo without the full catalog
 
 ### Manual per-skill install
 
@@ -155,20 +115,16 @@ cp -R skills/connect ~/.claude/skills/connect
 cp -R skills/connect ~/.codex/skills/connect
 ```
 
-Replace `connect` with any skill name from this repo, for example `query`, `create-dive`, or `build-dashboard`.
-
 For manual installs, prefer `.agents/skills/<name>` when the skill should be shared with the project. Use `~/.claude/skills/<name>` or `~/.codex/skills/<name>` only for personal cross-project defaults.
 
 ### After installation
 
-These are skills, not standalone apps. Once installed, the normal flow is to ask the agent to do the work and let it pull in the relevant skill when needed.
+These are skills, not standalone apps. After install, ask the agent to do the work and let it load the right skill from context.
 
-Examples:
+You can name a skill explicitly if you want, but in most cases a normal request is enough:
 
-- `Use MotherDuck skills to connect to my workspace and inspect the schema.`
-- `Use the connect, explore, and query skills to validate this analytics query.`
-- `Use MotherDuck skills to build a Dive-backed dashboard on these tables.`
-- `/motherduck:route migrate this Postgres analytics workload to MotherDuck`
+- `Use MotherDuck skills to inspect this workspace and validate the query.`
+- `Use MotherDuck skills to build a dashboard on these tables.`
 
 If you installed a single skill manually or through the Skills CLI, you can name it explicitly, but most agents should also discover it automatically from context.
 
@@ -189,19 +145,14 @@ Maintainer note for Gemini gallery discovery:
 
 ## How Agents Should Use This Repo
 
-For most real tasks, the right flow is:
+For most real tasks, start in this order:
 
 1. `connect`
 2. `explore`
 3. `query`
 4. move into the workflow or use-case skill that matches the job
 
-That sequence is deliberate:
-
-- `connect` decides PG endpoint vs native DuckDB vs other paths
-- `explore` establishes the real MotherDuck data model in scope
-- `query` validates the actual SQL shape before higher-level orchestration
-- the higher-level skill should then stay focused on architecture and delivery
+That keeps the agent grounded in the real connection path, schema, and SQL shape before it moves into higher-level orchestration.
 
 When a use-case skill is involved and a remote or local MotherDuck server is active, the agent should not guess the schema:
 
