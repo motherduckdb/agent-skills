@@ -72,6 +72,12 @@ When changing the repo-level install and discovery story, also keep the Gemini e
 - `GEMINI.md`
 - `commands/motherduck/*.toml`
 
+Repo maintenance layout:
+
+- keep root `scripts/` limited to executable entrypoints
+- put shared script implementation in `scripts/_lib/`
+- put shared test implementation in `tests/_lib/`
+
 ## Writing Style
 
 - prefer direct trigger phrases in descriptions
@@ -95,4 +101,10 @@ When a change affects use-case skills or their artifacts, also run:
 ```bash
 uv run scripts/test_codex_use_cases.py
 uv run scripts/test_motherduck_artifacts.py
+```
+
+When a change affects TypeScript companion artifacts, also run:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```

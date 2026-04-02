@@ -44,41 +44,56 @@ function parseSnippet(code, fileName, kind) {
   });
 }
 
-const input = fs.readFileSync(0, "utf8");
-const snippets = JSON.parse(input);
-let hasErrors = false;
+function parseInput() {
+  const input = fs.readFileSync(0, "utf8");
+  const snippets = JSON.parse(input);
+  if (!Array.isArray(snippets)) {
+    throw new Error("Expected a JSON array of snippets");
+  }
+  return snippets;
+}
 
-const results = snippets.map((snippet, index) => {
-  const kind = SCRIPT_KINDS[snippet.kind] || ts.ScriptKind.TS;
-  const ext = FILE_EXTENSIONS[snippet.kind] || "ts";
+function wrappedTsxCandidates(code) {
+  return [
+    `function __SnippetWrapper__() {\n  return (<>\n${code}\n  </>);\n}`,
+    `function __SnippetWrapper__() {\n${code}\n}`,
+  ];
+}
+
+function validateSnippet(snippet, index) {
+  const kindName = snippet.kind || "TS";
+  const kind = SCRIPT_KINDS[kindName] || ts.ScriptKind.TS;
+  const ext = FILE_EXTENSIONS[kindName] || "ts";
   const fileName = `snippet_${index}.${ext}`;
 
-  // First attempt: parse as-is
-  const errors = parseSnippet(snippet.code, fileName, kind);
-
-  if (errors.length === 0) {
+  const initialErrors = parseSnippet(snippet.code, fileName, kind);
+  if (initialErrors.length === 0) {
     return { index, errors: [] };
   }
 
-  // For TSX snippets, retry by wrapping in a component (handles JSX fragments)
-  if (snippet.kind === "TSX") {
-    const wrapped = `function __SnippetWrapper__() {\n  return (<>\n${snippet.code}\n  </>);\n}`;
-    const wrappedErrors = parseSnippet(wrapped, fileName, kind);
-    if (wrappedErrors.length === 0) {
-      return { index, errors: [] };
-    }
-
-    // Also try wrapping as a statement block (handles expression snippets)
-    const wrappedBlock = `function __SnippetWrapper__() {\n${snippet.code}\n}`;
-    const blockErrors = parseSnippet(wrappedBlock, fileName, kind);
-    if (blockErrors.length === 0) {
-      return { index, errors: [] };
+  if (kindName === "TSX") {
+    for (const candidate of wrappedTsxCandidates(snippet.code)) {
+      if (parseSnippet(candidate, fileName, kind).length === 0) {
+        return { index, errors: [] };
+      }
     }
   }
 
-  hasErrors = true;
-  return { index, errors };
-});
+  return { index, errors: initialErrors };
+}
 
-process.stdout.write(JSON.stringify(results));
-process.exit(hasErrors ? 1 : 0);
+function main() {
+  const snippets = parseInput();
+  const results = snippets.map((snippet, index) => validateSnippet(snippet, index));
+  const hasErrors = results.some((entry) => entry.errors.length > 0);
+  process.stdout.write(JSON.stringify(results));
+  process.exit(hasErrors ? 1 : 0);
+}
+
+try {
+  main();
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  process.stderr.write(`${message}\n`);
+  process.exit(1);
+}

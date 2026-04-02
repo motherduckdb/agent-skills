@@ -1,6 +1,6 @@
 ---
 name: build-dashboard
-description: Build a complete analytics dashboard using MotherDuck Dives. Use when an analytics_lead, champion_user, or consultant_partner needs a multi-chart, multi-KPI interactive dashboard with live MotherDuck data and a clear story for end users.
+description: Build a live MotherDuck dashboard as a Dive. Use when composing one shareable KPI, trend, and breakdown story over existing MotherDuck data, especially when the result should stay a saved workspace artifact rather than a full application.
 license: MIT
 ---
 
@@ -33,6 +33,7 @@ If no server is active, ask for a table list or schema excerpt and make the assu
 - The user wants KPIs plus trend and breakdown views in one artifact.
 - The result should be a saved, shareable Dive.
 - The work needs dashboard composition, not just chart mechanics.
+- The result is a workspace analytics surface, not a customer-facing product backend.
 
 For lower-level Dive mechanics, use `create-dive`.
 
@@ -88,7 +89,8 @@ Use this exact top-level shape when JSON is requested:
 
 ## Runnable Artifact
 
-- `artifacts/dashboard_story_example.py` -- local DuckDB example that produces KPI, trend, breakdown, and detail outputs for one dashboard story
+- `artifacts/dashboard_story_example.py` -- MotherDuck-backed Python example that produces KPI, trend, breakdown, and detail outputs for one dashboard story
+- `artifacts/dashboard_story_example.ts` -- TypeScript companion artifact with the same dashboard output contract
 
 Run it with:
 
@@ -101,6 +103,12 @@ Run the same artifact against a temporary MotherDuck database:
 ```bash
 MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
 uv run --with duckdb python skills/build-dashboard/artifacts/dashboard_story_example.py
+```
+
+Validate the TypeScript companion artifact:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 ## Related Skills

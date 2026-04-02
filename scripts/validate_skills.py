@@ -11,7 +11,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-from gemini_extension_config import (
+from _lib.gemini import (
     GEMINI_COMMANDS,
     GEMINI_CONTEXT,
     GEMINI_CONTEXT_FILE_NAME,
@@ -19,9 +19,8 @@ from gemini_extension_config import (
     GEMINI_PLAN_DIRECTORY,
     GEMINI_REQUIRED_COMMANDS,
 )
+from _lib.repo import ROOT, read_json_file
 
-
-ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 SKILL_CATALOG = SKILLS_DIR / "catalog.json"
 README = ROOT / "README.md"
@@ -208,7 +207,7 @@ def read_gemini_context_skills() -> dict[str, list[str]]:
 
 
 def validate_claude_plugin() -> str:
-    payload = json.loads(CLAUDE_PLUGIN.read_text())
+    payload = read_json_file(CLAUDE_PLUGIN)
     plugin_name = payload.get("name")
     if not plugin_name:
         raise ValidationError(f"{CLAUDE_PLUGIN}: missing name")
@@ -231,7 +230,7 @@ def validate_claude_marketplace(expected_plugin_name: str) -> None:
     if not marketplace_path.exists():
         raise ValidationError(f"Missing required Claude marketplace manifest: {marketplace_path}")
 
-    payload = json.loads(marketplace_path.read_text())
+    payload = read_json_file(marketplace_path)
     if not payload.get("name"):
         raise ValidationError(f"{marketplace_path}: missing name")
 
@@ -267,7 +266,7 @@ def validate_codex_plugin(skills: list[str]) -> str:
     if not CODEX_PLUGIN.exists():
         raise ValidationError(f"Missing required Codex plugin manifest: {CODEX_PLUGIN}")
 
-    payload = json.loads(CODEX_PLUGIN.read_text())
+    payload = read_json_file(CODEX_PLUGIN)
     plugin_name = payload.get("name")
     if not plugin_name:
         raise ValidationError(f"{CODEX_PLUGIN}: missing name")
@@ -303,7 +302,7 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
     if not CODEX_MARKETPLACE.exists():
         raise ValidationError(f"Missing required Codex marketplace: {CODEX_MARKETPLACE}")
 
-    payload = json.loads(CODEX_MARKETPLACE.read_text())
+    payload = read_json_file(CODEX_MARKETPLACE)
     if not payload.get("name"):
         raise ValidationError(f"{CODEX_MARKETPLACE}: missing top-level name")
 
@@ -364,7 +363,7 @@ def validate_gemini_extension() -> str:
     if not GEMINI_EXTENSION.exists():
         raise ValidationError(f"Missing required Gemini extension manifest: {GEMINI_EXTENSION}")
 
-    payload = json.loads(GEMINI_EXTENSION.read_text())
+    payload = read_json_file(GEMINI_EXTENSION)
     extension_name = payload.get("name")
     if not extension_name:
         raise ValidationError(f"{GEMINI_EXTENSION}: missing name")

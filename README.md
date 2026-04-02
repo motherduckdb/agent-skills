@@ -4,9 +4,17 @@ MotherDuck Skills is the public skill catalog for agents building on MotherDuck.
 
 It gives agents practical guidance for the most common work on the platform: connecting to MotherDuck, exploring live data, writing DuckDB SQL, modeling tables, building Dives, and shipping larger workflows like dashboards, migrations, and data pipelines.
 
+The lower-level skills are intentionally not generic data-engineering tutorials. They exist to encode MotherDuck-specific defaults, gotchas, and opinionated workflow choices:
+
+- when to prefer the PG endpoint versus a native DuckDB client
+- when DuckDB SQL differs from PostgreSQL habits that would break on MotherDuck
+- when native MotherDuck storage should stay the default over DuckLake
+- how shares, Dives, read scaling, and customer-facing isolation actually work on MotherDuck
+
 The repo is intentionally opinionated and agent-oriented:
 
 - prefer live schema discovery over invented schemas
+- keep utility and workflow `SKILL.md` files short and router-like
 - keep deeper guidance in `references/`
 - ship runnable examples inside the skill folders
 - validate important artifacts against temporary real MotherDuck databases
@@ -154,6 +162,8 @@ For most real tasks, start in this order:
 
 That keeps the agent grounded in the real connection path, schema, and SQL shape before it moves into higher-level orchestration.
 
+This order matters because the lower-level skills are the opinionated foundation. They should add MotherDuck-specific judgment, not reteach generic analytics theory.
+
 When a use-case skill is involved and a remote or local MotherDuck server is active, the agent should not guess the schema:
 
 1. ask which database or workspace is in scope if unclear
@@ -172,6 +182,20 @@ These are the end-to-end use-case skills in the catalog:
 - `partner-delivery` -- deliver repeatable MotherDuck architectures for consultants and partners
 
 ## Skills Overview
+
+```text
+                           Use Cases
+    build-cfa-app • build-dashboard • build-data-pipeline
+      migrate-to-motherduck • enable-self-serve-analytics
+                        • partner-delivery
+
+                            Workflows
+   load-data • model-data • share-data • create-dive • ducklake
+            security-governance • pricing-roi
+
+                            Utilities
+           connect • explore • query • duckdb-sql
+```
 
 | Skill | Layer | Use it when |
 |-------|-------|-------------|
@@ -203,6 +227,12 @@ Each skill folder can contain:
 
 Some use-case skills also ship a fuller runnable reference project under `references/` when the local artifact is intentionally smaller than the real workflow.
 
+In practice, this means:
+
+- utility and workflow skills should stay short, activation-friendly, and explicit about defaults
+- detailed mechanics, examples, and edge cases belong in `references/`
+- use-case skills should orchestrate lower-level skills rather than duplicating them
+
 The machine-readable index lives at:
 
 - `skills/catalog.json`
@@ -218,7 +248,12 @@ That catalog tracks:
 
 ## Runnable Use-Case Artifacts
 
-These are local-first examples packaged with the skills:
+These are packaged per use-case as paired artifacts:
+
+- a MotherDuck-backed Python artifact used by the existing smoke tests
+- a TypeScript companion artifact with the same output contract for app/backend-oriented implementations
+
+Python artifact commands:
 
 ```bash
 uv run --with duckdb python skills/build-cfa-app/artifacts/customer_routing_example.py
@@ -229,7 +264,13 @@ uv run --with duckdb python skills/enable-self-serve-analytics/artifacts/self_se
 uv run --with duckdb python skills/partner-delivery/artifacts/client_delivery_example.py
 ```
 
-They are not meant to replace production code. They are small runnable patterns that help an agent move from plan to implementation faster.
+Validate the TypeScript companion artifacts:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
+```
+
+They are not meant to replace production code. They are small patterns that help an agent move from plan to implementation faster.
 
 To run the whole artifact suite against temporary real MotherDuck databases with your token:
 
@@ -281,6 +322,7 @@ If you are editing the repo itself:
 ```bash
 uv run scripts/validate_skills.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+uv run scripts/test_typescript_artifacts.py
 uv run scripts/test_codex_plugin.py
 uv run scripts/test_codex_use_cases.py
 uv run scripts/test_motherduck_artifacts.py

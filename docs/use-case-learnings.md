@@ -26,6 +26,7 @@ This document captures the durable lessons from repeatedly building and testing 
 ## Artifact Design Rules
 
 - Keep a small local-first artifact for each use case.
+- When a use case ships both Python and TypeScript artifacts, keep their contracts aligned.
 - When the use case claims real MotherDuck behavior, make the artifact dual-mode so it can run against MotherDuck too.
 - Prefer a small runnable artifact plus one deeper reference project over bloating the top-level skill.
 
@@ -49,7 +50,8 @@ This document captures the durable lessons from repeatedly building and testing 
 - Use dedicated runtime checks for both:
   - plugin installation and skill exposure
   - use-case output structure
+  - TypeScript companion artifact compilation and execution
   - MotherDuck-backed artifact execution
 - Treat the runtime loop as two tiers:
-  - quick inner-loop checks: `validate_skills.py`, snippet validation, and targeted artifact runs
+  - quick inner-loop checks: `validate_skills.py`, snippet validation, TypeScript artifact checks, and targeted artifact runs
   - slower regression checks: `test_codex_use_cases.py` and the full MotherDuck artifact suite

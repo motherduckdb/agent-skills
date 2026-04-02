@@ -34,7 +34,11 @@ Important supporting surfaces:
 
 - `skills/*/references/`: preserved deep guidance and fuller runnable reference projects
 - `skills/*/artifacts/`: small runnable examples, now expected to support local-first and MotherDuck-backed validation where appropriate
+- `scripts/`: executable repo-maintainer entrypoints only
+- `scripts/_lib/`: shared implementation used by the entrypoint scripts
+- `tests/_lib/`: shared implementation used by test entrypoints
 - `scripts/test_motherduck_artifacts.py`: end-to-end MotherDuck-backed artifact test runner
+- `scripts/test_typescript_artifacts.py`: TypeScript companion artifact runner
 - `scripts/test_codex_use_cases.py`: strict Codex use-case output and structure runner
 
 ## Non-Negotiable Content Rules
@@ -84,6 +88,12 @@ Run this when editing markdown examples or code fences:
 
 ```bash
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+```
+
+Run this when changing TypeScript companion artifacts or guidance that claims the TS artifacts are runnable:
+
+```bash
+uv run scripts/test_typescript_artifacts.py
 ```
 
 Run this when changing artifact behavior, reference projects, or any guidance that claims to be validated against real MotherDuck:

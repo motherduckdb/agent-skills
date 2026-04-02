@@ -6,6 +6,7 @@ on:
     paths:
       - '**/*.md'
       - 'tests/validate_snippets.py'
+      - 'tests/_lib/**'
       - 'tests/ts_syntax_check.js'
       - '.github/workflows/validate-snippets.yml'
 

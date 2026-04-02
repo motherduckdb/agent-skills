@@ -3,46 +3,19 @@
 from __future__ import annotations
 
 import argparse
-import json
 import tarfile
 from pathlib import Path
 
-from gemini_extension_config import (
+from _lib.gemini import (
     GEMINI_EXTENSION,
     GEMINI_OPTIONAL_PACKAGING_ENTRIES,
     GEMINI_REQUIRED_PACKAGING_ENTRIES,
     ROOT,
 )
+from _lib.repo import iter_files, read_json_file
 
 
 DEFAULT_OUTPUT_DIR = ROOT / "release"
-
-SKIP_NAMES = {
-    ".DS_Store",
-    ".git",
-    ".mypy_cache",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".venv",
-    "__pycache__",
-    "logs",
-    "node_modules",
-    "target",
-}
-
-
-def iter_files(path: Path) -> list[Path]:
-    if path.is_file():
-        return [path]
-
-    files: list[Path] = []
-    for candidate in sorted(path.rglob("*")):
-        if candidate.is_dir():
-            continue
-        if any(part in SKIP_NAMES for part in candidate.parts):
-            continue
-        files.append(candidate)
-    return files
 
 
 def main() -> int:
@@ -54,8 +27,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    manifest = json.loads(GEMINI_EXTENSION.read_text())
-    extension_name = manifest["name"]
+    extension_name = str(read_json_file(GEMINI_EXTENSION)["name"])
     output_dir = Path(args.out_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     archive_path = output_dir / f"{extension_name}.tar.gz"

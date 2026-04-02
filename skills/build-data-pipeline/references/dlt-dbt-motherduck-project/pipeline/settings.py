@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 
-from scripts.motherduck_user_agent import build_use_case_user_agent
+from scripts._lib.motherduck_user_agent import build_use_case_user_agent
 
 DEFAULT_DATABASE = "md_skills_pipeline_demo"
 DATABASE_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")

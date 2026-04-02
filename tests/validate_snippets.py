@@ -12,19 +12,16 @@ from __future__ import annotations
 
 import ast
 import json
-import os
 import re
 import subprocess
-import sys
-import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import duckdb
 import yaml
+from _lib.typescript import TS_LANGUAGES, validate_typescript_batch
 
 ROOT = Path(__file__).resolve().parents[1]
-TS_CHECK_SCRIPT = Path(__file__).resolve().parent / "ts_syntax_check.js"
 
 SKIP_PATTERN = re.compile(r"^\s*<!--\s*snippet-skip-next\s*-->\s*$")
 FENCE_OPEN = re.compile(r"^```(\w*)(.*)$")
@@ -79,7 +76,7 @@ def extract_snippets(path: Path) -> list[Snippet]:
     i = start
     while i < len(lines):
         m = FENCE_OPEN.match(lines[i])
-        if m and not _inside_code_block(lines, i):
+        if m:
             language = m.group(1).lower()
             fence_line = i + 1  # 1-based
 
@@ -113,11 +110,6 @@ def extract_snippets(path: Path) -> list[Snippet]:
         i += 1
 
     return snippets
-
-
-def _inside_code_block(lines: list[str], idx: int) -> bool:
-    """Check if line idx is already inside an open code block (shouldn't happen in valid MD)."""
-    return False  # Simplified — we parse sequentially
 
 
 # ---------------------------------------------------------------------------
@@ -287,103 +279,6 @@ def validate_python(snippet: Snippet) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# TypeScript/TSX/JS validation (batched)
-# ---------------------------------------------------------------------------
-
-
-def validate_typescript_batch(
-    snippets: list[tuple[int, Snippet]],
-) -> dict[int, list[str]]:
-    """Validate a batch of TS/TSX/JS snippets in a single Node.js invocation.
-
-    Returns a dict mapping snippet index to list of error messages.
-    """
-    if not snippets:
-        return {}
-
-    lang_to_kind = {"ts": "TS", "tsx": "TSX", "javascript": "JS", "js": "JS"}
-
-    batch = []
-    index_map: dict[int, int] = {}  # batch_index -> original_index
-    for batch_idx, (orig_idx, snippet) in enumerate(snippets):
-        kind = lang_to_kind.get(snippet.language, "TS")
-        batch.append({"code": snippet.code, "kind": kind})
-        index_map[batch_idx] = orig_idx
-
-    try:
-        result = _run_typescript_check(batch)
-    except FileNotFoundError:
-        return {
-            idx: ["  TypeScript/Node.js not available for syntax checking"]
-            for idx in [orig_idx for _, (orig_idx, _) in enumerate(snippets)]
-        }
-    except subprocess.TimeoutExpired:
-        return {
-            idx: ["  TypeScript syntax check timed out"]
-            for idx in [orig_idx for _, (orig_idx, _) in enumerate(snippets)]
-        }
-
-    errors_by_index: dict[int, list[str]] = {}
-
-    try:
-        results = json.loads(result.stdout)
-    except (json.JSONDecodeError, ValueError):
-        # If we can't parse the output, report error for all snippets
-        err_msg = result.stderr.strip() or result.stdout.strip() or "Unknown parse error"
-        for _, (orig_idx, _) in enumerate(snippets):
-            errors_by_index[orig_idx] = [f"  {err_msg}"]
-        return errors_by_index
-
-    for entry in results:
-        batch_idx = entry["index"]
-        orig_idx = index_map[batch_idx]
-        if entry["errors"]:
-            errors_by_index[orig_idx] = [
-                f"  Line {e['line']}: {e['message']}" for e in entry["errors"]
-            ]
-
-    return errors_by_index
-
-
-def _run_typescript_check(batch: list[dict[str, str]]) -> subprocess.CompletedProcess[str]:
-    """Run the Node-based checker, bootstrapping TypeScript if needed."""
-    result = _invoke_ts_checker(batch)
-    missing_ts = "Cannot find module 'typescript'" in (result.stderr or "") or "Cannot find module 'typescript'" in (
-        result.stdout or ""
-    )
-    if not missing_ts:
-        return result
-
-    with tempfile.TemporaryDirectory(prefix="md-skills-ts-") as temp_dir:
-        temp_path = Path(temp_dir)
-        subprocess.run(
-            ["npm", "install", "--silent", "--prefix", str(temp_path), "typescript"],
-            capture_output=True,
-            text=True,
-            timeout=60,
-            check=True,
-        )
-        env = os.environ.copy()
-        node_path = str(temp_path / "node_modules")
-        existing_node_path = env.get("NODE_PATH")
-        env["NODE_PATH"] = node_path if not existing_node_path else f"{node_path}{os.pathsep}{existing_node_path}"
-        return _invoke_ts_checker(batch, env=env)
-
-
-def _invoke_ts_checker(
-    batch: list[dict[str, str]], env: dict[str, str] | None = None
-) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["node", str(TS_CHECK_SCRIPT)],
-        input=json.dumps(batch),
-        capture_output=True,
-        text=True,
-        timeout=30,
-        env=env,
-    )
-
-
-# ---------------------------------------------------------------------------
 # Bash validation
 # ---------------------------------------------------------------------------
 
@@ -457,23 +352,38 @@ SIMPLE_VALIDATORS = {
     "yml": validate_yaml,
 }
 
-TS_LANGUAGES = {"ts", "tsx", "typescript", "javascript", "js"}
+
+def discover_markdown_files() -> list[Path]:
+    return [
+        path
+        for path in sorted(ROOT.rglob("*.md"))
+        if not any(part.startswith(".") for part in path.relative_to(ROOT).parts)
+        and "node_modules" not in path.parts
+    ]
+
+
+def append_errors(
+    result: ValidationResult,
+    snippet: Snippet,
+    errors: list[str],
+) -> None:
+    for error in errors:
+        result.errors.append(
+            SnippetError(
+                file=str(snippet.file.relative_to(ROOT)),
+                line=snippet.line,
+                language=snippet.language,
+                message=error,
+            )
+        )
 
 
 def validate_all() -> ValidationResult:
     """Walk all markdown files and validate every code snippet."""
     result = ValidationResult()
 
-    md_files = sorted(ROOT.rglob("*.md"))
-    # Exclude hidden directories and node_modules
-    md_files = [
-        f for f in md_files
-        if not any(part.startswith(".") for part in f.relative_to(ROOT).parts)
-        and "node_modules" not in f.parts
-    ]
-
     all_snippets: list[Snippet] = []
-    for md_file in md_files:
+    for md_file in discover_markdown_files():
         all_snippets.extend(extract_snippets(md_file))
 
     result.total = len(all_snippets)
@@ -503,49 +413,25 @@ def validate_all() -> ValidationResult:
     # Validate SQL with shared connection
     if sql_snippets:
         conn = duckdb.connect(":memory:")
-        for _, snippet in sql_snippets:
-            errs = validate_sql(snippet, conn)
-            for err in errs:
-                result.errors.append(
-                    SnippetError(
-                        file=str(snippet.file.relative_to(ROOT)),
-                        line=snippet.line,
-                        language=snippet.language,
-                        message=err,
-                    )
-                )
-        conn.close()
+        try:
+            for _, snippet in sql_snippets:
+                append_errors(result, snippet, validate_sql(snippet, conn))
+        finally:
+            conn.close()
 
     # Validate TS/TSX/JS in a single batch
     if ts_snippets:
         ts_errors = validate_typescript_batch(ts_snippets)
         for idx, snippet in ts_snippets:
             if idx in ts_errors:
-                for err in ts_errors[idx]:
-                    result.errors.append(
-                        SnippetError(
-                            file=str(snippet.file.relative_to(ROOT)),
-                            line=snippet.line,
-                            language=snippet.language,
-                            message=err,
-                        )
-                    )
+                append_errors(result, snippet, ts_errors[idx])
 
     # Validate simple types
     for _, snippet in simple_snippets:
         validator = SIMPLE_VALIDATORS[snippet.language]
         if validator is None:
             continue
-        errs = validator(snippet)
-        for err in errs:
-            result.errors.append(
-                SnippetError(
-                    file=str(snippet.file.relative_to(ROOT)),
-                    line=snippet.line,
-                    language=snippet.language,
-                    message=err,
-                )
-            )
+        append_errors(result, snippet, validator(snippet))
 
     return result
 
@@ -593,7 +479,7 @@ def write_errors_json(result: ValidationResult) -> None:
         }
         for err in result.errors
     ]
-    (ROOT / "snippet-errors.json").write_text(json.dumps(errors, indent=2))
+    (ROOT / "snippet-errors.json").write_text(json.dumps(errors, indent=2), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

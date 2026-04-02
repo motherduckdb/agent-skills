@@ -7,18 +7,22 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import time
 from pathlib import Path
 
-
-ROOT = Path(__file__).resolve().parents[1]
-MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
-PLUGIN_MANIFEST = ROOT / ".codex-plugin" / "plugin.json"
+from _lib.codex import (
+    CodexAppServer,
+    CodexSupportError,
+    IsolatedCodexHome,
+    MARKETPLACE,
+    plugin_name,
+    require_codex_cli,
+    use_case_skill_names,
+)
+from _lib.repo import ROOT
 REQUIRED_KEYS = [
     "summary",
     "assumptions",
@@ -30,28 +34,6 @@ REQUIRED_KEYS = [
 
 class UseCaseTestError(Exception):
     pass
-
-
-def rpc_call(proc: subprocess.Popen[str], request_id: int, method: str, params: dict | None = None) -> dict:
-    payload = {"jsonrpc": "2.0", "id": request_id, "method": method}
-    if params is not None:
-        payload["params"] = params
-
-    assert proc.stdin is not None
-    assert proc.stdout is not None
-
-    proc.stdin.write(json.dumps(payload) + "\n")
-    proc.stdin.flush()
-
-    while True:
-        line = proc.stdout.readline()
-        if not line:
-            raise UseCaseTestError(f"app-server closed while waiting for {method}")
-        message = json.loads(line)
-        if message.get("id") == request_id:
-            if "error" in message:
-                raise UseCaseTestError(f"{method} failed: {message['error']}")
-            return message["result"]
 
 
 def parse_json_output(raw: str, *, skill_name: str) -> dict:
@@ -94,20 +76,22 @@ def run_use_case(env: dict[str, str], plugin_name: str, skill_name: str) -> dict
         entry["stderr_tail"] = result.stderr[-1000:]
         return entry
 
-    raw = output_path.read_text()
-    payload = parse_json_output(raw, skill_name=skill_name)
-    missing = [key for key in REQUIRED_KEYS if key not in payload]
-    if missing:
-        raise UseCaseTestError(f"{skill_name} output missing keys: {missing}")
+    try:
+        raw = output_path.read_text()
+        payload = parse_json_output(raw, skill_name=skill_name)
+        missing = [key for key in REQUIRED_KEYS if key not in payload]
+        if missing:
+            raise UseCaseTestError(f"{skill_name} output missing keys: {missing}")
 
-    entry["top_level_keys"] = sorted(payload.keys())
-    entry["summary_preview"] = str(payload["summary"])[:160]
-    return entry
+        entry["top_level_keys"] = sorted(payload.keys())
+        entry["summary_preview"] = str(payload["summary"])[:160]
+        return entry
+    finally:
+        output_path.unlink(missing_ok=True)
 
 
 def main() -> int:
-    if shutil.which("codex") is None:
-        raise UseCaseTestError("codex CLI is not installed or not on PATH")
+    require_codex_cli()
 
     parser = argparse.ArgumentParser(description="Exercise all MotherDuck use-case skills through the installed Codex plugin.")
     parser.add_argument(
@@ -117,50 +101,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    plugin_name = json.loads(PLUGIN_MANIFEST.read_text())["name"]
-    default_skills = sorted(path.parent.name for path in (ROOT / "skills").glob("*/SKILL.md") if path.parent.name in {
-        "build-cfa-app",
-        "build-dashboard",
-        "build-data-pipeline",
-        "migrate-to-motherduck",
-        "enable-self-serve-analytics",
-        "partner-delivery",
-    })
+    current_plugin_name = plugin_name()
+    default_skills = use_case_skill_names()
     selected_skills = args.skills or default_skills
 
-    tmp_home = Path(tempfile.mkdtemp(prefix="codex-usecase-home-"))
-    env = os.environ.copy()
-    env["HOME"] = str(tmp_home)
-
-    source_codex_home = Path.home() / ".codex"
-    tmp_codex_home = tmp_home / ".codex"
-    tmp_codex_home.mkdir(parents=True, exist_ok=True)
-    for filename in ("auth.json", "config.toml"):
-        source_path = source_codex_home / filename
-        if source_path.exists():
-            shutil.copy2(source_path, tmp_codex_home / filename)
-
-    proc = subprocess.Popen(
-        ["codex", "app-server", "--listen", "stdio://"],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        env=env,
-    )
-
-    try:
-        rpc_call(proc, 1, "initialize", {"protocolVersion": "0.1.0", "clientInfo": {"name": "codex-usecase-test", "version": "1.0.0"}})
-        rpc_call(proc, 2, "plugin/install", {"marketplacePath": str(MARKETPLACE), "pluginName": plugin_name})
-        results = [run_use_case(env, plugin_name, skill_name) for skill_name in selected_skills]
-    finally:
-        proc.terminate()
-        try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait(timeout=5)
-        shutil.rmtree(tmp_home, ignore_errors=True)
+    with IsolatedCodexHome(prefix="codex-usecase-home-") as (_, env):
+        with CodexAppServer(env=env) as server:
+            server.call("plugin/install", {"marketplacePath": str(MARKETPLACE), "pluginName": current_plugin_name})
+            results = [run_use_case(env, current_plugin_name, skill_name) for skill_name in selected_skills]
 
     print(json.dumps(results, indent=2))
     return 0
@@ -169,6 +117,9 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
+    except CodexSupportError as exc:
+        print(f"Codex use-case test failed: {exc}", file=sys.stderr)
+        raise SystemExit(1)
     except UseCaseTestError as exc:
         print(f"Codex use-case test failed: {exc}", file=sys.stderr)
         raise SystemExit(1)

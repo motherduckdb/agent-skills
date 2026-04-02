@@ -6,7 +6,7 @@ import duckdb
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from scripts.motherduck_artifact_utils import artifact_session
+from scripts._lib.motherduck_artifact_utils import artifact_session
 
 
 CLIENTS = [
