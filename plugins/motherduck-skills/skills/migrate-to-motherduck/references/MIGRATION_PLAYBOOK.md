@@ -5,8 +5,6 @@
 
 Use this skill when the user needs a migration plan from an existing warehouse, database, or analytics stack onto MotherDuck. This is a use-case skill: it combines connection strategy, ingestion, modeling, query migration, and rollout sequencing into one plan.
 
-For reusable language patterns, see `references/typescript.md` and `references/python.md`.
-
 ## Source Of Truth
 
 - Prefer current MotherDuck public documentation and product pages first.

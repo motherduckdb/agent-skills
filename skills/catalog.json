@@ -74,16 +74,22 @@
     "description": "Connect to MotherDuck from any application. Use when setting up database connectivity via the Postgres endpoint (recommended), pg_duckdb, native DuckDB API, or JDBC. Covers connection strings, authentication, SSL, and environment variable configuration.",
     "layer": "utility",
     "depends_on": [],
-    "references": [],
+    "references": [
+      "references/CONNECTION_GUIDE.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/postgres-endpoint/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/attach-modes/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/"
     ],
     "needs_live_discovery": false
   },
   "create-dive": {
     "name": "create-dive",
-    "description": "Create interactive MotherDuck Dives \u2014 persistent React data apps with live queries and visualizations. Use when building charts, dashboards, KPI displays, or any data visualization that should be saved and shareable.",
+    "description": "Create interactive MotherDuck Dives with live SQL queries. Use when building, previewing, saving, styling, updating, or embedding a Dive, especially when the workflow depends on get_dive_guide, useSQLQuery, theme prompts, and live MotherDuck data.",
     "layer": "workflow",
     "depends_on": [
       "explore",
@@ -95,13 +101,16 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/managing-dives-as-code/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
       "https://motherduck.com/dive-gallery/"
     ],
     "needs_live_discovery": false
   },
   "duckdb-sql": {
     "name": "duckdb-sql",
-    "description": "DuckDB SQL syntax reference for MotherDuck. Use when you need to look up DuckDB-specific syntax, data types, functions, extensions, or resolve SQL errors. Covers friendly SQL, complex types, pre-installed extensions, and MotherDuck-specific SQL.",
+    "description": "DuckDB SQL reference for MotherDuck. Use when you need exact DuckDB syntax, function behavior, supported MotherDuck SQL features, or to resolve whether PostgreSQL-oriented SQL will fail on MotherDuck.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -109,23 +118,29 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://duckdb.org/docs/"
+      "https://duckdb.org/docs/",
+      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/"
     ],
     "needs_live_discovery": false
   },
   "ducklake": {
     "name": "ducklake",
-    "description": "Decide when DuckLake is the right fit and how to use it on MotherDuck. Use when evaluating open-table-format storage, object storage-backed databases, or DuckLake-specific capabilities such as BYOB, time travel, maintenance functions, and file-level ingestion.",
+    "description": "Decide when DuckLake is the right MotherDuck storage pattern. Use when evaluating fully managed DuckLake, BYOB, own-compute DuckLake access, data inlining, object-storage layout, or file-aware maintenance instead of native MotherDuck storage.",
     "layer": "workflow",
     "depends_on": [
       "connect",
       "query",
       "explore"
     ],
-    "references": [],
+    "references": [
+      "references/DUCKLAKE_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/",
+      "https://motherduck.com/docs/concepts/ducklake/",
+      "https://motherduck.com/docs/integrations/file-formats/ducklake/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-database/",
       "https://ducklake.select/"
     ],
     "needs_live_discovery": false
@@ -158,16 +173,19 @@
     "description": "Discover and explore databases, tables, columns, and data shares in MotherDuck. Use when you need to understand what data is available, preview table contents, or search the data catalog.",
     "layer": "utility",
     "depends_on": [],
-    "references": [],
+    "references": [
+      "references/EXPLORATION_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/"
     ],
     "needs_live_discovery": false
   },
   "load-data": {
     "name": "load-data",
-    "description": "Load and ingest data into MotherDuck from files, cloud storage, HTTP, or other databases. Use when importing CSV, Parquet, JSON, Excel files or setting up data ingestion from S3, GCS, Azure, or external sources.",
+    "description": "Load data into MotherDuck from local files, object storage, HTTPS, dataframes, or external databases. Use when choosing a MotherDuck-specific ingestion path, especially CTAS and INSERT...SELECT, bulk loading, secrets, and Postgres-endpoint versus DuckDB-client tradeoffs.",
     "layer": "workflow",
     "depends_on": [
       "connect",
@@ -179,7 +197,10 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/",
+      "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/considerations-for-loading-data/",
+      "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/loading-data-via-postgres-endpoint/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/"
     ],
     "needs_live_discovery": false
   },
@@ -216,10 +237,13 @@
       "query",
       "explore"
     ],
-    "references": [],
+    "references": [
+      "references/MODELING_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/getting-started/customer-facing-analytics/",
+      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/"
     ],
     "needs_live_discovery": false
   },
@@ -251,10 +275,14 @@
     "description": "Explain MotherDuck pricing and ROI tradeoffs. Use when an economic_buyer, technical_owner, or analytics_lead is asking about spend, budget guardrails, workload cost drivers, plan fit, or whether MotherDuck is worth adopting.",
     "layer": "workflow",
     "depends_on": [],
-    "references": [],
+    "references": [
+      "references/PRICING_ROI_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/pricing/"
+      "https://motherduck.com/pricing/",
+      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/trust/"
     ],
     "needs_live_discovery": false
   },
@@ -263,11 +291,15 @@
     "description": "Execute DuckDB SQL queries against MotherDuck databases. Use when running analytics, aggregations, transformations, or any SQL operation. Covers query best practices, CTEs, window functions, QUALIFY, and performance optimization.",
     "layer": "utility",
     "depends_on": [],
-    "references": [],
+    "references": [
+      "references/QUERY_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
       "https://duckdb.org/docs/",
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/postgres-endpoint/"
     ],
     "needs_live_discovery": false
   },
@@ -279,10 +311,15 @@
       "connect",
       "explore"
     ],
-    "references": [],
+    "references": [
+      "references/SECURITY_GOVERNANCE_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
+      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/trust/"
     ],
     "needs_live_discovery": false
   },
@@ -295,10 +332,15 @@
       "explore",
       "query"
     ],
-    "references": [],
+    "references": [
+      "references/SHARE_PLAYBOOK.md"
+    ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/"
+      "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-share/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/update-share/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/refresh-database/"
     ],
     "needs_live_discovery": false
   }
