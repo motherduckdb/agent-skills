@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Opinionated app-builder skills for connecting to MotherDuck, shipping Dives, pipelines, CFA apps, and DuckLake-backed workflows.",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "motherduck-skills",
       "source": "./",
       "description": "Skills for building applications with MotherDuck, the serverless DuckDB-powered data warehouse.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "MotherDuck"
       },
