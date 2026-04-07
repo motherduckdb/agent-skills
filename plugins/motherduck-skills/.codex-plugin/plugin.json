@@ -1,7 +1,7 @@
 {
   "name": "motherduck-skills",
   "version": "1.1.0",
-  "description": "Opinionated MotherDuck skills for AI coding agents building analytics apps, Dives, pipelines, and customer-facing data products.",
+  "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
   "author": {
     "name": "MotherDuck",
     "url": "https://motherduck.com"
@@ -22,8 +22,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "MotherDuck Skills",
-    "shortDescription": "Opinionated MotherDuck workflows for AI coding agents.",
-    "longDescription": "Reusable MotherDuck skills for connection setup, DuckDB SQL, Dives, pipelines, self-serve analytics, and customer-facing analytics architectures.",
+    "shortDescription": "Connect, explore, query, and build on MotherDuck.",
+    "longDescription": "A packaged MotherDuck skill catalog for connecting to MotherDuck, inspecting live schemas, writing DuckDB SQL, building Dives, and shipping dashboards, pipelines, and customer-facing analytics.",
     "developerName": "MotherDuck",
     "category": "Productivity",
     "capabilities": [

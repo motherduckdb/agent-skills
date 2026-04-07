@@ -6,6 +6,17 @@ MotherDuck is a serverless cloud data warehouse built on DuckDB.
 
 This repo is optimized for AI builders using MotherDuck to ship apps, pipelines, Dives, and customer-facing analytics.
 
+## Default Routing
+
+- For most narrow technical work, start with `connect`, then `explore`, then `query`.
+- For larger product work, start with the matching use-case skill and let it orchestrate the lower layers.
+- If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the live workspace before inventing SQL, models, or rollout plans.
+
+## Install Notes
+
+- For shared Skills CLI installs, assume the prerequisite is `npm install -g @fountainai/skills` unless the environment already has the CLI.
+- The dedicated Claude plugin package lives at `plugins/motherduck-skills-claude`.
+
 ## Non-Negotiable Rules
 
 - Always write **DuckDB SQL**, not PostgreSQL SQL.

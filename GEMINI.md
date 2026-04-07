@@ -2,7 +2,7 @@
 
 This extension bundles the MotherDuck skill catalog for Gemini CLI.
 
-Use it when the task involves MotherDuck, DuckDB analytics, Dives, data pipelines, migrations, governance, pricing, self-serve analytics, or customer-facing analytics products.
+Use it when the task involves connecting to MotherDuck, exploring a live workspace, writing DuckDB SQL, building Dives, shipping pipelines, or designing larger analytics products.
 
 ## Default Routing
 

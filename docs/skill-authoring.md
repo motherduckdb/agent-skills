@@ -72,11 +72,22 @@ When changing the repo-level install and discovery story, also keep the Gemini e
 - `GEMINI.md`
 - `commands/motherduck/*.toml`
 
+When the public install story references the shared Skills CLI path, keep the prerequisite explicit:
+
+```bash
+npm install -g @fountainai/skills
+```
+
+When the change affects supported harnesses, also keep these packaged skill trees aligned with `skills/`:
+
+- `plugins/motherduck-skills-claude`
+
 Repo maintenance layout:
 
 - keep root `scripts/` limited to executable entrypoints
 - put shared script implementation in `scripts/_lib/`
 - put shared test implementation in `tests/_lib/`
+- keep the shared source skills portable; Claude-only metadata such as `argument-hint` belongs in the dedicated Claude package sync layer, not in the source `skills/` tree
 
 ## Writing Style
 
@@ -92,6 +103,10 @@ When changing skills, references, artifacts, or catalog surfaces:
 
 ```bash
 uv run scripts/validate_skills.py
+claude plugin validate ./.claude-plugin/marketplace.json
+claude plugin validate ./plugins/motherduck-skills-claude
+uv run scripts/sync_claude_plugin.py
+uv run scripts/check_claude_plugin_sync.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
 python3 scripts/package_gemini_extension.py
 ```
