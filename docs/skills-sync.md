@@ -10,12 +10,15 @@ The lightweight model in this repo is:
 2. the relevant `SKILL.md` and `references/` files carry the product guidance
 3. detailed guidance lives in `references/`
 4. runnable examples live in `artifacts/`
+5. packaged plugin surfaces and install docs reflect the same catalog
 
 That gives maintainers one place to see:
 
 - which product docs a skill depends on
 - which detailed references should be reviewed
 - which artifacts should still run after updates
+- which plugin surfaces and install routes should still work after updates
+- which Claude-only packaged skill augmentations should still be applied
 
 ## How Drift Checks Work
 
@@ -33,7 +36,8 @@ The intended review loop is:
 4. update the skill and references
 5. run the artifacts that represent the use case
 6. run any deeper reference project if that skill ships one
-7. run repo validation
+7. sync the dedicated Claude plugin when the shared skill content changed
+8. run repo validation
 
 This is deliberately simple. It is a review path, not a content-generation pipeline.
 
@@ -59,5 +63,8 @@ When updating a skill, treat `skills/catalog.json` as the first stop:
 - rerun `scripts/test_typescript_artifacts.py` when the skill ships TS companion artifacts
 - rerun any bundled reference project that represents the use case more completely
 - rerun the MotherDuck-backed artifact suite when the change affects real MotherDuck behavior
+- rerun `uv run scripts/sync_claude_plugin.py` when the shared catalog changed
+- rerun `uv run scripts/check_claude_plugin_sync.py` before you consider the Claude package done
+- keep the Skills CLI prerequisite in install docs explicit: `npm install -g @fountainai/skills`
 
 That is the docs-to-skills sync path in this repo.

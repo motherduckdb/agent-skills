@@ -9,11 +9,13 @@ on:
       - 'ARCHITECTURE.md'
       - 'CLAUDE.md'
       - 'GEMINI.md'
+      - 'HARNESSES.md'
       - 'README.md'
       - 'commands/**'
       - 'docs/**'
       - 'gemini-extension.json'
       - 'skills/**'
+      - 'plugins/motherduck-skills-claude/**'
       - 'plugins/motherduck-skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
@@ -29,11 +31,13 @@ on:
       - 'ARCHITECTURE.md'
       - 'CLAUDE.md'
       - 'GEMINI.md'
+      - 'HARNESSES.md'
       - 'README.md'
       - 'commands/**'
       - 'docs/**'
       - 'gemini-extension.json'
       - 'skills/**'
+      - 'plugins/motherduck-skills-claude/**'
       - 'plugins/motherduck-skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
@@ -63,11 +67,28 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
       - name: Validate skills plus Claude and Codex plugin wiring
         run: uv run scripts/validate_skills.py
 
+      - name: Validate Claude marketplace manifest
+        run: claude plugin validate ./.claude-plugin/marketplace.json
+
+      - name: Validate packaged Claude plugin
+        run: claude plugin validate ./plugins/motherduck-skills-claude
+
       - name: Verify packaged Codex plugin matches source skills
         run: uv run scripts/check_codex_plugin_sync.py
+
+      - name: Verify packaged Claude plugin matches source skills
+        run: uv run scripts/check_claude_plugin_sync.py
 
       - name: Build Gemini extension archive
         run: python3 scripts/package_gemini_extension.py

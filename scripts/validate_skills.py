@@ -19,13 +19,20 @@ from _lib.gemini import (
     GEMINI_PLAN_DIRECTORY,
     GEMINI_REQUIRED_COMMANDS,
 )
+from _lib.claude_plugin import (
+    CLAUDE_PACKAGED_PLUGIN,
+    CLAUDE_PACKAGED_PLUGIN_MANIFEST,
+    CLAUDE_PACKAGED_PLUGIN_SKILLS,
+    CLAUDE_SKILL_ARGUMENT_HINTS,
+)
 from _lib.repo import ROOT, read_json_file
 
 SKILLS_DIR = ROOT / "skills"
 SKILL_CATALOG = SKILLS_DIR / "catalog.json"
 README = ROOT / "README.md"
+HARNESS_GUIDE = ROOT / "HARNESSES.md"
+INSTALL_MATRIX = ROOT / "docs" / "install-matrix.md"
 CLAUDE_CONTEXT = ROOT / "CLAUDE.md"
-CLAUDE_PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
 CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
@@ -36,6 +43,12 @@ GEMINI_CATALOG_HEADINGS = {
     "workflow": "### Workflow",
     "use-case": "### Use-case",
 }
+SUPPORTED_HARNESSES = [
+    "Claude Code",
+    "Codex",
+    "Gemini CLI",
+]
+DEFAULT_ROUTING_SEQUENCE = "`connect`, then `explore`, then `query`"
 
 
 class ValidationError(Exception):
@@ -54,7 +67,7 @@ def parse_frontmatter(path: Path) -> dict[str, object]:
     frontmatter = text[4:end].splitlines()
 
     data: dict[str, object] = {}
-    allowed_keys = {"name", "description", "license"}
+    allowed_keys = {"name", "description", "license", "argument-hint"}
 
     for raw_line in frontmatter:
         if not raw_line.strip():
@@ -207,19 +220,39 @@ def read_gemini_context_skills() -> dict[str, list[str]]:
 
 
 def validate_claude_plugin() -> str:
-    payload = read_json_file(CLAUDE_PLUGIN)
+    if not CLAUDE_PACKAGED_PLUGIN_MANIFEST.exists():
+        raise ValidationError(f"Missing required Claude plugin manifest: {CLAUDE_PACKAGED_PLUGIN_MANIFEST}")
+
+    payload = read_json_file(CLAUDE_PACKAGED_PLUGIN_MANIFEST)
     plugin_name = payload.get("name")
     if not plugin_name:
-        raise ValidationError(f"{CLAUDE_PLUGIN}: missing name")
+        raise ValidationError(f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: missing name")
+    if not payload.get("version"):
+        raise ValidationError(f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: missing version")
+    if not payload.get("description"):
+        raise ValidationError(f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: missing description")
 
     skills_path = payload.get("skills")
     if skills_path != "./skills/":
-        raise ValidationError(f"{CLAUDE_PLUGIN}: expected skills to be './skills/', found {skills_path!r}")
-
-    resolved_skills_dir = (ROOT / skills_path).resolve()
-    if resolved_skills_dir != SKILLS_DIR.resolve():
         raise ValidationError(
-            f"{CLAUDE_PLUGIN}: skills path does not resolve to repo skills directory: {resolved_skills_dir}"
+            f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: expected skills to be './skills/', found {skills_path!r}"
+        )
+
+    author = payload.get("author")
+    if not isinstance(author, dict) or not author.get("name"):
+        raise ValidationError(f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: author.name is required")
+
+    resolved_skills_dir = (CLAUDE_PACKAGED_PLUGIN / skills_path).resolve()
+    if resolved_skills_dir != CLAUDE_PACKAGED_PLUGIN_SKILLS.resolve():
+        raise ValidationError(
+            f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: skills path does not resolve to packaged Claude skills directory: {resolved_skills_dir}"
+        )
+
+    claude_skills = sorted(p.parent.name for p in resolved_skills_dir.glob("*/SKILL.md"))
+    expected_skills = sorted(CLAUDE_SKILL_ARGUMENT_HINTS)
+    if claude_skills != expected_skills:
+        raise ValidationError(
+            f"{CLAUDE_PACKAGED_PLUGIN_MANIFEST}: skills directory mismatch\nexpected: {expected_skills}\nfound:    {claude_skills}"
         )
 
     return plugin_name
@@ -252,9 +285,9 @@ def validate_claude_marketplace(expected_plugin_name: str) -> None:
 
     marketplace_root = marketplace_path.parents[1]
     resolved_plugin_root = (marketplace_root / source).resolve()
-    if resolved_plugin_root != ROOT.resolve():
+    if resolved_plugin_root != CLAUDE_PACKAGED_PLUGIN.resolve():
         raise ValidationError(
-            f"{marketplace_path}: plugin source must resolve to repo root, found {resolved_plugin_root}"
+            f"{marketplace_path}: plugin source must resolve to {CLAUDE_PACKAGED_PLUGIN}, found {resolved_plugin_root}"
         )
     if not (resolved_plugin_root / ".claude-plugin" / "plugin.json").exists():
         raise ValidationError(
@@ -396,6 +429,22 @@ def validate_gemini_extension() -> str:
 
     return extension_name
 
+def validate_discoverability_docs() -> None:
+    docs_to_check = [README, HARNESS_GUIDE, INSTALL_MATRIX]
+
+    for doc in docs_to_check:
+        text = doc.read_text()
+        for harness in SUPPORTED_HARNESSES:
+            if harness not in text:
+                raise ValidationError(f"{doc}: missing supported harness {harness!r}")
+
+    for doc in (README, HARNESS_GUIDE):
+        text = doc.read_text()
+        if DEFAULT_ROUTING_SEQUENCE not in text:
+            raise ValidationError(
+                f"{doc}: missing default routing sequence {DEFAULT_ROUTING_SEQUENCE!r}"
+            )
+
 
 def main() -> int:
     skills = sorted(p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md"))
@@ -407,6 +456,10 @@ def main() -> int:
         raise ValidationError(
             f"{SKILL_CATALOG}: skill catalog mismatch\nexpected: {skills}\nfound:    {sorted(catalog)}"
         )
+
+    for required_doc in (HARNESS_GUIDE, INSTALL_MATRIX):
+        if not required_doc.exists():
+            raise ValidationError(f"Missing required discoverability doc: {required_doc}")
 
     parsed: dict[str, dict[str, object]] = {}
     for skill_name in skills:
@@ -477,14 +530,13 @@ def main() -> int:
                 f"{GEMINI_CONTEXT}: skill catalog mismatch for {layer}\nexpected: {expected}\nfound:    {found}"
             )
 
-    if not CLAUDE_PLUGIN.exists():
-        raise ValidationError(f"Missing required Claude plugin manifest: {CLAUDE_PLUGIN}")
     claude_plugin_name = validate_claude_plugin()
     validate_claude_marketplace(claude_plugin_name)
 
     codex_plugin_name = validate_codex_plugin(skills)
     validate_codex_marketplace(codex_plugin_name)
     validate_gemini_extension()
+    validate_discoverability_docs()
 
     print(f"Validated {len(skills)} skills successfully.")
     return 0

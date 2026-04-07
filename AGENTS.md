@@ -22,11 +22,14 @@ Primary source-of-truth files:
 - `skills/*/SKILL.md`: actual skill content and frontmatter
 - `skills/catalog.json`: machine-readable skill index and source-doc map
 - `README.md`: public catalog and install docs
+- `HARNESSES.md`: supported agent harnesses and native discovery paths
 - `ARCHITECTURE.md`: invariants and dependency rules
 - `docs/skill-authoring.md`: repo-specific authoring guidance
 - `docs/skills-sync.md`: docs-to-skills drift workflow
+- `docs/install-matrix.md`: copy-paste install routes by harness
 - `CLAUDE.md`: Claude-facing catalog/context
-- `.claude-plugin/plugin.json`: Claude plugin manifest
+- `.claude-plugin/marketplace.json`: Claude marketplace manifest
+- `plugins/motherduck-skills-claude/.claude-plugin/plugin.json`: packaged Claude plugin manifest
 - `.codex-plugin/plugin.json`: Codex plugin manifest
 - `.agents/plugins/marketplace.json`: repo-local Codex marketplace wiring
 
@@ -40,6 +43,7 @@ Important supporting surfaces:
 - `scripts/test_motherduck_artifacts.py`: end-to-end MotherDuck-backed artifact test runner
 - `scripts/test_typescript_artifacts.py`: TypeScript companion artifact runner
 - `scripts/test_codex_use_cases.py`: strict Codex use-case output and structure runner
+- `scripts/check_claude_plugin_sync.py`: packaged Claude plugin sync checker
 
 ## Non-Negotiable Content Rules
 
@@ -54,6 +58,7 @@ Important supporting surfaces:
 
 - Lead with the Postgres endpoint for thin-client and PostgreSQL-driver interoperability.
 - Keep native DuckDB APIs in the guidance when local files, hybrid execution, or direct DuckDB control matter.
+- For Skills CLI installs, keep the prerequisite explicit: `npm install -g @fountainai/skills`.
 - Prefer MCP-assisted exploration when MotherDuck MCP is available.
 - For use-case skills, if a remote or local MotherDuck server is active, start from the user's real database/schema instead of inventing one.
 - Prefer a native `md:` workspace connection for multi-database exploration, bootstrap flows, and temporary validation environments.
@@ -82,6 +87,10 @@ Run these when changing skills, catalogs, or manifests:
 
 ```bash
 uv run scripts/validate_skills.py
+claude plugin validate ./.claude-plugin/marketplace.json
+claude plugin validate ./plugins/motherduck-skills-claude
+uv run scripts/sync_claude_plugin.py
+uv run scripts/check_claude_plugin_sync.py
 ```
 
 Run this when editing markdown examples or code fences:
@@ -110,7 +119,7 @@ uv run scripts/test_codex_use_cases.py
 
 ## Common Drift Traps
 
-- `README.md`, `CLAUDE.md`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.agents/plugins/marketplace.json` falling out of sync with `skills/`
+- `README.md`, `CLAUDE.md`, `plugins/motherduck-skills-claude/.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.agents/plugins/marketplace.json` falling out of sync with `skills/`
 - `skills/catalog.json` no longer matching the actual `references/` and `artifacts/` paths
 - `build-dashboard` reintroducing duplicated `create-dive` mechanics
 - accidental PostgreSQL-specific claims in SQL examples

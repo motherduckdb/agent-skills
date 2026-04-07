@@ -1,0 +1,23 @@
+{
+  "name": "motherduck-skills",
+  "version": "1.1.0",
+  "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, and building dashboards, Dives, pipelines, and analytics apps.",
+  "author": {
+    "name": "MotherDuck",
+    "url": "https://motherduck.com"
+  },
+  "homepage": "https://github.com/motherduckdb/agent-skills",
+  "repository": "https://github.com/motherduckdb/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "motherduck",
+    "duckdb",
+    "analytics",
+    "data-warehouse",
+    "sql",
+    "postgres",
+    "dives",
+    "ducklake"
+  ],
+  "skills": "./skills/"
+}
