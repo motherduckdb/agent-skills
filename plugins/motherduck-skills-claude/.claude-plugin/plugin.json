@@ -1,6 +1,6 @@
 {
   "name": "motherduck-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, and building dashboards, Dives, pipelines, and analytics apps.",
   "author": {
     "name": "MotherDuck",
