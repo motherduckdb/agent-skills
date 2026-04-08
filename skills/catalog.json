@@ -248,7 +248,7 @@
   },
   "model-data": {
     "name": "model-data",
-    "description": "Design database schemas and data models in MotherDuck. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.",
+    "description": "Design and build database schemas and data models in MotherDuck. Produces a file-based project scaffold. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.",
     "layer": "workflow",
     "depends_on": [
       "duckdb-sql",
