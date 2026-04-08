@@ -4,12 +4,11 @@ MotherDuck Skills is the public skill catalog for agents and developers building
 
 It packages the common work done on the platform: choosing the right connection path, exploring live data, writing DuckDB SQL, building Dives, and shipping larger workflows like dashboards, migrations, pipelines, and customer-facing analytics apps.
 
-The repo is intentionally opinionated. It is a productized set of MotherDuck defaults and workflows, not a generic analytics encyclopedia.
+The repo is intentionally opinionated. It is a productized set of MotherDuck defaults and workflows.
 
 ## Quick Start
 
 - install the repo in the harness you already use
-- for most narrow technical work, start with `connect`, then `explore`, then `query`
 - mention MotherDuck in your prompt and the agent should pick the right skill automatically
 - when a remote or local MotherDuck server is active, let the live schema drive the work
 
@@ -33,12 +32,6 @@ Choose one install path per harness.
 ### Skills CLI: install all skills
 
 This is the default install path for most agents, including `Codex`, `Claude Code`, and custom agent setups.
-
-If you do not already have the Skills CLI available, install it first:
-
-```bash
-npm install -g @fountainai/skills
-```
 
 Use the non-interactive repo-level install that auto-accepts all prompts and installs the full catalog:
 
