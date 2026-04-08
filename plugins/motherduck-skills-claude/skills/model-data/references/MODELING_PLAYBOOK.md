@@ -307,6 +307,54 @@ CREATE TABLE "my_db"."main"."users" (
 - Use CTAS and `CREATE OR REPLACE` for rebuildable analytical tables.
 - Separate lifecycle stages across databases.
 
+## Project Scaffold Conventions
+
+Each SQL file contains exactly one model and follows a naming convention by stage:
+- Raw: `raw_<entity>.sql`
+- Staging: `stg_<entity>.sql`
+- Analytics: `dim_<entity>.sql` or `fct_<entity>.sql`
+
+### Manifest Format (`model_manifest.yml`)
+
+The manifest declares every model, its position in the DAG, and how it should be materialized.
+
+```yaml
+project:
+  name: my_analytics
+  default_database: analytics
+
+models:
+  - name: raw_events
+    path: models/raw/raw_events.sql
+    stage: raw
+    materialization: table        # table | view
+    database: raw
+    depends_on: []
+
+  - name: stg_events
+    path: models/staging/stg_events.sql
+    stage: staging
+    materialization: table
+    database: staging
+    depends_on: [raw_events]
+
+  - name: dim_users
+    path: models/analytics/dim_users.sql
+    stage: analytics
+    materialization: table
+    depends_on: [stg_events]
+
+  - name: fct_daily_activity
+    path: models/analytics/fct_daily_activity.sql
+    stage: analytics
+    materialization: table
+    depends_on: [stg_events, dim_users]
+```
+
+### When Using Another Framework
+
+If building with dbt, SQLMesh, or similar frameworks, the SQL files and manifest translate directly: each SQL file becomes a model, `depends_on` becomes `{{ ref() }}`, and `materialization` maps to the framework's materialization config.
+
 ## Common Mistakes
 
 - Over-normalizing
