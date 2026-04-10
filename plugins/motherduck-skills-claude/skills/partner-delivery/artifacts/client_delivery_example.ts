@@ -11,7 +11,7 @@ function normalizeMetadataValue(value: string | undefined, fallback: string): st
 function buildUseCaseUserAgent(): string {
   const harness = normalizeMetadataValue(process.env.MOTHERDUCK_AGENT_HARNESS, "unknown");
   const llm = normalizeMetadataValue(process.env.MOTHERDUCK_AGENT_LLM, "unknown");
-  return `agent-skills/1.0.0(harness-${harness};llm-${llm})`;
+  return `agent-skills/<latest-available-skills-version>(harness-${harness};llm-${llm})`;
 }
 
 const clients = [

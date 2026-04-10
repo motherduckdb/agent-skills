@@ -70,7 +70,7 @@ const clients: ClientConfig[] = [
 ```python
 import duckdb
 
-PARTNER_USER_AGENT = "agent-skills/1.0.0(harness-unknown;llm-unknown)"
+PARTNER_USER_AGENT = "agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)"
 
 
 def provision_client(conn: duckdb.DuckDBPyConnection, slug: str, region: str) -> dict:
