@@ -45,7 +45,7 @@ Native DuckDB path for Node.js:
 import { DuckDBInstance } from "@duckdb/node-api";
 import { readFile } from "node:fs/promises";
 
-const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/1.0.0");
+const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/<latest-available-skills-version>");
 const conn = await instance.connect();
 for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
   await conn.run(await readFile(`sql/pipeline/${file}`, "utf8"));
@@ -200,7 +200,7 @@ Operational defaults:
 
 - buffer API or event traffic before writing analytical tables
 - prefer staged Parquet, Arrow/dataframes, or `COPY`
-- tag long-lived workloads with `custom_user_agent`; for repo use-case builds, use `agent-skills/1.0.0(harness-<harness>;llm-<llm>)`
+- tag long-lived workloads with `custom_user_agent`; for repo use-case builds, use `agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)`
 - keep write transactions comfortably bounded instead of unbounded monoliths
 
 ---
@@ -479,7 +479,7 @@ import duckdb
 import os
 from pathlib import Path
 
-PIPELINE_USER_AGENT = "agent-skills/1.0.0(harness-unknown;llm-unknown)"
+PIPELINE_USER_AGENT = "agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)"
 
 def run_pipeline():
     conn = duckdb.connect(f"md:?custom_user_agent={PIPELINE_USER_AGENT}")
@@ -533,7 +533,7 @@ Number files to enforce execution order (`01_ingest.sql`, `02_dedupe.sql`, etc.)
 - **Version control all SQL transformations.** Store `.sql` files in git, not in ad-hoc query editors.
 - **Deduplicate before building analytics tables.** Raw sources often contain duplicates.
 - **Use fully qualified table names** in every statement: `"database"."schema"."table"`.
-- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later. For repo use-case builds, use `agent-skills/1.0.0(harness-<harness>;llm-<llm>)`.
+- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later. For repo use-case builds, use `agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)`.
 
 ---
 
