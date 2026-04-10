@@ -35,8 +35,22 @@ This is the default install path for most agents, including `Codex`, `Claude Cod
 
 Use the non-interactive repo-level install that auto-accepts all prompts and installs the full catalog:
 
+Local (current project):
+
 ```bash
-npx -y skills add motherduckdb/agent-skills --yes --global
+npx skills add motherduckdb/agent-skills --skill '*' --yes
+```
+
+Global (all projects):
+
+```bash
+npx skills add motherduckdb/agent-skills --skill '*' --yes --global
+```
+
+To link skills to a specific agent (e.g. Claude Code):
+
+```bash
+npx skills add motherduckdb/agent-skills --agent claude-code --skill '*' --yes --global
 ```
 
 ### Claude Code plugin install
