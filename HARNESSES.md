@@ -12,13 +12,13 @@ Use this file to answer two questions quickly:
 
 | Harness | Best install path | Native surface in this repo | Verify it worked |
 |-------|-------|-------|-------|
-| `Claude Code` | Claude plugin install or `npx skills` | `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | ask Claude Code to use `connect`, inspect the plugin list, or run `claude --plugin-dir ./plugins/motherduck-skills-claude` |
+| `Claude Code` | Claude plugin install or `npx skills` | `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | ask Claude Code to use `motherduck-connect`, inspect the plugin list, or run `claude --plugin-dir ./plugins/motherduck-skills-claude` |
 | `Codex` | Codex plugin install or `npx skills` | `.codex-plugin/plugin.json`, `plugins/motherduck-skills` | open `/plugins` or run the Codex plugin smoke test |
 | `Gemini CLI` | Gemini extension install or Gemini skills install | `gemini-extension.json`, `GEMINI.md`, `commands/motherduck/` | run `gemini extensions list` or `gemini skills list` |
 
 ## Default Routing
 
-For most narrow technical work, start with `connect`, then `explore`, then `query`.
+For most narrow technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`.
 
 For end-to-end product work, start with the matching use-case skill and let it orchestrate the lower layers.
 

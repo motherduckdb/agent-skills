@@ -28,7 +28,7 @@
         "sql",
         "postgres",
         "dives",
-        "ducklake",
+        "motherduck-ducklake",
         "mcp"
       ]
     }

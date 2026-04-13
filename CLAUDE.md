@@ -8,7 +8,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 
 ## Default Routing
 
-- For most narrow technical work, start with `connect`, then `explore`, then `query`.
+- For most narrow technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`.
 - For larger product work, start with the matching use-case skill and let it orchestrate the lower layers.
 - If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the live workspace before inventing SQL, models, or rollout plans.
 
@@ -58,23 +58,23 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 
 | Skill | Invoke | Description |
 |---|---|---|
-| connect | `/connect` | Choose and configure the right connection path. |
-| query | `/query` | Structure and optimize DuckDB SQL for MotherDuck. |
-| explore | `/explore` | Discover databases, schemas, tables, columns, views, and shares. |
-| duckdb-sql | `/duckdb-sql` | Look up DuckDB SQL and MotherDuck-specific constraints. |
-| load-data | `/load-data` | Ingest files, cloud objects, and upstream data into MotherDuck. |
-| model-data | `/model-data` | Design analytics-ready schemas and tables. |
-| share-data | `/share-data` | Distribute data with shares and share Dive-backed data safely. |
-| create-dive | `/create-dive` | Build, theme, preview, save, and update Dives. |
-| ducklake | `/ducklake` | Decide when DuckLake is appropriate and how to use it safely. |
-| security-governance | `/security-governance` | Answer security, governance, access, and residency questions. |
-| pricing-roi | `/pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |
-| build-cfa-app | `/build-cfa-app` | Build customer-facing analytics products on MotherDuck. |
-| build-dashboard | `/build-dashboard` | Create a coherent Dive-backed analytics dashboard. |
-| build-data-pipeline | `/build-data-pipeline` | Build ingestion-to-serving workflows on MotherDuck. |
-| migrate-to-motherduck | `/migrate-to-motherduck` | Plan migrations from legacy warehouses and Postgres estates. |
-| enable-self-serve-analytics | `/enable-self-serve-analytics` | Roll out governed self-serve analytics for internal teams. |
-| partner-delivery | `/partner-delivery` | Deliver repeatable MotherDuck architectures for clients and partners. |
+| motherduck-connect | `/motherduck-connect` | Choose and configure the right connection path. |
+| motherduck-query | `/motherduck-query` | Structure and optimize DuckDB SQL for MotherDuck. |
+| motherduck-explore | `/motherduck-explore` | Discover databases, schemas, tables, columns, views, and shares. |
+| motherduck-duckdb-sql | `/motherduck-duckdb-sql` | Look up DuckDB SQL and MotherDuck-specific constraints. |
+| motherduck-load-data | `/motherduck-load-data` | Ingest files, cloud objects, and upstream data into MotherDuck. |
+| motherduck-model-data | `/motherduck-model-data` | Design analytics-ready schemas and tables. |
+| motherduck-share-data | `/motherduck-share-data` | Distribute data with shares and share Dive-backed data safely. |
+| motherduck-create-dive | `/motherduck-create-dive` | Build, theme, preview, save, and update Dives. |
+| motherduck-ducklake | `/motherduck-ducklake` | Decide when DuckLake is appropriate and how to use it safely. |
+| motherduck-security-governance | `/motherduck-security-governance` | Answer security, governance, access, and residency questions. |
+| motherduck-pricing-roi | `/motherduck-pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |
+| motherduck-build-cfa-app | `/motherduck-build-cfa-app` | Build customer-facing analytics products on MotherDuck. |
+| motherduck-build-dashboard | `/motherduck-build-dashboard` | Create a coherent Dive-backed analytics dashboard. |
+| motherduck-build-data-pipeline | `/motherduck-build-data-pipeline` | Build ingestion-to-serving workflows on MotherDuck. |
+| motherduck-migrate-to-motherduck | `/motherduck-migrate-to-motherduck` | Plan migrations from legacy warehouses and Postgres estates. |
+| motherduck-enable-self-serve-analytics | `/motherduck-enable-self-serve-analytics` | Roll out governed self-serve analytics for internal teams. |
+| motherduck-partner-delivery | `/motherduck-partner-delivery` | Deliver repeatable MotherDuck architectures for clients and partners. |
 
 ## Layering Rule
 

@@ -20,9 +20,9 @@ Keep changes targeted. Prefer small, mechanical updates over broad rewrites.
 
 The catalog is a three-layer graph:
 
-- `utility`: `connect`, `query`, `explore`, `duckdb-sql`
-- `workflow`: `load-data`, `model-data`, `share-data`, `create-dive`, `ducklake`, `security-governance`, `pricing-roi`
-- `use-case`: `build-cfa-app`, `build-dashboard`, `build-data-pipeline`, `migrate-to-motherduck`, `enable-self-serve-analytics`, `partner-delivery`
+- `utility`: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`
+- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- `use-case`: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Important source-of-truth files:
 
@@ -75,12 +75,12 @@ These are packaged per use-case as paired artifacts:
 Python artifact commands:
 
 ```bash
-uv run --with duckdb python skills/build-cfa-app/artifacts/customer_routing_example.py
-uv run --with duckdb python skills/build-dashboard/artifacts/dashboard_story_example.py
-uv run --with duckdb python skills/build-data-pipeline/artifacts/pipeline_stage_example.py
-uv run --with duckdb python skills/migrate-to-motherduck/artifacts/migration_validation_example.py
-uv run --with duckdb python skills/enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
-uv run --with duckdb python skills/partner-delivery/artifacts/client_delivery_example.py
+uv run --with duckdb python skills/motherduck-build-cfa-app/artifacts/customer_routing_example.py
+uv run --with duckdb python skills/motherduck-build-dashboard/artifacts/dashboard_story_example.py
+uv run --with duckdb python skills/motherduck-build-data-pipeline/artifacts/pipeline_stage_example.py
+uv run --with duckdb python skills/motherduck-migrate-to-motherduck/artifacts/migration_validation_example.py
+uv run --with duckdb python skills/motherduck-enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
+uv run --with duckdb python skills/motherduck-partner-delivery/artifacts/client_delivery_example.py
 ```
 
 Validate the TypeScript companion artifacts:
@@ -103,10 +103,10 @@ That suite:
 - runs the full `dlt + dbt + MotherDuck` reference pipeline
 - drops the temporary databases afterward
 
-For a fuller MotherDuck pipeline example, `build-data-pipeline` also includes:
+For a fuller MotherDuck pipeline example, `motherduck-build-data-pipeline` also includes:
 
 ```bash
-cd skills/build-data-pipeline/references/dlt-dbt-motherduck-project
+cd skills/motherduck-build-data-pipeline/references/dlt-dbt-motherduck-project
 export MOTHERDUCK_TOKEN=...
 export MOTHERDUCK_PIPELINE_DB=md_skills_pipeline_demo
 uv sync --python 3.12

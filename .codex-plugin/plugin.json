@@ -17,7 +17,7 @@
     "sql",
     "postgres",
     "dives",
-    "ducklake"
+    "motherduck-ducklake"
   ],
   "skills": "./skills/",
   "interface": {

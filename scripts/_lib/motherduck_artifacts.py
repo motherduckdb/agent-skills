@@ -35,14 +35,14 @@ class CommandResult:
 
 
 ARTIFACT_TARGETS = [
-    ArtifactTarget("build-cfa-app", ROOT / "skills" / "build-cfa-app" / "artifacts" / "customer_routing_example.py"),
-    ArtifactTarget("build-dashboard", ROOT / "skills" / "build-dashboard" / "artifacts" / "dashboard_story_example.py"),
-    ArtifactTarget("build-data-pipeline", ROOT / "skills" / "build-data-pipeline" / "artifacts" / "pipeline_stage_example.py"),
-    ArtifactTarget("migrate-to-motherduck", ROOT / "skills" / "migrate-to-motherduck" / "artifacts" / "migration_validation_example.py"),
-    ArtifactTarget("enable-self-serve-analytics", ROOT / "skills" / "enable-self-serve-analytics" / "artifacts" / "self_serve_rollout_example.py"),
-    ArtifactTarget("partner-delivery", ROOT / "skills" / "partner-delivery" / "artifacts" / "client_delivery_example.py"),
+    ArtifactTarget("motherduck-build-cfa-app", ROOT / "skills" / "motherduck-build-cfa-app" / "artifacts" / "customer_routing_example.py"),
+    ArtifactTarget("motherduck-build-dashboard", ROOT / "skills" / "motherduck-build-dashboard" / "artifacts" / "dashboard_story_example.py"),
+    ArtifactTarget("motherduck-build-data-pipeline", ROOT / "skills" / "motherduck-build-data-pipeline" / "artifacts" / "pipeline_stage_example.py"),
+    ArtifactTarget("motherduck-migrate-to-motherduck", ROOT / "skills" / "motherduck-migrate-to-motherduck" / "artifacts" / "migration_validation_example.py"),
+    ArtifactTarget("motherduck-enable-self-serve-analytics", ROOT / "skills" / "motherduck-enable-self-serve-analytics" / "artifacts" / "self_serve_rollout_example.py"),
+    ArtifactTarget("motherduck-partner-delivery", ROOT / "skills" / "motherduck-partner-delivery" / "artifacts" / "client_delivery_example.py"),
 ]
-REFERENCE_PROJECT = ROOT / "skills" / "build-data-pipeline" / "references" / "dlt-dbt-motherduck-project"
+REFERENCE_PROJECT = ROOT / "skills" / "motherduck-build-data-pipeline" / "references" / "dlt-dbt-motherduck-project"
 
 
 def selected_artifacts(selected_slugs: list[str] | None = None) -> list[ArtifactTarget]:

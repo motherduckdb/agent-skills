@@ -5,7 +5,7 @@ Route this task onto the installed MotherDuck skill catalog: {{args}}
 
 Required behavior:
 - Recommend the best single skill or ordered skill sequence.
-- For most tasks, prefer `connect`, `explore`, and `query` before higher-level skills.
+- For most tasks, prefer `motherduck-connect`, `motherduck-explore`, and `motherduck-query` before higher-level skills.
 - If a use-case skill applies and a remote MotherDuck MCP server or local MotherDuck server is likely active, say what live workspace or schema details should be inspected first.
 - Keep the answer short and actionable.
 
