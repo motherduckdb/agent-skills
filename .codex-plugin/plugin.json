@@ -1,6 +1,6 @@
 {
   "name": "motherduck-skills",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
   "author": {
     "name": "MotherDuck",
