@@ -13,9 +13,9 @@ Optimize for:
 
 The catalog is a 3-layer graph:
 
-- `utility`: `connect`, `query`, `explore`, `duckdb-sql`
-- `workflow`: `load-data`, `model-data`, `share-data`, `create-dive`, `ducklake`, `security-governance`, `pricing-roi`
-- `use-case`: `build-cfa-app`, `build-dashboard`, `build-data-pipeline`, `migrate-to-motherduck`, `enable-self-serve-analytics`, `partner-delivery`
+- `utility`: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`
+- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- `use-case`: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Primary source-of-truth files:
 
@@ -121,7 +121,7 @@ uv run scripts/test_codex_use_cases.py
 
 - `README.md`, `CLAUDE.md`, `plugins/motherduck-skills-claude/.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.agents/plugins/marketplace.json` falling out of sync with `skills/`
 - `skills/catalog.json` no longer matching the actual `references/` and `artifacts/` paths
-- `build-dashboard` reintroducing duplicated `create-dive` mechanics
+- `motherduck-build-dashboard` reintroducing duplicated `motherduck-create-dive` mechanics
 - accidental PostgreSQL-specific claims in SQL examples
 - artifacts drifting into local-only behavior when the repo now claims MotherDuck-backed validation
 - shipped references accidentally telling plugin users to consult `motherduck-examples`

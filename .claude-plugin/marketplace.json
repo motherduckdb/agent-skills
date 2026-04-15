@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, and shipping Dives, dashboards, pipelines, and analytics apps.",
-    "version": "1.3.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "motherduck-skills",
       "source": "./plugins/motherduck-skills-claude",
       "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, and building dashboards, Dives, pipelines, and analytics apps.",
-      "version": "1.3.0",
+      "version": "2.0.0",
       "author": {
         "name": "MotherDuck"
       },
@@ -28,7 +28,7 @@
         "sql",
         "postgres",
         "dives",
-        "ducklake",
+        "motherduck-ducklake",
         "mcp"
       ]
     }

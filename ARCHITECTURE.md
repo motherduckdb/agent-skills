@@ -20,9 +20,9 @@ The catalog is a three-layer dependency graph:
 
 Current catalog:
 
-- Utility: `connect`, `query`, `explore`, `duckdb-sql`
-- Workflow: `load-data`, `model-data`, `share-data`, `create-dive`, `ducklake`, `security-governance`, `pricing-roi`
-- Use-case: `build-cfa-app`, `build-dashboard`, `build-data-pipeline`, `migrate-to-motherduck`, `enable-self-serve-analytics`, `partner-delivery`
+- Utility: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`
+- Workflow: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- Use-case: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Each skill may also have:
 

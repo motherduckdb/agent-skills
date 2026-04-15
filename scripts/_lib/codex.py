@@ -15,12 +15,12 @@ MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 PLUGIN_MANIFEST = ROOT / ".codex-plugin" / "plugin.json"
 SKILLS_DIR = ROOT / "skills"
 USE_CASE_SKILLS = {
-    "build-cfa-app",
-    "build-dashboard",
-    "build-data-pipeline",
-    "migrate-to-motherduck",
-    "enable-self-serve-analytics",
-    "partner-delivery",
+    "motherduck-build-cfa-app",
+    "motherduck-build-dashboard",
+    "motherduck-build-data-pipeline",
+    "motherduck-migrate-to-motherduck",
+    "motherduck-enable-self-serve-analytics",
+    "motherduck-partner-delivery",
 }
 
 

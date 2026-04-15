@@ -48,7 +48,7 @@ SUPPORTED_HARNESSES = [
     "Codex",
     "Gemini CLI",
 ]
-DEFAULT_ROUTING_SEQUENCE = "`connect`, then `explore`, then `query`"
+DEFAULT_ROUTING_SEQUENCE = "`motherduck-connect`, then `motherduck-explore`, then `motherduck-query`"
 
 
 class ValidationError(Exception):

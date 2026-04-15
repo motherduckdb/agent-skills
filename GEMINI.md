@@ -6,7 +6,7 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 
 ## Default Routing
 
-- For most technical work, start with `connect`, then `explore`, then `query`.
+- For most technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`.
 - Add a workflow or use-case skill only after the connection path, live schema, and SQL shape are grounded.
 - If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the real workspace, schemas, tables, joins, and time dimensions before inventing SQL, models, or rollout plans.
 - If the database or workspace is unclear, ask which one is in scope before designing the solution.
@@ -15,29 +15,29 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 
 ### Utility
 
-- `connect`: choose and configure the right connection path.
-- `explore`: inspect databases, schemas, tables, columns, views, and shares.
-- `query`: write, validate, and optimize DuckDB SQL for MotherDuck.
-- `duckdb-sql`: look up DuckDB SQL syntax and MotherDuck-specific constraints.
+- `motherduck-connect`: choose and configure the right connection path.
+- `motherduck-explore`: inspect databases, schemas, tables, columns, views, and shares.
+- `motherduck-query`: write, validate, and optimize DuckDB SQL for MotherDuck.
+- `motherduck-duckdb-sql`: look up DuckDB SQL syntax and MotherDuck-specific constraints.
 
 ### Workflow
 
-- `load-data`: ingest files, cloud objects, or upstream systems into MotherDuck.
-- `model-data`: design analytics-ready schemas, tables, and views.
-- `share-data`: publish, consume, and govern MotherDuck shares safely.
-- `create-dive`: build, theme, preview, save, and update Dives.
-- `ducklake`: decide whether DuckLake fits and how to apply it safely.
-- `security-governance`: answer security, access, governance, and residency questions.
-- `pricing-roi`: frame workload cost drivers, pricing posture, and ROI tradeoffs.
+- `motherduck-load-data`: ingest files, cloud objects, or upstream systems into MotherDuck.
+- `motherduck-model-data`: design analytics-ready schemas, tables, and views.
+- `motherduck-share-data`: publish, consume, and govern MotherDuck shares safely.
+- `motherduck-create-dive`: build, theme, preview, save, and update Dives.
+- `motherduck-ducklake`: decide whether DuckLake fits and how to apply it safely.
+- `motherduck-security-governance`: answer security, access, governance, and residency questions.
+- `motherduck-pricing-roi`: frame workload cost drivers, pricing posture, and ROI tradeoffs.
 
 ### Use-case
 
-- `build-cfa-app`: build customer-facing analytics products on MotherDuck.
-- `build-dashboard`: compose a coherent Dive-backed analytics dashboard.
-- `build-data-pipeline`: design ingestion-to-serving workflows on MotherDuck.
-- `migrate-to-motherduck`: move workloads from legacy warehouses or Postgres estates.
-- `enable-self-serve-analytics`: roll out governed self-serve analytics for internal teams.
-- `partner-delivery`: deliver repeatable MotherDuck architectures for customers or partners.
+- `motherduck-build-cfa-app`: build customer-facing analytics products on MotherDuck.
+- `motherduck-build-dashboard`: compose a coherent Dive-backed analytics dashboard.
+- `motherduck-build-data-pipeline`: design ingestion-to-serving workflows on MotherDuck.
+- `motherduck-migrate-to-motherduck`: move workloads from legacy warehouses or Postgres estates.
+- `motherduck-enable-self-serve-analytics`: roll out governed self-serve analytics for internal teams.
+- `motherduck-partner-delivery`: deliver repeatable MotherDuck architectures for customers or partners.
 
 ## Core Rules
 

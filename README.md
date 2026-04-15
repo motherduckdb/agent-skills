@@ -97,45 +97,45 @@ Global manual install for a specific agent:
 
 ```bash
 mkdir -p ~/.claude/skills ~/.codex/skills
-cp -R skills/connect ~/.claude/skills/connect
-cp -R skills/connect ~/.codex/skills/connect
+cp -R skills/motherduck-connect ~/.claude/skills/motherduck-connect
+cp -R skills/motherduck-connect ~/.codex/skills/motherduck-connect
 ```
 
 ## Start Here by Task
 
 | If you need to... | Start with... |
 |-------|-------|
-| connect an app or service to MotherDuck | `connect` |
-| inspect a live workspace or schema | `explore` |
-| write or debug analytics SQL | `query` |
-| check exact DuckDB syntax | `duckdb-sql` |
-| build a Dive | `create-dive` |
-| build a dashboard | `build-dashboard` |
-| design a data pipeline | `build-data-pipeline` |
-| plan a migration | `migrate-to-motherduck` |
-| design customer-facing analytics | `build-cfa-app` |
+| connect an app or service to MotherDuck | `motherduck-connect` |
+| inspect a live workspace or schema | `motherduck-explore` |
+| write or debug analytics SQL | `motherduck-query` |
+| check exact DuckDB syntax | `motherduck-duckdb-sql` |
+| build a Dive | `motherduck-create-dive` |
+| build a dashboard | `motherduck-build-dashboard` |
+| design a data pipeline | `motherduck-build-data-pipeline` |
+| plan a migration | `motherduck-migrate-to-motherduck` |
+| design customer-facing analytics | `motherduck-build-cfa-app` |
 
 ## Skills Overview
 
 | Skill | Layer | Use it when |
 |-------|-------|-------------|
-| `connect` | Utility | you need to choose the right connection path before writing code or SQL |
-| `explore` | Utility | you need to inspect real databases, schemas, tables, columns, views, or shares |
-| `query` | Utility | you need to write, validate, or optimize DuckDB SQL against MotherDuck |
-| `duckdb-sql` | Utility | you need DuckDB SQL syntax or MotherDuck-specific SQL constraints quickly |
-| `load-data` | Workflow | you need to ingest files, cloud objects, HTTP data, or upstream systems into MotherDuck |
-| `model-data` | Workflow | you need to design analytical schemas, tables, views, or transformation layers |
-| `share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |
-| `create-dive` | Workflow | you need to build, theme, preview, save, or update a Dive |
-| `ducklake` | Workflow | you need to decide whether DuckLake is appropriate and how to apply it safely |
-| `security-governance` | Workflow | you need MotherDuck-specific guidance on security, access, governance, or residency |
-| `pricing-roi` | Workflow | you need to frame workload cost drivers, pricing posture, or ROI tradeoffs |
-| `build-cfa-app` | Use-case | you are building a customer-facing analytics product on MotherDuck |
-| `build-dashboard` | Use-case | you are building one coherent analytics dashboard backed by Dives and tables |
-| `build-data-pipeline` | Use-case | you are designing an ingestion-to-serving data pipeline on MotherDuck |
-| `migrate-to-motherduck` | Use-case | you are moving from Snowflake, Redshift, Postgres, or dbt-heavy stacks onto MotherDuck |
-| `enable-self-serve-analytics` | Use-case | you are rolling out internal self-serve analytics, sharing, and governed dashboards |
-| `partner-delivery` | Use-case | you are delivering repeatable multi-client MotherDuck implementations for customers or partners |
+| `motherduck-connect` | Utility | you need to choose the right connection path before writing code or SQL |
+| `motherduck-explore` | Utility | you need to inspect real databases, schemas, tables, columns, views, or shares |
+| `motherduck-query` | Utility | you need to write, validate, or optimize DuckDB SQL against MotherDuck |
+| `motherduck-duckdb-sql` | Utility | you need DuckDB SQL syntax or MotherDuck-specific SQL constraints quickly |
+| `motherduck-load-data` | Workflow | you need to ingest files, cloud objects, HTTP data, or upstream systems into MotherDuck |
+| `motherduck-model-data` | Workflow | you need to design analytical schemas, tables, views, or transformation layers |
+| `motherduck-share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |
+| `motherduck-create-dive` | Workflow | you need to build, theme, preview, save, or update a Dive |
+| `motherduck-ducklake` | Workflow | you need to decide whether DuckLake is appropriate and how to apply it safely |
+| `motherduck-security-governance` | Workflow | you need MotherDuck-specific guidance on security, access, governance, or residency |
+| `motherduck-pricing-roi` | Workflow | you need to frame workload cost drivers, pricing posture, or ROI tradeoffs |
+| `motherduck-build-cfa-app` | Use-case | you are building a customer-facing analytics product on MotherDuck |
+| `motherduck-build-dashboard` | Use-case | you are building one coherent analytics dashboard backed by Dives and tables |
+| `motherduck-build-data-pipeline` | Use-case | you are designing an ingestion-to-serving data pipeline on MotherDuck |
+| `motherduck-migrate-to-motherduck` | Use-case | you are moving from Snowflake, Redshift, Postgres, or dbt-heavy stacks onto MotherDuck |
+| `motherduck-enable-self-serve-analytics` | Use-case | you are rolling out internal self-serve analytics, sharing, and governed dashboards |
+| `motherduck-partner-delivery` | Use-case | you are delivering repeatable multi-client MotherDuck implementations for customers or partners |
 
 ## Why This Repo Is Opinionated
 
@@ -155,7 +155,7 @@ These skills preserve a few strong defaults:
 Use this repo as a routed skill catalog
 
 - Install the plugins or skills matching what you need. Usually, it's better to install the entire plugin, as skills and plugin only use a minimal amount of context (they are not loaded fully in context, just their description)
-- `Route work`: start with `connect`, then `explore`, then `query` for narrow technical work; start with the matching use-case skill for end-to-end product work.
+- `Route work`: start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query` for narrow technical work; start with the matching use-case skill for end-to-end product work.
 - `Use live discovery`: if a remote or local MotherDuck server is active, inspect the real workspace, schema, joins, and date columns before inventing examples or plans.
 - `Read next`:
   - `skills/catalog.json`
