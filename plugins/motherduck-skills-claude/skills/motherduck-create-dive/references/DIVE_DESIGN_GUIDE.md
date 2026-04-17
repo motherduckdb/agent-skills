@@ -443,14 +443,27 @@ This is the right path when multiple people will maintain the Dive or when previ
 
 ### Embed Dives
 
-Use embedding when you need a lightweight live dashboard in an existing app or site:
+Use embedding when you need a live read-only Dive inside an existing app or site:
 
 - backend creates the embed session
-- browser receives only the short-lived session string
+- browser receives only the short-lived session string, not the admin access token
 - the embedded Dive is read-only
+- the embed session expires after 24 hours
+- Embedded Dives require a Business plan unless current docs explicitly say otherwise
 - `embed-motherduck.com` may need to be added to `frame-src` if CSP is strict
 
-Do not put admin tokens in the browser. If the user needs richer application behavior, stronger per-customer control, or backend-side policy enforcement, move to the `motherduck-build-cfa-app` patterns instead.
+Use server mode first; it runs queries through the Postgres endpoint and is enough for most embeds. Use dual mode only when the Dive needs browser-side DuckDB-Wasm behavior, and only after configuring cross-origin isolation headers.
+
+Do not put admin tokens in the browser. If the user needs richer application behavior, custom API contracts, writes, non-Dive routing, or backend-side policy enforcement, move to the `motherduck-build-cfa-app` patterns instead.
+
+### Dive Version History
+
+Every saved Dive update creates a version. Before overwriting a Dive:
+
+- inspect `current_version` with `list_dives`
+- use `read_dive` without `version` for the latest content
+- use `read_dive(version = N)` to inspect a historical version
+- treat older versions as read-only unless the user explicitly asks to restore by saving updated content
 
 ---
 

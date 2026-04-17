@@ -26,6 +26,7 @@ CLAUDE_SKILL_ARGUMENT_HINTS: dict[str, str] = {
     "motherduck-partner-delivery": "[client-delivery-scenario]",
     "motherduck-pricing-roi": "[workload-or-pricing-question]",
     "motherduck-query": "[query-or-task]",
+    "motherduck-rest-api": "[admin-api-task]",
     "motherduck-security-governance": "[security-question]",
     "motherduck-share-data": "[database-and-audience]",
 }

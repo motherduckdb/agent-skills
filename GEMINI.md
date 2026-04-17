@@ -19,6 +19,7 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 - `motherduck-explore`: inspect databases, schemas, tables, columns, views, and shares.
 - `motherduck-query`: write, validate, and optimize DuckDB SQL for MotherDuck.
 - `motherduck-duckdb-sql`: look up DuckDB SQL syntax and MotherDuck-specific constraints.
+- `motherduck-rest-api`: use the REST API for service accounts, tokens, Duckling config, active accounts, and Dive embed sessions.
 
 ### Workflow
 

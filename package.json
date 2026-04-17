@@ -1,6 +1,6 @@
 {
   "name": "motherduck-skills",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Opinionated MotherDuck skills for AI coding agents.",
   "devDependencies": {
     "typescript": "^6.0.2"

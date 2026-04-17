@@ -2,7 +2,7 @@
 
 MotherDuck Skills is the public skill catalog for agents and developers building on MotherDuck.
 
-It packages the common work done on the platform: choosing the right connection path, exploring live data, writing DuckDB SQL, building Dives, and shipping larger workflows like dashboards, migrations, pipelines, and customer-facing analytics apps.
+It packages the common work done on the platform: choosing the right connection path, exploring live data, writing DuckDB SQL, using the REST API for administration, building Dives, and shipping larger workflows like dashboards, migrations, pipelines, and customer-facing analytics apps.
 
 The repo is intentionally opinionated. It is a productized set of MotherDuck defaults and workflows.
 
@@ -109,6 +109,7 @@ cp -R skills/motherduck-connect ~/.codex/skills/motherduck-connect
 | inspect a live workspace or schema | `motherduck-explore` |
 | write or debug analytics SQL | `motherduck-query` |
 | check exact DuckDB syntax | `motherduck-duckdb-sql` |
+| manage service accounts, tokens, Duckling config, active accounts, or Dive embed sessions with the REST API | `motherduck-rest-api` |
 | build a Dive | `motherduck-create-dive` |
 | build a dashboard | `motherduck-build-dashboard` |
 | design a data pipeline | `motherduck-build-data-pipeline` |
@@ -123,6 +124,7 @@ cp -R skills/motherduck-connect ~/.codex/skills/motherduck-connect
 | `motherduck-explore` | Utility | you need to inspect real databases, schemas, tables, columns, views, or shares |
 | `motherduck-query` | Utility | you need to write, validate, or optimize DuckDB SQL against MotherDuck |
 | `motherduck-duckdb-sql` | Utility | you need DuckDB SQL syntax or MotherDuck-specific SQL constraints quickly |
+| `motherduck-rest-api` | Utility | you need to use the REST API for control-plane tasks like service accounts, tokens, Duckling config, active accounts, or Dive embed sessions |
 | `motherduck-load-data` | Workflow | you need to ingest files, cloud objects, HTTP data, or upstream systems into MotherDuck |
 | `motherduck-model-data` | Workflow | you need to design analytical schemas, tables, views, or transformation layers |
 | `motherduck-share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |

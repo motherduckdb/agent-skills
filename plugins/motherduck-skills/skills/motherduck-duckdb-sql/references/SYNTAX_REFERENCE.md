@@ -4,6 +4,25 @@ Complete function and data type reference for DuckDB on MotherDuck.
 
 ---
 
+## Version-Sensitive Features
+
+MotherDuck supports multiple DuckDB client versions over time. For newly released DuckDB features, check the MotherDuck version-lifecycle docs before treating syntax or types as production-safe in MotherDuck.
+
+Examples to verify before relying on them:
+
+- `MERGE INTO`
+- `FILL()` window interpolation
+- newly added or newly expanded types such as `VARIANT` or native `GEOMETRY`
+
+MotherDuck-only lifecycle commands are operational SQL, not analytical query syntax:
+
+```sql
+SHUTDOWN;
+SHUTDOWN TERMINATE (REASON 'stuck batch job');
+```
+
+Use `SHUTDOWN` for graceful Duckling shutdown after current work completes. Use `SHUTDOWN TERMINATE` only when the user explicitly wants to interrupt running work.
+
 ## Data Types
 
 | Type | Description | Example |

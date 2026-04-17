@@ -154,10 +154,11 @@ When using the MotherDuck MCP server, prefer:
 | `list_columns` | List columns and types |
 | `search_catalog` | Search the data catalog |
 | `list_shares` | List available data shares |
-| `motherduck-query` | Execute read-only SQL |
+| `query` | Execute read-only SQL |
+| `query_rw` | Execute DDL, DML, or connection-state changes only when the user explicitly asks for a write and confirms the change |
 | `ask_docs_question` | Clarify product or SQL behavior |
 
-Use `search_catalog` when you do not know which database or table contains the data you need.
+Use `search_catalog` when you do not know which database or table contains the data you need. Do not use `query_rw` for exploration that can be answered with read-only metadata or `SELECT` queries.
 
 ## Advanced Exploration Patterns
 

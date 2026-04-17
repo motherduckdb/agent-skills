@@ -62,6 +62,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | motherduck-query | `/motherduck-query` | Structure and optimize DuckDB SQL for MotherDuck. |
 | motherduck-explore | `/motherduck-explore` | Discover databases, schemas, tables, columns, views, and shares. |
 | motherduck-duckdb-sql | `/motherduck-duckdb-sql` | Look up DuckDB SQL and MotherDuck-specific constraints. |
+| motherduck-rest-api | `/motherduck-rest-api` | Manage service accounts, tokens, Duckling config, active accounts, and Dive embed sessions. |
 | motherduck-load-data | `/motherduck-load-data` | Ingest files, cloud objects, and upstream data into MotherDuck. |
 | motherduck-model-data | `/motherduck-model-data` | Design analytics-ready schemas and tables. |
 | motherduck-share-data | `/motherduck-share-data` | Distribute data with shares and share Dive-backed data safely. |

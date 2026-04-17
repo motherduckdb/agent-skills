@@ -60,6 +60,8 @@ WHERE total_spent > 1000;
 
 ### Pre-Aggregate for Repeated Reads
 
+Creating or replacing tables changes state. When the runner is MCP, use `query_rw` only after the user explicitly asks for the table change and confirms what will be modified.
+
 ```sql
 CREATE OR REPLACE TABLE "analytics"."main"."daily_revenue" AS
 SELECT
@@ -88,6 +90,20 @@ GROUP BY customer_id;
 - unnecessary `ORDER BY` in intermediate CTEs
 - `SELECT *` in production queries
 - raw-table rescans for app-serving endpoints
+
+## Duckling Lifecycle Commands
+
+Use lifecycle commands only for operational control after the user has explicitly asked to stop a Duckling or optimize batch/CI cost.
+
+```sql
+SHUTDOWN;
+SHUTDOWN TERMINATE (REASON 'batch complete');
+```
+
+- `SHUTDOWN` registers a graceful shutdown and lets running work complete.
+- `SHUTDOWN TERMINATE` interrupts running queries and should be reserved for stuck or explicitly force-stopped Ducklings.
+- Both are subject to the minimum billing period documented for Duckling compute.
+- In MCP, lifecycle commands require `query_rw` and explicit user confirmation.
 
 ## DuckDB SQL Patterns
 
