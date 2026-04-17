@@ -220,7 +220,8 @@ Use the current pricing page for exact numbers. Do not hardcode numbers in durab
 ## Compute and Storage Realities To Call Out
 
 - Pulse is usage-based and fits bursty or smaller read-heavy work well.
-- Standard, Jumbo, Mega, and Giga are wall-clock metered instance types with cooldown behavior.
+- Standard, Jumbo, Mega, and Giga are wall-clock metered instance types with cooldown behavior. Their cooldown periods are configurable from 1 minute to 24 hours; Pulse does not accept `cooldown_seconds`.
+- For batch or CI/CD workloads, `SHUTDOWN` can skip idle cooldown after work completes, while `SHUTDOWN TERMINATE` force-stops running work. Both still have the documented minimum billing period.
 - Storage billing is for compressed MotherDuck-managed storage plus retained recoverability windows, not just the current visible table size.
 - Shares are zero-copy and do not add storage cost by themselves.
 - Data kept in the customer's own object store for DuckLake or BYOB-style patterns is not billed as MotherDuck-managed storage.
@@ -263,6 +264,7 @@ Frame ROI with concrete categories:
 ## Plan-Aware Talking Points
 
 - Business is publicly positioned for production analytics, with more users, unlimited service accounts, read-scaling replicas, 90-day snapshot retention, query history, support from MotherDuck experts, and a 99.9% availability SLA.
+- Dives are available broadly, while Embedded Dives are positioned as Business-plan functionality unless current docs say otherwise.
 - Enterprise is publicly positioned for larger-scale deployments with custom commercial terms, fixed-cost capacity pricing, and AWS PrivateLink connectivity.
 - Trust and compliance can matter to ROI because security review friction, support level, and procurement constraints affect total adoption cost.
 

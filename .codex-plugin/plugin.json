@@ -1,7 +1,7 @@
 {
   "name": "motherduck-skills",
-  "version": "2.0.0",
-  "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
+  "version": "2.1.0",
+  "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, use the REST API, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
   "author": {
     "name": "MotherDuck",
     "url": "https://motherduck.com"
@@ -16,6 +16,7 @@
     "data-warehouse",
     "sql",
     "postgres",
+    "rest-api",
     "dives",
     "motherduck-ducklake"
   ],
@@ -23,7 +24,7 @@
   "interface": {
     "displayName": "MotherDuck Skills",
     "shortDescription": "Connect, explore, query, and build on MotherDuck.",
-    "longDescription": "A packaged MotherDuck skill catalog for connecting to MotherDuck, inspecting live schemas, writing DuckDB SQL, building Dives, and shipping dashboards, pipelines, and customer-facing analytics.",
+    "longDescription": "A packaged MotherDuck skill catalog for connecting to MotherDuck, inspecting live schemas, writing DuckDB SQL, using the REST API for administration, building Dives, and shipping dashboards, pipelines, and customer-facing analytics.",
     "developerName": "MotherDuck",
     "category": "Productivity",
     "capabilities": [

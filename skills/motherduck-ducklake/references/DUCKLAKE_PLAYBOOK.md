@@ -2,6 +2,8 @@
 
 Use this reference when the question is no longer "what is DuckLake?" but "should we use it here, and if so, how?"
 
+MotherDuck supports DuckLake 1.0. Treat DuckLake as a supported, opt-in open-table-format path, not as the default storage posture for every analytical workload.
+
 ## MotherDuck-first position
 
 Start with native MotherDuck storage unless there is a concrete requirement for:
@@ -78,6 +80,14 @@ MotherDuck docs require the S3 bucket to be in the same AWS region as the Mother
 
 Other clouds are not supported today for BYOB DuckLake storage.
 
+Additional options to verify against current docs before using:
+
+- `DATA_INLINING_ROW_LIMIT`
+- `SNAPSHOT_RETENTION_DAYS`
+- encryption-related options
+
+DuckLake databases should not be presented as transient databases unless current docs explicitly add that support.
+
 ### Attach the metadata database for own-compute access
 
 ```sql
@@ -88,6 +98,7 @@ Important:
 
 - the metadata database attach is an own-compute pattern, not the default MotherDuck operating surface
 - only the database owner can attach the metadata database
+- verify the DuckDB and DuckLake version matrix before direct metadata-catalog access; newer DuckLake spec versions can require newer DuckDB clients
 - do not recommend this path unless the user actually needs their own DuckDB client to read and write the lake directly
 
 ## Data inlining posture
@@ -123,6 +134,8 @@ That means you should define:
 
 If the design has no answer for maintenance, it is not ready for DuckLake.
 
+Use `CHECKPOINT` as the current high-level maintenance wrapper when current docs recommend it for the DuckLake operation in question. Keep lower-level maintenance functions as targeted tools for cases where the docs call for them directly.
+
 ## Sharing and write constraints
 
 Current MotherDuck docs call out a few important limits:
@@ -136,7 +149,7 @@ Do not promise a broad multi-writer lakehouse collaboration model unless the cur
 
 ## Gotchas
 
-- DuckLake is still preview / active-development. Do not present syntax or behavior as fully stable.
+- DuckLake 1.0 is supported, but MotherDuck-specific DuckLake behavior can still differ from raw `ducklake` extension behavior. Verify current docs before relying on new extension features.
 - Keep the MotherDuck product surface separate from raw DuckLake extension assumptions. The extension can expose behaviors that MotherDuck does not expose the same way.
 - BYOB region restrictions apply to DuckLake storage, not to ordinary remote reads from S3-compatible storage.
 - Do not use DuckLake as a generic "big data" answer when native MotherDuck would be simpler and faster.

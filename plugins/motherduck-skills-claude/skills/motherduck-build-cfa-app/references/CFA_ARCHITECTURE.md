@@ -336,7 +336,7 @@ Set 90-day expiration on all tokens. At day 80, generate a new token and store i
 ### Phase 1: Launch (1-50 customers)
 
 - **One Duckling per customer.** Each customer gets a separate database and service account.
-- **Start simple on reads.** Add read scaling only when concurrency is real; the documented default flock limit is 16 replicas, adjustable via support.
+- **Start simple on reads.** Add read scaling only when concurrency is real; the default pool size is 4 replicas and can be increased up to 16 as a soft limit.
 - **Single backend instance.** One API server routes requests to customer databases.
 - **Monitor:** Query latency (p50, p95, p99), error rates, connection counts.
 
@@ -350,7 +350,7 @@ Set 90-day expiration on all tokens. At day 80, generate a new token and store i
 
 ### Phase 3: Scale (500+ customers)
 
-- **Scale read replicas for top-tier customers.** The highest-traffic customers may need the documented default maximum flock size or a higher limit coordinated with support.
+- **Scale read replicas for top-tier customers.** The highest-traffic customers may need the documented soft limit or a higher limit coordinated with support.
 - **Tiered customer configs.** Group customers by usage tier (free, pro, enterprise) with different replica counts and query rate limits.
 - **Per-customer rate limiting.** Protect the system from runaway query volume by enforcing per-customer request limits.
 - **Dedicated backend pools.** Route enterprise customers to dedicated backend instances for guaranteed capacity.
@@ -362,7 +362,7 @@ Set 90-day expiration on all tokens. At day 80, generate a new token and store i
 |---|---|
 | p95 query latency > 2s | Add read replicas for affected customers |
 | Connection pool exhausted | Increase pool size or add backend instances |
-| Replica lag > 10s | Investigate write volume; consider `CREATE SNAPSHOT` |
+| Replica lag beyond freshness target | Investigate write volume; consider `CREATE SNAPSHOT` |
 | Single customer > 50% of total traffic | Move to dedicated backend pool |
 | Provisioning takes > 5 min manually | Automate with scripts or API |
 

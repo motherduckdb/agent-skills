@@ -109,10 +109,12 @@ Use only when datasets are under 1GB per user and the use case is a lightweight,
 
 Embedded Dives sit between a standalone Dive and a full CFA app:
 
-- good for read-only live dashboards inside an existing site or product
+- good for read-only live Dives inside an existing site or product
 - backend still creates the embed session
 - browser receives only the short-lived session string
 - not a substitute for a full app backend when you need customer-specific routing, richer write paths, or tighter policy enforcement
+- server mode runs through the Postgres endpoint and is the default embed query mode
+- dual mode adds browser-side DuckDB-Wasm behavior and requires cross-origin isolation headers
 
 If the requirement is "show a live MotherDuck dashboard inside our product," this can be enough. If the requirement is "serve each customer through our own application contract and backend controls," stay with the 3-tier CFA architecture.
 
@@ -297,7 +299,7 @@ Validate and sanitize all queries before execution. Never pass raw user input di
 
 Enable read scaling for each customer's service account when concurrent read workloads justify it.
 
-- **Default flock limit:** read scaling starts with a maximum default flock size of 16 replicas, adjustable via support.
+- **Default pool size:** read scaling starts with a default pool size of 4 replicas and can be increased up to 16 as a soft limit.
 - **Use Read Scaling tokens** to distribute load across replicas automatically.
 - **Read Scaling tokens are read-only.** Write operations require a Read/Write token.
 - **Use `session_hint` on native DuckDB connections** so repeated requests from the same end user land on the same replica when possible.
@@ -324,7 +326,7 @@ CREATE SNAPSHOT;
 REFRESH DATABASE customer_acme;
 ```
 
-Use this pattern sparingly. For most CFA use cases, eventual consistency with a few seconds of delay is sufficient and performs better.
+Use this pattern sparingly. For most CFA use cases, eventual consistency with a few minutes of delay is sufficient and performs better.
 
 ---
 
@@ -345,8 +347,8 @@ This model eliminates the "noisy neighbor" problem that plagues shared-database 
 
 Read scaling distributes read queries across multiple replicas of a customer's Duckling instance.
 
-- **Default flock size is capped at 16 replicas** unless support adjusts it.
-- **Eventually consistent.** Replicas sync from the primary with a delay. This delay is acceptable for analytics workloads.
+- **Default pool size is 4 replicas** and can be increased up to 16 as a soft limit.
+- **Eventually consistent.** Replicas sync from the primary within a few minutes. This delay is acceptable for analytics workloads.
 - **Automatic load distribution.** When using a Read Scaling token, MotherDuck routes queries across available replicas automatically.
 - **Session affinity matters.** When using native DuckDB connections, pass a stable `session_hint` so the same user stays on the same replica when possible.
 - **No query rewrite is required.** The main change is token type and connection configuration, not a new SQL dialect.

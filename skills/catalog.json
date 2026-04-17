@@ -92,6 +92,8 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/postgres-endpoint/",
+      "https://motherduck.com/docs/integrations/bi-tools/powerbi/",
+      "https://motherduck.com/docs/getting-started/interfaces/client-apis/other/postgres-endpoint-jdbc/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/attach-modes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/"
@@ -115,6 +117,8 @@
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/managing-dives-as-code/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
+      "https://motherduck.com/docs/sql-reference/mcp/list-dives/",
+      "https://motherduck.com/docs/sql-reference/mcp/read-dive/",
       "https://motherduck.com/dive-gallery/"
     ],
     "needs_live_discovery": false
@@ -131,7 +135,9 @@
     "source_docs": [
       "https://duckdb.org/docs/",
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
-      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/"
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
+      "https://motherduck.com/docs/troubleshooting/version-lifecycle-schedules/"
     ],
     "needs_live_discovery": false
   },
@@ -193,7 +199,8 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
-      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/"
+      "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/mcp/query-rw/"
     ],
     "needs_live_discovery": false
   },
@@ -239,7 +246,7 @@
       "artifacts/migration_validation_example.ts"
     ],
     "source_docs": [
-      "https://motherduck.com/docs/key-tasks/postgres-integrations/",
+      "https://motherduck.com/product/postgres-integration/",
       "https://motherduck.com/docs/concepts/ducklake/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/"
@@ -288,7 +295,7 @@
       "https://motherduck.com/docs/concepts/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
-      "https://motherduck.com/trust/"
+      "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": true
   },
@@ -304,7 +311,7 @@
     "source_docs": [
       "https://motherduck.com/pricing/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
-      "https://motherduck.com/trust/"
+      "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": false
   },
@@ -321,7 +328,30 @@
       "https://duckdb.org/docs/",
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
+      "https://motherduck.com/docs/sql-reference/mcp/query-rw/",
       "https://motherduck.com/docs/sql-reference/postgres-endpoint/"
+    ],
+    "needs_live_discovery": false
+  },
+  "motherduck-rest-api": {
+    "name": "motherduck-rest-api",
+    "description": "Use when automating or advising on MotherDuck REST API control-plane workflows for service-account provisioning, supported access-token lifecycle operations, Duckling instance configuration, active account inspection, or Dive embed sessions. Do not use for SQL or data-plane query work.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [
+      "references/REST_API_GUIDE.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://api.motherduck.com",
+      "https://api.motherduck.com/docs/specs",
+      "https://motherduck.com/docs/sql-reference/rest-api/motherduck-rest-api/",
+      "https://motherduck.com/docs/sql-reference/rest-api/users-create-token/",
+      "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
+      "https://motherduck.com/docs/about-motherduck/billing/duckling-sizes/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/"
     ],
     "needs_live_discovery": false
   },
@@ -341,7 +371,7 @@
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
-      "https://motherduck.com/trust/"
+      "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": false
   },

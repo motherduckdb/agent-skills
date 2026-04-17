@@ -17,7 +17,7 @@ Is this a backend app or script?
             └── Yes ──> DuckDB-WASM
 ```
 
-Use the PG endpoint for backend applications that already want PostgreSQL wire compatibility. If the runtime can use DuckDB directly and you need local files, hybrid execution, or tighter DuckDB control, use the native DuckDB API instead.
+Use the PG endpoint for backend applications and BI tools that already want PostgreSQL wire compatibility. It is the compatibility path for supported tools such as Power BI and Tableau Cloud, as well as serverless runtimes where installing a native DuckDB client is awkward. If the runtime can use DuckDB directly and you need local files, hybrid execution, or tighter DuckDB control, use the native DuckDB API instead.
 
 ## Operational Defaults
 
@@ -277,8 +277,10 @@ Requires the DuckDB JDBC driver, not the PostgreSQL driver.
 Use read scaling for high-concurrency read-only workloads on the same account.
 
 - Read scaling replicas are eventually consistent.
+- Default read-scaling pool size is 4 replicas and can be increased up to 16 as a soft limit.
 - Use a stable `session_hint` per end user, session, or tenant-facing request path.
 - Prefer `access_mode=read_only` on read-only serving connections.
+- Use `dbinstance_inactivity_ttl` where supported to help preserve session affinity across short connection gaps.
 - If the workflow needs stricter freshness after a write, use `CREATE SNAPSHOT` on the writer and `REFRESH DATABASE` on readers.
 
 ### Python
@@ -324,7 +326,9 @@ const db = await DuckDBInstance.create(
 - SSL is required for the PG endpoint.
 - The PG endpoint does not support PostgreSQL-specific features such as `pg_*` functions, indexes, sequences, stored procedures, `LISTEN`/`NOTIFY`, or advisory locks.
 - The PG endpoint does not support local file access or dual execution.
-- MotherDuck documents `custom_user_agent` for native DuckDB connections, not for PG endpoint connection strings.
+- The PG endpoint still executes DuckDB SQL; do not rewrite queries into PostgreSQL dialect just because the wire protocol is PostgreSQL-compatible.
+- Nested DuckDB types can be harder to consume through PostgreSQL-compatible clients. Prefer flatter serving views for BI and server-mode embedded dashboards.
+- MotherDuck documents `custom_user_agent` for native DuckDB connections. For PG endpoint clients, use `application_name` when the driver exposes it.
 - Use fully qualified table names across databases.
 - Do not install extensions at runtime in MotherDuck.
 

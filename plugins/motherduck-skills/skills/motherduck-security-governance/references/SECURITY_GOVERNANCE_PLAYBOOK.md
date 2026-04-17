@@ -56,6 +56,7 @@ These are safe public anchors to use:
 - Public pricing and trust pages state that compliance reports are available through the commercial process, and that some commercial or security features vary by plan.
 - MotherDuck publicly documents service accounts as organization-owned non-human identities for applications and automation.
 - MotherDuck publicly documents shares as read-only, zero-copy, database-level distribution rather than row-level or table-level entitlement enforcement.
+- MotherDuck publicly documents SSO support with identity providers such as Okta, Microsoft Entra ID, and SAML/OIDC options. Verify current plan requirements and limitations before promising a rollout path.
 
 Do not overstate beyond those anchors. If the user needs a compliance report, a signed DPA, a HIPAA BAA, or plan-specific contractual commitments, say that these require confirmation through current Trust/Security or commercial channels.
 
@@ -90,6 +91,7 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 ## Topics This Skill Should Cover
 
 - service accounts and token handling
+- SSO and organization login controls
 - database-level isolation vs shared-database tradeoffs
 - regional endpoint selection
 - share and Dive sharing boundaries
@@ -109,6 +111,14 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 - Shares are zero-copy, database-level, and read-only. Use them for governed distribution, not as a substitute for row-level entitlement logic.
 - Do not assume Dives replace all BI tooling; MotherDuck positions them for the long tail of questions that do not justify a full dashboard.
 - For broad external or client-facing access, be explicit about whether the right pattern is a share, a Dive, or a full customer-facing application.
+
+## SSO Guidance
+
+- Treat SSO as an organization-level authentication control, not a data-access boundary.
+- Verify that the organization is on a plan that supports SSO before proposing implementation work.
+- Confirm verified domains, IdP ownership, and domain conflicts before activation.
+- Once SSO is active for matching domains, users should expect to authenticate through the identity provider rather than unmanaged login paths.
+- If the user needs multi-org SSO behavior, verify current docs before committing; do not infer it from ordinary SAML or OIDC support.
 
 ## What Not To Overstate
 
