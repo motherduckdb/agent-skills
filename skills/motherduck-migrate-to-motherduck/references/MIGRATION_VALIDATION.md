@@ -433,7 +433,7 @@ When validation reports non-zero variance, do not treat it as an automatic failu
 import duckdb
 
 # Connect to both databases
-USE_CASE_USER_AGENT = "agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.1.0(harness-<harness>;llm-<llm>)"
 conn = duckdb.connect(f"md:?custom_user_agent={USE_CASE_USER_AGENT}")
 
 # If source is a Postgres database (local DuckDB only):
