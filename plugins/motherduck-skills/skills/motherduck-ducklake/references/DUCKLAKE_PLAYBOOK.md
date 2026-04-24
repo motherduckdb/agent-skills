@@ -2,7 +2,7 @@
 
 Use this reference when the question is no longer "what is DuckLake?" but "should we use it here, and if so, how?"
 
-MotherDuck supports DuckLake 1.0. Treat DuckLake as a supported, opt-in open-table-format path, not as the default storage posture for every analytical workload.
+Upstream DuckLake v1.0 is a production-ready lakehouse specification, but MotherDuck's DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
 
 ## MotherDuck-first position
 
@@ -103,7 +103,7 @@ Important:
 
 ## Data inlining posture
 
-MotherDuck docs say DuckLake data inlining is enabled by default for small writes.
+MotherDuck docs say DuckLake data inlining is experimental and requires explicit enablement with `DATA_INLINING_ROW_LIMIT` when creating the DuckLake database. Upstream DuckLake v1.0 has broader default small-write inlining behavior; do not assume raw extension defaults apply unchanged on MotherDuck.
 
 Use it when:
 
@@ -136,6 +136,8 @@ If the design has no answer for maintenance, it is not ready for DuckLake.
 
 Use `CHECKPOINT` as the current high-level maintenance wrapper when current docs recommend it for the DuckLake operation in question. Keep lower-level maintenance functions as targeted tools for cases where the docs call for them directly.
 
+For file compaction, upstream DuckLake documents `ducklake_merge_adjacent_files(...)` and related auto-compaction options. Treat those as explicit maintenance choices, not background behavior, and verify schema-evolution/time-travel constraints before recommending a compaction policy.
+
 ## Sharing and write constraints
 
 Current MotherDuck docs call out a few important limits:
@@ -149,7 +151,7 @@ Do not promise a broad multi-writer lakehouse collaboration model unless the cur
 
 ## Gotchas
 
-- DuckLake 1.0 is supported, but MotherDuck-specific DuckLake behavior can still differ from raw `ducklake` extension behavior. Verify current docs before relying on new extension features.
+- Upstream DuckLake v1.0 features such as sorted tables, bucket partitioning, deletion vectors, and default inlining may not map one-for-one to the current MotherDuck DuckLake surface. Verify MotherDuck docs before relying on new extension features.
 - Keep the MotherDuck product surface separate from raw DuckLake extension assumptions. The extension can expose behaviors that MotherDuck does not expose the same way.
 - BYOB region restrictions apply to DuckLake storage, not to ordinary remote reads from S3-compatible storage.
 - Do not use DuckLake as a generic "big data" answer when native MotherDuck would be simpler and faster.

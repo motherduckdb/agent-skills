@@ -2,7 +2,7 @@ md_pipeline_demo:
   outputs:
     dev:
       type: duckdb
-      path: "md:{{ env_var('MOTHERDUCK_PIPELINE_DB', 'md_skills_pipeline_demo') }}?motherduck_token={{ env_var('MOTHERDUCK_TOKEN') }}&custom_user_agent=agent-skills/<latest-available-skills-version>(harness-{{ env_var('MOTHERDUCK_AGENT_HARNESS', 'unknown') | replace(' ', '-') }};llm-{{ env_var('MOTHERDUCK_AGENT_LLM', 'unknown') | replace(' ', '-') }})"
+      path: "md:{{ env_var('MOTHERDUCK_PIPELINE_DB', 'md_skills_pipeline_demo') }}?motherduck_token={{ env_var('MOTHERDUCK_TOKEN') }}&custom_user_agent=agent-skills/2.1.0(harness-{{ env_var('MOTHERDUCK_AGENT_HARNESS', 'unknown') | replace(' ', '-') }};llm-{{ env_var('MOTHERDUCK_AGENT_LLM', 'unknown') | replace(' ', '-') }})"
       schema: main
       threads: 1
   target: dev

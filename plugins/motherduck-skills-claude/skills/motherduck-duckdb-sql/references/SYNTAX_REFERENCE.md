@@ -6,13 +6,15 @@ Complete function and data type reference for DuckDB on MotherDuck.
 
 ## Version-Sensitive Features
 
-MotherDuck supports multiple DuckDB client versions over time. For newly released DuckDB features, check the MotherDuck version-lifecycle docs before treating syntax or types as production-safe in MotherDuck.
+DuckDB's current upstream documentation can move ahead of the DuckDB versions currently supported by MotherDuck. Check MotherDuck's version-lifecycle docs before treating newly released syntax or types as production-safe in MotherDuck.
 
 Examples to verify before relying on them:
 
 - `MERGE INTO`
 - `FILL()` window interpolation
 - newly added or newly expanded types such as `VARIANT` or native `GEOMETRY`
+- DuckDB 1.5 date/time behavior such as `date_trunc` returning `TIMESTAMP` when applied to `DATE`
+- lakehouse-format changes that depend on current DuckDB, DuckLake, Iceberg, Delta, or httpfs extension behavior
 
 MotherDuck-only lifecycle commands are operational SQL, not analytical query syntax:
 

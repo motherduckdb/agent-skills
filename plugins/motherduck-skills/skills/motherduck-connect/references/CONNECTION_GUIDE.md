@@ -191,7 +191,7 @@ Use `duckdb.connect("md:")` for workspace-level operations such as:
 
 Use `duckdb.connect("md:my_database")` when the workload is scoped to one database.
 
-When a use-case skill emits a native DuckDB connection, watermark it with `custom_user_agent=agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)`. If metadata values are missing, use `harness-unknown` and `llm-unknown`.
+When a use-case skill emits a native DuckDB connection, watermark it with `custom_user_agent=agent-skills/2.1.0(harness-<harness>;llm-<llm>)`. If metadata values are missing, use `harness-unknown` and `llm-unknown`.
 
 ### Python
 
@@ -199,7 +199,7 @@ When a use-case skill emits a native DuckDB connection, watermark it with `custo
 import duckdb
 import os
 
-USE_CASE_USER_AGENT = "agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.1.0(harness-<harness>;llm-<llm>)"
 
 conn = duckdb.connect(
     f"md:my_database?custom_user_agent={USE_CASE_USER_AGENT}"
@@ -223,7 +223,7 @@ Install: `pip install duckdb`
 ```javascript
 import { DuckDBInstance } from "@duckdb/node-api";
 
-const userAgent = "agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)";
+const userAgent = "agent-skills/2.1.0(harness-<harness>;llm-<llm>)";
 const instance = await DuckDBInstance.create(
   `md:my_database?attach_mode=single&custom_user_agent=${userAgent}`,
   {
@@ -241,7 +241,7 @@ Install: `npm install @duckdb/node-api`
 ### JDBC (Native DuckDB)
 
 ```text
-jdbc:duckdb:md:my_database?motherduck_token=<MOTHERDUCK_TOKEN>&custom_user_agent=agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)
+jdbc:duckdb:md:my_database?motherduck_token=<MOTHERDUCK_TOKEN>&custom_user_agent=agent-skills/2.1.0(harness-<harness>;llm-<llm>)
 ```
 
 Requires the DuckDB JDBC driver, not the PostgreSQL driver.
@@ -292,7 +292,7 @@ import os
 conn = duckdb.connect(
     "md:my_database?session_hint=user-123&access_mode=read_only"
     "&dbinstance_inactivity_ttl=300"
-    "&custom_user_agent=agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)",
+    "&custom_user_agent=agent-skills/2.1.0(harness-<harness>;llm-<llm>)",
     config={
         "motherduck_token": os.environ["MOTHERDUCK_READ_SCALING_TOKEN"],
     },
@@ -307,7 +307,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 const db = await DuckDBInstance.create(
   "md:my_database?session_hint=user-123&access_mode=read_only"
   + "&dbinstance_inactivity_ttl=300"
-  + "&custom_user_agent=agent-skills/<latest-available-skills-version>(harness-<harness>;llm-<llm>)",
+  + "&custom_user_agent=agent-skills/2.1.0(harness-<harness>;llm-<llm>)",
   {
     motherduck_token: process.env.MOTHERDUCK_READ_SCALING_TOKEN,
   }
