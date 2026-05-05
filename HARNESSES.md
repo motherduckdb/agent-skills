@@ -1,6 +1,6 @@
 # MotherDuck Skills Harness Matrix
 
-MotherDuck Skills ships one shared skill catalog that all main harnesses can install through `npx skills`.
+MotherDuck Skills ships one shared skill catalog that the main agent hosts can install through the Skills CLI.
 For major harnesses that support it, this repo also ships native plugin, extension, or packaged discovery surfaces.
 
 Use this file to answer two questions quickly:
@@ -12,8 +12,11 @@ Use this file to answer two questions quickly:
 
 | Harness | Best install path | Native surface in this repo | Verify it worked |
 |-------|-------|-------|-------|
-| `Claude Code` | Claude plugin install or `npx skills` | `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | ask Claude Code to use `motherduck-connect`, inspect the plugin list, or run `claude --plugin-dir ./plugins/motherduck-skills-claude` |
-| `Codex` | Codex plugin install or `npx skills` | `.codex-plugin/plugin.json`, `plugins/motherduck-skills` | open `/plugins` or run the Codex plugin smoke test |
+| `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` | `.claude-plugin/marketplace.json`, `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | run `/plugin list` and ask Copilot to use `motherduck-connect` |
+| `VS Code / GitHub Copilot` | `npx -y skills add motherduckdb/agent-skills --agent github-copilot --skill '*' --yes --global` | shared `skills/` catalog | ask Copilot to use a MotherDuck skill in agent mode |
+| `Claude Code` | Claude plugin install or Skills CLI | `.claude-plugin/marketplace.json`, `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | ask Claude Code to use `motherduck-connect`, inspect the plugin list, or run `claude --plugin-dir ./plugins/motherduck-skills-claude` |
+| `Codex` | Codex plugin install or Skills CLI | `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `plugins/motherduck-skills` | open `/plugins` or run the Codex plugin smoke test |
+| `Cursor` | Skills CLI or Cursor plugin manifest ingestion | `.cursor-plugin/plugin.json`, `.cursor-plugin/marketplace.json` | reload Cursor and ask it to use `motherduck-connect` |
 | `Gemini CLI` | Gemini extension install or Gemini skills install | `gemini-extension.json`, `GEMINI.md`, `commands/motherduck/` | run `gemini extensions list` or `gemini skills list` |
 
 ## Default Routing

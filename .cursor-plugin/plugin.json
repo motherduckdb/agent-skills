@@ -1,0 +1,33 @@
+{
+  "name": "motherduck-skills",
+  "displayName": "MotherDuck Skills",
+  "version": "2.1.0",
+  "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, use the REST API, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
+  "author": {
+    "name": "MotherDuck"
+  },
+  "publisher": "MotherDuck",
+  "homepage": "https://motherduck.com",
+  "repository": "https://github.com/motherduckdb/agent-skills",
+  "license": "MIT",
+  "logo": "assets/duck_skills.png",
+  "keywords": [
+    "motherduck",
+    "duckdb",
+    "analytics",
+    "data-warehouse",
+    "sql",
+    "postgres",
+    "rest-api",
+    "dives",
+    "motherduck-ducklake"
+  ],
+  "category": "data",
+  "tags": [
+    "motherduck",
+    "duckdb",
+    "analytics",
+    "skills"
+  ],
+  "skills": "./skills/"
+}

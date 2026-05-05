@@ -38,7 +38,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Use-case skills may depend only on utility and workflow skills.
 - SKILL frontmatter stays portable and limited to broadly supported fields like `name`, `description`, and `license`.
 - Repo-only skill graph data lives in `skills/catalog.json`, not in SKILL frontmatter.
-- The README catalog, `CLAUDE.md` catalog, Gemini extension surfaces (`gemini-extension.json`, `GEMINI.md`, `commands/`), Claude marketplace manifest, packaged Claude plugin manifest, Codex plugin manifest, and Codex marketplace entry must stay in sync with the `skills/` directory.
+- The README catalog, `CLAUDE.md` catalog, Gemini extension surfaces (`gemini-extension.json`, `GEMINI.md`, `commands/`), Claude marketplace manifest, packaged Claude plugin manifest, Codex plugin manifest, Codex marketplace entry, and Cursor plugin manifests must stay in sync with the `skills/` directory.
 - The Codex marketplace must point at the packaged plugin under `plugins/motherduck-skills`, not the repo root.
 - Gemini release archives must keep `gemini-extension.json` at the archive root and include the bundled `skills/` and Gemini-specific discovery surfaces.
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
@@ -75,6 +75,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Gemini extension manifest and command wiring
 - Claude and Codex plugin consistency
 - Claude marketplace wiring
+- Cursor plugin and marketplace wiring
 - packaged Claude plugin sync and metadata
 - Codex marketplace wiring
 - packaged Codex plugin sync and non-symlink packaging
