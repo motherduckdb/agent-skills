@@ -1,0 +1,16 @@
+{
+  "name": "motherduck-skills",
+  "owner": {
+    "name": "MotherDuck"
+  },
+  "metadata": {
+    "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, using the REST API, and shipping Dives, dashboards, pipelines, migrations, and analytics apps."
+  },
+  "plugins": [
+    {
+      "name": "motherduck-skills",
+      "source": ".",
+      "description": "Connect, explore, query, and build on MotherDuck from Cursor."
+    }
+  ]
+}

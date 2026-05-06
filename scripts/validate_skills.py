@@ -36,6 +36,8 @@ CLAUDE_CONTEXT = ROOT / "CLAUDE.md"
 CODEX_PLUGIN = ROOT / ".codex-plugin" / "plugin.json"
 CODEX_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 CODEX_PACKAGED_PLUGIN = ROOT / "plugins" / "motherduck-skills"
+CURSOR_PLUGIN = ROOT / ".cursor-plugin" / "plugin.json"
+CURSOR_MARKETPLACE = ROOT / ".cursor-plugin" / "marketplace.json"
 
 LAYERS = {"utility": 0, "workflow": 1, "use-case": 2}
 GEMINI_CATALOG_HEADINGS = {
@@ -377,6 +379,71 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
         raise ValidationError(f"{CODEX_MARKETPLACE}: category is required on each plugin entry")
 
 
+def validate_cursor_plugin(skills: list[str]) -> str:
+    if not CURSOR_PLUGIN.exists():
+        raise ValidationError(f"Missing required Cursor plugin manifest: {CURSOR_PLUGIN}")
+
+    payload = read_json_file(CURSOR_PLUGIN)
+    plugin_name = payload.get("name")
+    if not plugin_name:
+        raise ValidationError(f"{CURSOR_PLUGIN}: missing name")
+    if not payload.get("displayName"):
+        raise ValidationError(f"{CURSOR_PLUGIN}: missing displayName")
+    if not payload.get("version"):
+        raise ValidationError(f"{CURSOR_PLUGIN}: missing version")
+    if not payload.get("description"):
+        raise ValidationError(f"{CURSOR_PLUGIN}: missing description")
+
+    skills_path = payload.get("skills")
+    if skills_path != "./skills/":
+        raise ValidationError(f"{CURSOR_PLUGIN}: expected skills to be './skills/', found {skills_path!r}")
+
+    resolved_skills_dir = (ROOT / skills_path).resolve()
+    if resolved_skills_dir != SKILLS_DIR.resolve():
+        raise ValidationError(
+            f"{CURSOR_PLUGIN}: skills path does not resolve to repo skills directory: {resolved_skills_dir}"
+        )
+
+    logo_path = payload.get("logo")
+    if not isinstance(logo_path, str) or not (ROOT / logo_path).exists():
+        raise ValidationError(f"{CURSOR_PLUGIN}: logo must point at an existing repo file")
+
+    cursor_skills = sorted(p.parent.name for p in resolved_skills_dir.glob("*/SKILL.md"))
+    if cursor_skills != skills:
+        raise ValidationError(
+            f"{CURSOR_PLUGIN}: skills directory mismatch\nexpected: {skills}\nfound:    {cursor_skills}"
+        )
+
+    return plugin_name
+
+
+def validate_cursor_marketplace(expected_plugin_name: str) -> None:
+    if not CURSOR_MARKETPLACE.exists():
+        raise ValidationError(f"Missing required Cursor marketplace manifest: {CURSOR_MARKETPLACE}")
+
+    payload = read_json_file(CURSOR_MARKETPLACE)
+    if not payload.get("name"):
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: missing top-level name")
+
+    owner = payload.get("owner")
+    if not isinstance(owner, dict) or not owner.get("name"):
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: owner.name is required")
+
+    plugins = payload.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: plugins must be a non-empty list")
+
+    entry = next((plugin for plugin in plugins if plugin.get("name") == expected_plugin_name), None)
+    if entry is None:
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: missing plugin entry for {expected_plugin_name!r}")
+
+    source = entry.get("source")
+    if source not in {".", "./"}:
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: expected plugin source to be '.', found {source!r}")
+    if not (ROOT / ".cursor-plugin" / "plugin.json").exists():
+        raise ValidationError(f"{CURSOR_MARKETPLACE}: source does not point at a valid Cursor plugin root")
+
+
 def validate_command_file(path: Path) -> None:
     try:
         payload = tomllib.loads(path.read_text())
@@ -535,6 +602,8 @@ def main() -> int:
 
     codex_plugin_name = validate_codex_plugin(skills)
     validate_codex_marketplace(codex_plugin_name)
+    cursor_plugin_name = validate_cursor_plugin(skills)
+    validate_cursor_marketplace(cursor_plugin_name)
     validate_gemini_extension()
     validate_discoverability_docs()
 
