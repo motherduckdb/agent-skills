@@ -1,6 +1,6 @@
 <h1><img src="assets/duck_skills.png" alt="MotherDuck Skills" height="80" align="center" /> MotherDuck Skills Plugin</h1>
 
-MotherDuck work is not just a SQL problem. An agent needs to choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, understand Dives and sharing, and keep production analytics patterns safe.
+Working in MotherDuck is not just a SQL problem. An agent needs to choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, understand Dives and sharing, and keep production analytics patterns safe.
 
 MotherDuck Skills packages those defaults as an installable skill catalog for compatible coding agents.
 
