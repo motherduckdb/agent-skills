@@ -13,7 +13,7 @@ function normalizeMetadataValue(value: string | undefined, fallback: string): st
 function buildUseCaseUserAgent(): string {
   const harness = normalizeMetadataValue(process.env.MOTHERDUCK_AGENT_HARNESS, "unknown");
   const llm = normalizeMetadataValue(process.env.MOTHERDUCK_AGENT_LLM, "unknown");
-  return `agent-skills/2.1.0(harness-${harness};llm-${llm})`;
+  return `agent-skills/2.2.0(harness-${harness};llm-${llm})`;
 }
 
 function summarizeCustomer(rows: EventRow[]): Array<{ event_type: string; total_revenue: number }> {

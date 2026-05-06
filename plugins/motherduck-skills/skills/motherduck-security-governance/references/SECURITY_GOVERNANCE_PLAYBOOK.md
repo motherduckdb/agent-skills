@@ -57,6 +57,7 @@ These are safe public anchors to use:
 - MotherDuck publicly documents service accounts as organization-owned non-human identities for applications and automation.
 - MotherDuck publicly documents shares as read-only, zero-copy, database-level distribution rather than row-level or table-level entitlement enforcement.
 - MotherDuck publicly documents SSO support with identity providers such as Okta, Microsoft Entra ID, and SAML/OIDC options. Verify current plan requirements and limitations before promising a rollout path.
+- MotherDuck publicly documents data recovery through automatic snapshots, named snapshots, point-in-time restore, and `UNDROP DATABASE`, with retention and availability varying by plan.
 
 Do not overstate beyond those anchors. If the user needs a compliance report, a signed DPA, a HIPAA BAA, or plan-specific contractual commitments, say that these require confirmation through current Trust/Security or commercial channels.
 
@@ -115,10 +116,17 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 ## SSO Guidance
 
 - Treat SSO as an organization-level authentication control, not a data-access boundary.
-- Verify that the organization is on a plan that supports SSO before proposing implementation work.
+- Current public docs place SSO on Business and Enterprise plans; verify the organization plan before proposing implementation work.
 - Confirm verified domains, IdP ownership, and domain conflicts before activation.
 - Once SSO is active for matching domains, users should expect to authenticate through the identity provider rather than unmanaged login paths.
 - If the user needs multi-org SSO behavior, verify current docs before committing; do not infer it from ordinary SAML or OIDC support.
+
+## Recovery and Retention Guidance
+
+- Treat recovery posture as a governance requirement when the user asks about rollback, deletion recovery, audit readiness, or operational resilience.
+- Verify the plan-specific retention window before promising a recovery target; Business supports configurable retention up to 90 days, while lower tiers have narrower documented defaults.
+- Use named snapshots for explicit restore points that should survive automatic snapshot garbage collection.
+- `UNDROP DATABASE` can recover dropped databases only within the documented recovery window.
 
 ## What Not To Overstate
 

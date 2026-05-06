@@ -264,7 +264,7 @@ Frame ROI with concrete categories:
 ## Plan-Aware Talking Points
 
 - Business is publicly positioned for production analytics, with more users, unlimited service accounts, read-scaling replicas, 90-day snapshot retention, query history, support from MotherDuck experts, and a 99.9% availability SLA.
-- Dives are available broadly, while Embedded Dives are positioned as Business-plan functionality unless current docs say otherwise.
+- Current public materials say Dives are available on all plans, while Embedded Dives are positioned as Business-plan functionality.
 - Enterprise is publicly positioned for larger-scale deployments with custom commercial terms, fixed-cost capacity pricing, and AWS PrivateLink connectivity.
 - Trust and compliance can matter to ROI because security review friction, support level, and procurement constraints affect total adoption cost.
 

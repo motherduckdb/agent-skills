@@ -22,6 +22,7 @@ Use them when you need:
 
 - local-file `COPY`
 - loading from local DuckDB files
+- uploading an existing DuckDB database into MotherDuck
 - dataframe or Arrow registration
 - `CREATE SECRET`
 - extension-backed reads
@@ -109,6 +110,34 @@ For the PG endpoint, think in classic thin-client terms:
 - transactions that stay comfortably bounded
 
 If you find yourself trying to simulate a local DuckDB ingestion workflow over the PG wire, switch to a native DuckDB client path instead.
+
+### Upload a local DuckDB database
+
+When the source is a whole local DuckDB database, use a native DuckDB client or CLI connection. This is not a Postgres-endpoint workflow.
+
+Upload the current active local database:
+
+```sql
+ATTACH 'md:';
+CREATE OR REPLACE DATABASE remote_database_name FROM CURRENT_DATABASE();
+```
+
+Upload an attached local database:
+
+```sql
+ATTACH '/path/to/local/database.duckdb' AS local_db_name;
+ATTACH 'md:';
+CREATE OR REPLACE DATABASE remote_database_name FROM local_db_name;
+```
+
+Upload directly from a file path:
+
+```sql
+ATTACH 'md:';
+CREATE OR REPLACE DATABASE remote_database_name FROM '/path/to/local/database.duckdb';
+```
+
+Uploading a database does not switch the active query context. After the upload, qualify remote tables or `USE`/connect to the remote database before validating.
 
 ---
 

@@ -237,7 +237,7 @@ Request fields:
 - `username`: required service account username within the organization
 - `session_hint`: optional non-empty hint used to reuse the same read-scaling session across embed requests
 
-Embedded Dives require a Business plan unless current docs explicitly say otherwise; organizations without embed access should expect a `403`.
+Current public materials say ordinary Dives are available on all plans, while Embedded Dives require a Business plan. Organizations without embed access should expect a `403`.
 
 The response contains an opaque `session` string backed by a short-lived read-scaling token that runs as the service account. Treat it as a runtime credential:
 

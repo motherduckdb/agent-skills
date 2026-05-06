@@ -1,10 +1,259 @@
 # Dive Design Guide
 
-Reference for theming, Recharts components, Tailwind utilities, loading patterns, table components, color usage, interactive filters, and annotated examples.
+Reference for creating, editing, managing, sharing, embedding, and polishing MotherDuck Dives. Use this for the practical mechanics after `motherduck-create-dive` has selected the right workflow.
 
 ---
 
-## 1. Theme Prompt Template
+## 1. What a Dive Is
+
+A Dive is a live React component saved in MotherDuck. It queries MotherDuck with `useSQLQuery`, renders interactive UI with normal React, and persists as a workspace artifact with version history.
+
+Use a Dive when the user needs:
+
+- a persistent answer that stays live over MotherDuck data
+- an interactive internal data app or dashboard
+- a shareable workspace artifact that can be iterated on conversationally
+- an embeddable read-only analytics surface inside another app
+- a version-controlled React + SQL artifact managed by Git
+
+Do not force a Dive when the user only needs one ad hoc SQL answer, a static export, or a full application with custom backend policy, writes, and non-Dive routes.
+
+## 2. Workflow Selection
+
+Choose the path before writing code:
+
+| User goal | Recommended workflow |
+|---|---|
+| Quick persistent visualization | MCP-first workspace Dive: explore, generate, preview, save |
+| Edit a saved Dive | Read the Dive, inspect current version, edit locally or through MCP, update content |
+| Team-maintained Dive | Dives-as-code repo with local preview and PR previews |
+| Customer-facing read-only view | Embedded Dive with backend-created embed session |
+| Full product analytics app | Escalate to `motherduck-build-cfa-app` |
+
+Always start from live schema exploration when MCP or another MotherDuck connection is available. If the user gives a table or schema excerpt instead, state the assumptions and keep table names easy to replace.
+
+## 3. Authoring Workflow
+
+1. Explore databases, tables, columns, and representative rows.
+2. Validate the core SQL outside the Dive first.
+3. Call `get_dive_guide` when MCP is available so the current component API and runtime libraries are in scope.
+4. Design the data story: primary question, sections, filters, and interaction model.
+5. Build a React component with `useSQLQuery`, a default export, safe value conversion, and per-query loading/empty/error states.
+6. Preview locally when possible.
+7. Save or update only after the queries and UI behavior are correct.
+8. Share data or configure embed sessions only after the saved Dive works.
+
+Prefer incremental edits. A saved Dive can be updated in place, and every content update creates a version.
+
+## 4. Component Contract
+
+Every Dive component should have:
+
+- a default React component export
+- `useSQLQuery` calls for live MotherDuck SQL
+- fully qualified table names such as `"database"."schema"."table"`
+- SQL that does most aggregation and shaping
+- React state only for presentation, filters, and interaction controls
+- safe value conversion for unknown query values
+- loading, empty, and error states for each independent query
+
+Supported runtime libraries currently include React, `@motherduck/react-sql-query`, Recharts, and `lucide-react`. Verify with `get_dive_guide` before relying on a newly added library.
+
+Use this baseline shape:
+
+```tsx
+import { useSQLQuery } from "@motherduck/react-sql-query";
+
+const N = (v: unknown): number => (v != null ? Number(v) : 0);
+
+export default function Dive() {
+  const { data, isLoading, isError, error } = useSQLQuery(`
+    SELECT
+      date_trunc('month', order_date) AS month,
+      SUM(revenue) AS revenue
+    FROM "analytics"."main"."orders"
+    GROUP BY 1
+    ORDER BY 1
+  `);
+
+  const rows = Array.isArray(data) ? data : [];
+
+  if (isError) {
+    return <div>Failed to load: {error?.message || "Unknown error"}</div>;
+  }
+
+  return <div>{isLoading ? "Loading" : rows.map((row) => N(row.revenue)).join(", ")}</div>;
+}
+```
+
+## 5. Required Resources and Shared Data
+
+Dives can query private databases, shared databases, or org-shared data. If teammates need to view the Dive, the underlying data must be accessible to them.
+
+When a Dive uses a shared database in local preview or code-managed deployment:
+
+- declare the dependency explicitly
+- keep local aliases stable
+- avoid aliases that collide with the user's existing database names
+- prefer aliases with a `_share` suffix when collision risk is unclear
+- keep `REQUIRED_DATABASES` on one line in blessed-dives-style repos because the deploy script strips it with a regex
+- mirror the actual server-side dependencies in `dive_metadata.json.requiredResources` or the `required_resources` parameter used by SQL functions
+
+Example local-preview export:
+
+```tsx
+export const REQUIRED_DATABASES = [{ type: "share", path: "md:_share/eastlake/06fa503c-07d5-4097-b272-58f0cc0f1fdf", alias: "eastlake_share" }];
+```
+
+Example metadata:
+
+```json
+{
+  "id": "",
+  "title": "Sales Overview",
+  "description": "Sales KPIs and trends",
+  "requiredResources": [
+    { "url": "md:_share/eastlake/06fa503c-07d5-4097-b272-58f0cc0f1fdf", "alias": "eastlake_share" }
+  ]
+}
+```
+
+For workspace-only Dives, MCP can often suggest or create org-scoped shares for private databases referenced by the Dive. Ask explicitly when teammates need access.
+
+## 6. Editing Existing Dives
+
+Before editing an existing Dive:
+
+- identify the Dive by ID or exact title
+- list Dives to confirm `current_version`
+- read the latest content before changing it
+- inspect an older version if the user is asking to restore or compare behavior
+- preserve the title unless the user explicitly wants a rename
+- update metadata separately from content when only title or description changes
+
+MCP path:
+
+1. `list_dives` to find the Dive and current version.
+2. `read_dive` for the latest content, or `read_dive(version = N)` for a historical version.
+3. Edit and preview the component.
+4. `update_dive` only after the user approves the changed behavior.
+
+SQL path:
+
+- `MD_LIST_DIVES()` lists Dives.
+- `MD_GET_DIVE(id)` retrieves current source.
+- `MD_UPDATE_DIVE_METADATA(...)` changes title/description without creating a content version.
+- `MD_UPDATE_DIVE_CONTENT(...)` pushes new component content and creates a new version.
+- `MD_LIST_DIVE_VERSIONS(...)` and `MD_GET_DIVE_VERSION(...)` support version inspection.
+- `MD_DELETE_DIVE(...)` is destructive; confirm before using it.
+
+## 7. Dives as Code
+
+Use a Git-backed workflow when the Dive is part of a product, shared team surface, or reviewable analytical artifact. The blessed Dives example repo is the reference pattern.
+
+Recommended repo layout:
+
+```text
+dives/
+  my-dive/
+    my-dive.tsx
+    dive_metadata.json
+.dive-preview/
+  src/dive.tsx
+scripts/deploy-dive.sh
+.github/workflows/deploy_dives.yaml
+.github/workflows/cleanup_preview_dives.yaml
+```
+
+Workflow:
+
+1. Fork or create the repo.
+2. Add a MotherDuck token for local preview in `.dive-preview/.env`; never commit it.
+3. Use a service-account read/write token as the GitHub secret `MOTHERDUCK_TOKEN` for shared CI/CD ownership.
+4. Put each Dive in `dives/<name>/<name>.tsx` with `dive_metadata.json`.
+5. Register each Dive folder in the deploy workflow path filters.
+6. Preview locally with the Vite scaffold.
+7. On PR, deploy branch-tagged preview Dives and comment the links.
+8. On merge, create or update the production Dive matched by title.
+9. On branch deletion, clean up matching preview Dives.
+
+The blessed example uses:
+
+```bash
+make setup
+make new-dive my-dive
+make preview my-dive
+```
+
+Manual preview is equivalent to:
+
+```bash
+cd .dive-preview
+npm install
+echo 'export { default } from "../../dives/my-dive/my-dive";' > src/dive.tsx
+npm run dev
+```
+
+Deployment scripts should read source from the Dive folder, strip local-only `REQUIRED_DATABASES`, read metadata, pass `required_resources`, and either create or update based on exact title. Preview deployments should make title collisions impossible by appending the branch name.
+
+## 8. Embedding Dives
+
+Use embedding when an existing application needs a live read-only Dive surface without building a full custom analytics app.
+
+Current public materials say ordinary Dives are available on all plans, while Embedded Dives require a Business plan. Verify plan access before promising an embed rollout.
+
+Embedding flow:
+
+1. Build and save the Dive.
+2. Ensure the service account used for embedding can read the required data.
+3. Backend creates an embed session for the Dive.
+4. Frontend renders the session in a sandboxed iframe.
+5. Refresh the session when it expires.
+
+Keep all admin tokens and service-account tokens on the backend. The browser should receive only the short-lived embed session string.
+
+Backend session creation:
+
+```ts
+const response = await fetch(`https://api.motherduck.com/v1/dives/${diveId}/embed-session`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.MOTHERDUCK_TOKEN}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    username: process.env.MOTHERDUCK_SERVICE_ACCOUNT_USERNAME,
+    session_hint: customerId,
+  }),
+});
+
+const { session } = await response.json();
+```
+
+Frontend iframe:
+
+```html
+<iframe
+  src="https://embed-motherduck.com/sandbox/#session=SESSION_FROM_BACKEND"
+  sandbox="allow-scripts allow-same-origin"
+  width="100%"
+  height="600"
+  style="border:0"
+></iframe>
+```
+
+Add `frame-src https://embed-motherduck.com;` to Content Security Policy when CSP is strict.
+
+Use server mode first. Use dual mode only when the Dive needs browser-side DuckDB-Wasm responsiveness and the parent app can set cross-origin isolation headers:
+
+```text
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Opener-Policy: same-origin
+```
+
+Embedded Dives are read-only. Escalate to `motherduck-build-cfa-app` when the product needs custom writes, backend authorization logic, non-Dive routes, or per-customer API contracts.
+
+## 9. Theme Prompt Template
 
 Use this structure when you want the model to reliably produce a coherent Dive style instead of generic dashboard output.
 
@@ -29,7 +278,7 @@ Make the prompt concrete:
 - Ask for cross-filtering only when the Dive has a shared drill-down dimension.
 - Keep the palette to roughly 5-7 colors.
 
-## 2. Theme Gallery Shortlist
+## 10. Theme Gallery Shortlist
 
 Use these named gallery directions as defaults:
 
@@ -50,7 +299,7 @@ Borrow structure and pacing, not pixel-perfect styling.
 
 ---
 
-## 3. Recharts Component Reference
+## 11. Recharts Component Reference
 
 All charts must be wrapped in `<ResponsiveContainer width="100%" height={260}>`.
 
@@ -172,7 +421,7 @@ Area props: `type`, `dataKey`, `stroke`, `fill`, `fillOpacity` (0.1-0.3), `stack
 
 ---
 
-## 4. Tailwind Utilities Commonly Used
+## 12. Tailwind Utilities Commonly Used
 
 ### Layout
 
@@ -206,7 +455,7 @@ For brand colors use inline `style`: `style={{ color: "#231f20" }}`, `style={{ b
 
 ---
 
-## 5. Loading State Patterns
+## 13. Loading State Patterns
 
 ### KPI Skeleton
 
@@ -256,7 +505,7 @@ For brand colors use inline `style`: `style={{ color: "#231f20" }}`, `style={{ b
 
 ---
 
-## 6. Multi-Query Dive Pattern
+## 14. Multi-Query Dive Pattern
 
 Use multiple `useSQLQuery` calls. Name destructured variables uniquely. Each section renders its own loading state.
 
@@ -283,7 +532,7 @@ export default function MultiQueryDive() {
 
 ---
 
-## 7. Table Component Pattern
+## 15. Table Component Pattern
 
 Use tables for fewer than 8 categories or when exact values matter.
 
@@ -315,7 +564,7 @@ Rules: left-align text, right-align numbers, `border-b` separators, alternating 
 
 ---
 
-## 8. Color Usage
+## 16. Color Usage
 
 ### Chart Series (in order)
 
@@ -348,7 +597,7 @@ const deltaColor = delta >= 0 ? "#2d7a00" : "#bd4e35";
 
 ---
 
-## 9. Interactive Filters
+## 17. Interactive Filters
 
 ### Period Selector
 
@@ -395,7 +644,7 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 10. Formatting Patterns
+## 18. Formatting Patterns
 
 ```tsx
 // Currency
@@ -413,7 +662,7 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 11. Choosing the Right Chart
+## 19. Choosing the Right Chart
 
 | Data Shape | Chart | Notes |
 |---|---|---|
@@ -428,46 +677,22 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 
 ---
 
-## 12. Manage as Code and Embed
+## 20. Common Failure Modes
 
-### Manage Dives as Code
-
-Use a Git-backed workflow when the Dive is part of a real product or a shared team artifact:
-
-- store the Dive source in the repo
-- iterate locally with hot reload
-- review through PR previews
-- deploy with a scripted save/update step or CI pipeline
-
-This is the right path when multiple people will maintain the Dive or when preview and production should be reviewable separately.
-
-### Embed Dives
-
-Use embedding when you need a live read-only Dive inside an existing app or site:
-
-- backend creates the embed session
-- browser receives only the short-lived session string, not the admin access token
-- the embedded Dive is read-only
-- the embed session expires after 24 hours
-- Embedded Dives require a Business plan unless current docs explicitly say otherwise
-- `embed-motherduck.com` may need to be added to `frame-src` if CSP is strict
-
-Use server mode first; it runs queries through the Postgres endpoint and is enough for most embeds. Use dual mode only when the Dive needs browser-side DuckDB-Wasm behavior, and only after configuring cross-origin isolation headers.
-
-Do not put admin tokens in the browser. If the user needs richer application behavior, custom API contracts, writes, non-Dive routing, or backend-side policy enforcement, move to the `motherduck-build-cfa-app` patterns instead.
-
-### Dive Version History
-
-Every saved Dive update creates a version. Before overwriting a Dive:
-
-- inspect `current_version` with `list_dives`
-- use `read_dive` without `version` for the latest content
-- use `read_dive(version = N)` to inspect a historical version
-- treat older versions as read-only unless the user explicitly asks to restore by saving updated content
+- Saving before the SQL has been validated.
+- Building one huge query that every UI interaction has to rerun.
+- Returning raw rows when the UI needs pre-aggregated values.
+- Missing loading, empty, or error states.
+- Using an unshared private database when teammates need to view the Dive.
+- Letting `REQUIRED_DATABASES` diverge from `dive_metadata.json.requiredResources`.
+- Breaking blessed-dives deployment by formatting `REQUIRED_DATABASES` across multiple lines.
+- Exposing MotherDuck tokens in browser code.
+- Updating content when only metadata should change.
+- Deleting or overwriting a Dive without checking version history.
 
 ---
 
-## 13. Complete Annotated Example
+## 21. Complete Annotated Example
 
 ```tsx
 import { useSQLQuery } from "@motherduck/react-sql-query";

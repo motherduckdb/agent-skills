@@ -102,7 +102,7 @@
   },
   "motherduck-create-dive": {
     "name": "motherduck-create-dive",
-    "description": "Create interactive MotherDuck Dives with live SQL queries. Use when building, previewing, saving, styling, updating, or embedding a Dive, especially when the workflow depends on get_dive_guide, useSQLQuery, theme prompts, and live MotherDuck data.",
+    "description": "Create, edit, manage, share, or embed MotherDuck Dives. Use when the work involves Dive authoring, live React + SQL components, MCP get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-explore",
@@ -116,9 +116,15 @@
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/managing-dives-as-code/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/managing-dives-as-code/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/dives/",
       "https://motherduck.com/docs/sql-reference/mcp/list-dives/",
       "https://motherduck.com/docs/sql-reference/mcp/read-dive/",
+      "https://motherduck.com/blog/april-2026-product-roundup/",
+      "https://motherduck.com/blog/introducing-embedded-dives/",
+      "https://motherduck.com/blog/dashboards-as-code-dives/",
+      "https://github.com/motherduckdb/blessed-dives-example",
       "https://motherduck.com/dive-gallery/"
     ],
     "needs_live_discovery": false
@@ -137,6 +143,7 @@
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
+      "https://motherduck.com/docs/concepts/data-recovery/",
       "https://motherduck.com/docs/troubleshooting/version-lifecycle-schedules/"
     ],
     "needs_live_discovery": false
@@ -158,6 +165,9 @@
       "https://motherduck.com/docs/concepts/ducklake/",
       "https://motherduck.com/docs/integrations/file-formats/ducklake/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-database/",
+      "https://motherduck.com/blog/announcing-ducklake-1-0-on-motherduck/",
+      "https://duckdb.org/2026/04/13/announcing-duckdb-152",
+      "https://ducklake.select/2026/04/13/ducklake-10/",
       "https://ducklake.select/"
     ],
     "needs_live_discovery": false
@@ -220,6 +230,8 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/",
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/considerations-for-loading-data/",
+      "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/loading-duckdb-database/",
+      "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/loading-data-from-cloud-or-https/",
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/loading-data-via-postgres-endpoint/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/"
     ],
@@ -311,6 +323,7 @@
     "source_docs": [
       "https://motherduck.com/pricing/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/blog/april-2026-product-roundup/",
       "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": false
@@ -329,6 +342,7 @@
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
+      "https://motherduck.com/docs/concepts/data-recovery/",
       "https://motherduck.com/docs/sql-reference/mcp/query-rw/",
       "https://motherduck.com/docs/sql-reference/postgres-endpoint/"
     ],
@@ -351,7 +365,8 @@
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/about-motherduck/billing/duckling-sizes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/"
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
+      "https://motherduck.com/blog/introducing-embedded-dives/"
     ],
     "needs_live_discovery": false
   },
@@ -371,6 +386,8 @@
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/sso-setup/",
+      "https://motherduck.com/docs/concepts/data-recovery/",
       "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": false
