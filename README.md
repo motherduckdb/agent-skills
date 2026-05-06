@@ -1,14 +1,14 @@
 <h1><img src="assets/duck_skills.png" alt="MotherDuck Skills" height="80" align="center" /> MotherDuck Skills Plugin</h1>
 
-Working in MotherDuck is not just a SQL problem. An agent needs to choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, understand Dives and sharing, and keep production analytics patterns safe.
+To work in MotherDuck an agent needs to choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, understand Dives and sharing, and keep production analytics patterns safe.
 
-MotherDuck Skills packages those defaults as an installable skill catalog for compatible coding agents.
+MotherDuck Skills package opinionated defaults to answer these and more questions in the best way possible and package this as an installable skill catalog for coding agents.
 
 **[Install the plugin](#install-in-60-seconds)**
 
 ## One Catalog, Three Layers
 
-### Utility Skills: The Foundation
+### Utility Skills
 
 Use these when the agent needs exact MotherDuck mechanics: connect, explore, query, use the REST API, or check DuckDB SQL behavior.
 
@@ -18,7 +18,7 @@ Use these when the agent needs exact MotherDuck mechanics: connect, explore, que
 - `motherduck-duckdb-sql`
 - `motherduck-rest-api`
 
-### Workflow Skills: The Playbooks
+### Workflow Skills
 
 Use these when the work has multiple steps and MotherDuck-specific tradeoffs.
 
@@ -30,7 +30,7 @@ Use these when the work has multiple steps and MotherDuck-specific tradeoffs.
 - `motherduck-security-governance`
 - `motherduck-pricing-roi`
 
-### Use-Case Skills: The End-to-End Paths
+### Use-Case Skills
 
 Use these when the agent is designing or shipping a product surface, rollout, migration, or partner implementation.
 
@@ -41,27 +41,6 @@ Use these when the agent is designing or shipping a product surface, rollout, mi
 - `motherduck-enable-self-serve-analytics`
 - `motherduck-partner-delivery`
 
-## Why This Plugin Is Different
-
-This is not a loose prompt pack. It is a maintained MotherDuck guidance layer:
-
-- **18 curated skills** with dependency rules across utility, workflow, and use-case layers.
-- **Live-data first guidance** when MotherDuck MCP or another live connection is available.
-- **DuckDB-first SQL defaults** so agents avoid PostgreSQL-only syntax in MotherDuck work.
-- **Runnable examples and references** for dashboards, customer-facing analytics, pipelines, migrations, and rollout plans.
-- **Multi-host packaging** for Claude Code, GitHub Copilot CLI, Codex, Cursor, Gemini CLI, and plain `SKILL.md` installs.
-
-## What You Get
-
-| Component | What it adds | Examples |
-| --- | --- | --- |
-| **MotherDuck skills** | Product defaults, routing, guardrails, and implementation guidance | Connect, explore, query, REST API, Dives, DuckLake, sharing |
-| **Reference playbooks** | Deeper scenario guidance preserved outside the short skill bodies | Migration validation, dashboard patterns, CFA architecture |
-| **Artifacts** | Small runnable examples for validated workflows | Python and TypeScript examples for dashboards, pipelines, migrations |
-| **Packaged host surfaces** | Native manifests where the host supports plugin or extension discovery | Claude, Codex, Cursor, Gemini |
-
-The source skills live in `skills/`. Packaged host manifests live in `.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`, `.agents/plugins/`, `plugins/`, and `gemini-extension.json`.
-
 ## Install in 60 Seconds
 
 ### Prerequisites
@@ -70,11 +49,6 @@ Before you install, make sure you have:
 
 - Git available on your PATH.
 - Node.js 18+ if you use the Skills CLI or host plugin tooling.
-- The Skills CLI when using the shared install path:
-
-```bash
-npm install -g @fountainai/skills
-```
 
 For live MotherDuck work, authenticate through your normal path: `MOTHERDUCK_TOKEN`, the Postgres endpoint credentials, a native `md:` DuckDB connection, or MotherDuck MCP. Do not paste tokens into prompts or skill files.
 
@@ -90,45 +64,17 @@ Use this table when you want the fastest copy-paste install route for a specific
 | `Cursor` | `npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global` |
 | `Gemini CLI` | `gemini extensions install https://github.com/motherduckdb/agent-skills --consent` |
 
+### Skills CLI
+
+This is the most portable path for Cursor, VS Code/GitHub Copilot, Codex, Claude Code, custom agents, and project-level installs. 
+
 For the shared Skills CLI route:
 
 ```bash
-npx -y skills add motherduckdb/agent-skills --skill '*' --yes
-```
-
-Global install:
-
-```bash
 npx -y skills add motherduckdb/agent-skills --skill '*' --yes --global
 ```
 
-Install for every supported agent directory:
-
-```bash
-npx -y skills add motherduckdb/agent-skills --all
-```
-
-### Skills CLI
-
-This is the most portable path for Cursor, VS Code/GitHub Copilot, Codex, Claude Code, custom agents, and project-level installs.
-
-Install the full catalog into the current project:
-
-```bash
-npx -y skills add motherduckdb/agent-skills --skill '*' --yes
-```
-
-Install globally:
-
-```bash
-npx -y skills add motherduckdb/agent-skills --skill '*' --yes --global
-```
-
-Install for every supported agent directory:
-
-```bash
-npx -y skills add motherduckdb/agent-skills --all
-```
+We deafult to global (`--global`) install, so the skills are available across all projects, and across all agents (`--all`)
 
 Check what got installed:
 

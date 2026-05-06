@@ -25,6 +25,22 @@ SHUTDOWN TERMINATE (REASON 'stuck batch job');
 
 Use `SHUTDOWN` for graceful Duckling shutdown after current work completes. Use `SHUTDOWN TERMINATE` only when the user explicitly wants to interrupt running work.
 
+MotherDuck recovery commands are also operational SQL. Verify current snapshot retention and plan limits before promising a recovery window.
+
+```sql
+CREATE SNAPSHOT named_snapshot OF my_database;
+
+CREATE DATABASE restored_database FROM my_database (
+    SNAPSHOT_NAME 'named_snapshot'
+);
+
+ALTER DATABASE my_database SET SNAPSHOT TO (
+    SNAPSHOT_NAME 'named_snapshot'
+);
+
+UNDROP DATABASE dropped_database;
+```
+
 ## Data Types
 
 | Type | Description | Example |

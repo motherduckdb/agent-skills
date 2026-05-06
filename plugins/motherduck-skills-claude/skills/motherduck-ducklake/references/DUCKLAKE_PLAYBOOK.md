@@ -2,7 +2,7 @@
 
 Use this reference when the question is no longer "what is DuckLake?" but "should we use it here, and if so, how?"
 
-Upstream DuckLake v1.0 is a production-ready lakehouse specification, but MotherDuck's DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
+Upstream DuckLake v1.0 is a production-ready lakehouse specification and DuckDB 1.5.2 includes support for DuckLake v1.0. MotherDuck has announced managed DuckLake 1.0 support, but the MotherDuck DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
 
 ## MotherDuck-first position
 
@@ -136,7 +136,7 @@ If the design has no answer for maintenance, it is not ready for DuckLake.
 
 Use `CHECKPOINT` as the current high-level maintenance wrapper when current docs recommend it for the DuckLake operation in question. Keep lower-level maintenance functions as targeted tools for cases where the docs call for them directly.
 
-For file compaction, upstream DuckLake documents `ducklake_merge_adjacent_files(...)` and related auto-compaction options. Treat those as explicit maintenance choices, not background behavior, and verify schema-evolution/time-travel constraints before recommending a compaction policy.
+For file compaction, upstream DuckLake documents `ducklake_merge_adjacent_files(...)` and related auto-compaction options. DuckLake v1.0 also adds features such as sorted tables, bucket partitioning, data inlining, and deletion vectors. Treat those as explicit design and maintenance choices, not background behavior, and verify MotherDuck support plus schema-evolution/time-travel constraints before recommending a policy.
 
 ## Sharing and write constraints
 

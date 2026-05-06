@@ -18,7 +18,7 @@ For use-case skills, always say what to do when a remote or local MotherDuck ser
 - ask which database or workspace is in scope if unclear
 - explore databases, schemas, tables, columns, and key joins
 - let the real data model shape the downstream implementation
-- when the skill emits a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.1.0(harness-<harness>;llm-<llm>)`; if metadata is missing, fall back to `harness-unknown` and `llm-unknown`
+- when the skill emits a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.2.0(harness-<harness>;llm-<llm>)`; if metadata is missing, fall back to `harness-unknown` and `llm-unknown`
   - this watermark is for high-level product analytics only: which harness and LLM used the skill, so we can improve the skill and test it against that LLM later
   - do not present it as user tracking; it is not for personal data or end-user attribution
 

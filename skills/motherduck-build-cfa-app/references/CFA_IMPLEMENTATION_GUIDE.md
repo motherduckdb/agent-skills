@@ -195,7 +195,7 @@ Native DuckDB gives full SQL support, cross-database queries, and no driver tran
 # Python backend example (FastAPI + duckdb)
 import duckdb
 
-CFA_USER_AGENT = "agent-skills/2.1.0(harness-<harness>;llm-<llm>)"
+CFA_USER_AGENT = "agent-skills/2.2.0(harness-<harness>;llm-<llm>)"
 
 def get_customer_connection(customer_db: str, customer_token: str):
     """Create a native DuckDB connection to a customer's MotherDuck database."""

@@ -105,6 +105,26 @@ SHUTDOWN TERMINATE (REASON 'batch complete');
 - Both are subject to the minimum billing period documented for Duckling compute.
 - In MCP, lifecycle commands require `query_rw` and explicit user confirmation.
 
+## Recovery Commands
+
+Use database recovery commands only when the user explicitly wants to preserve, clone, restore, or recover database state. Snapshot retention and point-in-time recovery support are plan-specific, so verify the current data-recovery docs before promising a window.
+
+```sql
+CREATE SNAPSHOT release_cutover OF analytics;
+
+CREATE DATABASE analytics_restore FROM analytics (
+    SNAPSHOT_NAME 'release_cutover'
+);
+
+ALTER DATABASE analytics SET SNAPSHOT TO (
+    SNAPSHOT_NAME 'release_cutover'
+);
+
+UNDROP DATABASE analytics;
+```
+
+In MCP, these are write operations and require `query_rw` plus explicit confirmation.
+
 ## DuckDB SQL Patterns
 
 ### `FROM`-First Queries
