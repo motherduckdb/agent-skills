@@ -86,7 +86,8 @@
     "layer": "utility",
     "depends_on": [],
     "references": [
-      "references/CONNECTION_GUIDE.md"
+      "references/CONNECTION_GUIDE.md",
+      "references/RUNTIME_SELECTION.md"
     ],
     "artifacts": [],
     "source_docs": [
