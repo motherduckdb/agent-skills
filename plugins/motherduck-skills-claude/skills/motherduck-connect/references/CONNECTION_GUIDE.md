@@ -2,6 +2,8 @@
 
 Reference for selecting a MotherDuck connection method, configuring authentication, and operating read-scaling or native DuckDB connections safely.
 
+This file picks the **connection method** (PG endpoint, native DuckDB API, pg_duckdb, WASM). Pick the **runtime** that executes the connection (MCP server, Python with `uv` or `pip`, Node, or the DuckDB CLI) in `RUNTIME_SELECTION.md`.
+
 ## Choose a Connection Method
 
 Pick one. Do not mix methods in the same application.
@@ -36,10 +38,9 @@ Use the PG endpoint for backend applications and BI tools that already want Post
 
 ## Language Focus
 
-- Prefer **TypeScript/Javascript** examples for backend APIs, serverless functions, Next.js or Express applications, and customer-facing analytics products.
-- Prefer **Python** examples for data pipelines, notebooks, FastAPI backends, ETL, orchestration, or ad hoc operational scripts.
-- For Node backends, default to `pg` for the PG endpoint and `@duckdb/node-api` for native DuckDB API usage.
-- For Python, default to `psycopg` or SQLAlchemy on the PG endpoint and `duckdb` for native DuckDB API usage.
+- Prefer **Python** for data pipelines, notebooks, FastAPI backends, ETL, orchestration, and ad hoc operational scripts. Default to `uv run --with duckdb` for scripts; use `psycopg` or SQLAlchemy on the PG endpoint and `duckdb` for native DuckDB API usage.
+- Prefer **TypeScript/Javascript** for backend APIs, serverless functions, Next.js or Express applications, and customer-facing analytics products. Default to `pg` for the PG endpoint and `@duckdb/node-api` for native DuckDB API usage.
+- For shell-driven ad hoc work where neither Python nor Node is appropriate, fall back to the DuckDB CLI. See `RUNTIME_SELECTION.md` for the install path and the runtime priority order overall.
 
 ## Typed Environment Pattern
 
