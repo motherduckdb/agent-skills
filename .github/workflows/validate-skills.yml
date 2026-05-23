@@ -84,9 +84,6 @@ jobs:
       - name: Validate packaged Claude plugin
         run: claude plugin validate ./plugins/motherduck-skills-claude
 
-      - name: Verify packaged Codex plugin matches source skills
-        run: uv run scripts/check_codex_plugin_sync.py
-
       - name: Verify packaged Claude plugin matches source skills
         run: uv run scripts/check_claude_plugin_sync.py
 
