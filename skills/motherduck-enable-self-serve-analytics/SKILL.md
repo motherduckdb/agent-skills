@@ -81,7 +81,9 @@ Use this exact top-level shape when JSON is requested:
 
 ## References
 
-- `references/SELF_SERVE_ROLLOUT_GUIDE.md` -- preserved detailed rollout guidance that used to live in this skill
+Read this as reference, not as a script to execute:
+
+- `references/SELF_SERVE_ROLLOUT_GUIDE.md` -- curate-publish-expand sequence, Dive-versus-share choice, data freshness checks, scale guidance, and starter snippets
 
 ## Runnable Artifact
 

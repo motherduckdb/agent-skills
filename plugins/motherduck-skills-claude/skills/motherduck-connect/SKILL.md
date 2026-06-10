@@ -12,12 +12,12 @@ Use this skill when establishing database connectivity from any application, scr
 ## Source Of Truth
 
 - Prefer current MotherDuck connection, attach-mode, read-scaling, and multithreading docs.
-- If the MotherDuck MCP `ask_docs_question` feature is available, use it first for current connection behavior.
+- If the MotherDuck MCP `ask_docs_question` tool is available, use it first for current connection behavior.
 - When it is unavailable, verify guidance against the public docs before making firm claims about connection strings, token types, or read-scaling behavior.
 
 ## Default Posture
 
-- Start with the PG endpoint for backend applications, BI tools, and serverless runtimes that want PostgreSQL wire compatibility.
+- Start with the PG endpoint (MotherDuck's Postgres-compatible endpoint) for backend applications, BI tools, and serverless runtimes that want PostgreSQL wire compatibility.
 - For BI tools, treat the PG endpoint as the compatibility path for Power BI and Tableau Cloud when current docs list them as supported.
 - Use the native DuckDB API only when you need local files, hybrid local/cloud execution, or direct DuckDB control.
 - Use `md:` workspace connections for multi-database exploration, bootstrap flows, and temporary validation environments.
@@ -56,11 +56,12 @@ Before any install step, fetch `https://motherduck.com/docs/duckdb-versions.json
 
 ## Open Next
 
-- `references/CONNECTION_GUIDE.md` for connection-method selection, PG endpoint and native DuckDB examples, token handling, read scaling, attach modes, and common failure modes
-- `references/RUNTIME_SELECTION.md` for the MCP-vs-Python-vs-Node-vs-CLI decision tree, detection commands, install snippets, and the DuckDB version-pinning workflow
+- Read `references/CONNECTION_GUIDE.md` for connection-method selection, PG endpoint and native DuckDB examples, token handling, read scaling, attach modes, and common failure modes
+- Read `references/RUNTIME_SELECTION.md` for the MCP-vs-Python-vs-Node-vs-CLI decision tree, detection commands, install snippets, and the DuckDB version-pinning workflow
 
 ## Related Skills
 
 - `motherduck-explore` for discovering databases, tables, columns, and shares after the connection is established
 - `motherduck-query` for executing DuckDB SQL against the connected databases
 - `motherduck-duckdb-sql` for DuckDB syntax and function lookup support
+- `motherduck-rest-api` for control-plane admin operations; those use `MOTHERDUCK_ADMIN_TOKEN`, which is never used for database connections

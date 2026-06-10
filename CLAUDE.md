@@ -47,6 +47,14 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - `Validation Signals` sections in references are maintainer/reviewer guidance, not a required heading in normal user-facing replies.
 - Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency.
 
+## Skill Authoring Posture
+
+- Write skill content for current frontier models: state MotherDuck-specific behavior, constraints, defaults, and gotchas; do not explain general concepts the model already knows.
+- Frontmatter descriptions are third person, state what the skill does and when to use it, and include concrete trigger terms; `skills/catalog.json` descriptions must match SKILL.md frontmatter exactly.
+- `SKILL.md` is a router; references link one level deep, and every `references/` file over 100 lines starts with a `## Contents` table of contents.
+- Make artifact intent explicit: "Run X" for executables, "Read X as reference" for guidance.
+- Give one concrete default plus an escape hatch instead of option menus; reserve exact lockstep commands for fragile operations (auth, version pinning, `get_dive_guide` ordering).
+
 ## Repo Maintenance Layout
 
 - Treat root `scripts/` as executable entrypoints only.

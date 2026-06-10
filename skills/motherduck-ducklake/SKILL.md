@@ -1,6 +1,6 @@
 ---
 name: motherduck-ducklake
-description: Decide when DuckLake is the right MotherDuck storage pattern. Use when evaluating fully managed DuckLake, BYOB, own-compute DuckLake access, data inlining, object-storage layout, or file-aware maintenance instead of native MotherDuck storage.
+description: Decide when DuckLake is the right MotherDuck storage pattern versus native MotherDuck storage (the default). Use when evaluating lakehouse or open table format storage, Iceberg-style requirements, fully managed DuckLake, BYOB buckets, own-compute DuckLake access, data inlining, time travel, object-storage layout, or file-aware compaction and maintenance.
 license: MIT
 ---
 
@@ -14,7 +14,7 @@ Use this skill when the storage decision is genuinely about open table format an
 - Use the upstream DuckLake and DuckDB extension docs only to clarify extension-level behavior that MotherDuck docs reference.
 - Keep the guidance aligned with the documented product posture:
   - native MotherDuck first
-  - upstream DuckLake v1.0 is production-ready and supported by DuckDB 1.5.2, while MotherDuck's DuckLake docs still define the MotherDuck product surface and preview/compatibility limits
+  - upstream DuckLake v1.0 is production-ready, but MotherDuck's DuckLake docs define the MotherDuck product surface and preview/compatibility limits; verify the current DuckDB/DuckLake version matrix instead of assuming a pinned version
   - fully managed, BYOB, and own-compute paths are distinct
   - maintenance and compaction are explicit operations, not background magic
 
@@ -39,7 +39,7 @@ Use this skill when the storage decision is genuinely about open table format an
 
 ## Open Next
 
-- `references/DUCKLAKE_PLAYBOOK.md` for the mode decision matrix, MotherDuck-specific SQL patterns, BYOB constraints, data-inlining behavior, maintenance functions, and common DuckLake mistakes
+- Read `references/DUCKLAKE_PLAYBOOK.md` for the mode decision matrix, MotherDuck-specific SQL patterns, BYOB constraints, data-inlining behavior, maintenance functions, and common DuckLake mistakes
 
 ## Related Skills
 

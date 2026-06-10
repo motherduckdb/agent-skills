@@ -2,6 +2,20 @@
 
 Reference for writing DuckDB SQL against MotherDuck, choosing the right query patterns, and avoiding common analytical-query mistakes.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| SQL-First / Compute and Storage Posture | Where logic lives, filtering and aggregation defaults |
+| Query Structure Best Practices | CTEs, pre-aggregation, `arg_max`, patterns to avoid |
+| Duckling Lifecycle Commands | `SHUTDOWN` and `SHUTDOWN TERMINATE` |
+| Recovery Commands | Snapshots, restore, `UNDROP DATABASE` |
+| DuckDB SQL Patterns | `FROM`-first, `GROUP BY ALL`, `QUALIFY`, `EXCLUDE`/`REPLACE`, `PIVOT`, `UNION BY NAME` |
+| Schema Exploration Queries | `MD_ALL_DATABASES()`, `duckdb_tables()`, `duckdb_columns()`, `SUMMARIZE` |
+| Performance Optimization | Pushdown, `EXPLAIN`, plan checks |
+| Common Query Patterns | Top-N per group, dedup, running totals, YoY, `FILTER` |
+| Key Rules / Common Mistakes | Hard rules and failure patterns |
+
 ## SQL-First Posture
 
 - Keep the query logic in SQL rather than pushing grouping, filtering, and reshaping into the caller.
@@ -77,7 +91,7 @@ GROUP BY ALL;
 ```sql
 SELECT
     customer_id,
-    arg_max(order_date, order_date) AS latest_order_date,
+    max(order_date) AS latest_order_date,
     arg_max(amount, order_date) AS latest_amount
 FROM "analytics"."main"."orders"
 GROUP BY customer_id;

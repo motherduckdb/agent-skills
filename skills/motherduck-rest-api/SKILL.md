@@ -1,6 +1,6 @@
 ---
 name: motherduck-rest-api
-description: Use when automating or advising on MotherDuck REST API control-plane workflows for service-account provisioning, supported access-token lifecycle operations, Duckling instance configuration, active account inspection, or Dive embed sessions. Do not use for SQL or data-plane query work.
+description: MotherDuck REST API control-plane reference. Use when calling api.motherduck.com to provision service accounts, create, list, rotate, or revoke access tokens, configure Duckling instance sizes and read scaling, inspect active accounts, or mint Dive embed sessions. Not for SQL or data-plane query work.
 license: MIT
 ---
 
@@ -17,7 +17,7 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 
 ## Default Posture
 
-- Treat the REST API as the control plane. Use `motherduck-query` for SQL and data-plane work.
+- Treat the REST API as the control plane; SQL and data-plane queries go through a database connection, not the REST API.
 - Use `https://api.motherduck.com` as the base URL unless the user provides another environment.
 - Authenticate with `Authorization: Bearer ${MOTHERDUCK_ADMIN_TOKEN}` and keep admin read-write tokens in backend-managed secrets.
 - Never use read-scaling tokens for REST API administration.
@@ -38,10 +38,11 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 
 ## Open Next
 
-- `references/REST_API_GUIDE.md` for endpoint summaries, auth headers, request payloads, curl examples, validation limits, and operational gotchas
+- Read `references/REST_API_GUIDE.md` for endpoint summaries, auth headers, request payloads, curl examples, validation limits, and operational gotchas.
 
 ## Related Skills
 
+- `motherduck-query` for SQL and data-plane query work
 - `motherduck-connect` for connection tokens and application connection posture
 - `motherduck-security-governance` for admin-token handling, service-account posture, and access-boundary questions
 - `motherduck-create-dive` for designing Dives before minting embed sessions

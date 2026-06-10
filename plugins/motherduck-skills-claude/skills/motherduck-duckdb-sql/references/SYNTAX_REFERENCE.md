@@ -2,6 +2,27 @@
 
 Complete function and data type reference for DuckDB on MotherDuck.
 
+## Contents
+
+- [Version-Sensitive Features](#version-sensitive-features)
+- [Data Types](#data-types)
+- [String Functions](#string-functions)
+- [Numeric Functions](#numeric-functions)
+- [Date/Time Functions](#datetime-functions)
+- [Aggregate Functions](#aggregate-functions)
+- [Window Functions](#window-functions)
+- [JSON Functions](#json-functions)
+- [List Functions](#list-functions)
+- [Spatial Functions](#spatial-functions)
+- [H3 Functions](#h3-functions)
+- [Table Functions](#table-functions)
+- [PIVOT / UNPIVOT](#pivot--unpivot)
+- [Regular Expressions](#regular-expressions)
+- [Conditional Expressions](#conditional-expressions)
+- [Common Table Expressions (CTEs)](#common-table-expressions-ctes)
+- [CREATE TABLE, INSERT, COPY](#create-table-insert-copy)
+- [Useful Patterns](#useful-patterns)
+
 ---
 
 ## Version-Sensitive Features
@@ -13,7 +34,7 @@ Examples to verify before relying on them:
 - `MERGE INTO`
 - `FILL()` window interpolation
 - newly added or newly expanded types such as `VARIANT` or native `GEOMETRY`
-- DuckDB 1.5 date/time behavior such as `date_trunc` returning `TIMESTAMP` when applied to `DATE`
+- changed date/time behavior in recent DuckDB releases, such as `date_trunc` returning `TIMESTAMP` when applied to `DATE`
 - lakehouse-format changes that depend on current DuckDB, DuckLake, Iceberg, Delta, or httpfs extension behavior
 
 MotherDuck-only lifecycle commands are operational SQL, not analytical query syntax:

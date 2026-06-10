@@ -2,6 +2,13 @@
 
 Copy-pasteable dashboard templates. Each is a complete Dive component with proper imports, independent loading states, `N()` helper, and the standard color palette. Replace placeholder table names with your actual fully qualified names.
 
+## Contents
+
+- [1. Sales Dashboard](#1-sales-dashboard)
+- [2. Product Analytics Dashboard](#2-product-analytics-dashboard)
+- [3. Operational Metrics Dashboard](#3-operational-metrics-dashboard)
+- [Adapting Templates](#adapting-templates)
+
 ---
 
 ## 1. Sales Dashboard

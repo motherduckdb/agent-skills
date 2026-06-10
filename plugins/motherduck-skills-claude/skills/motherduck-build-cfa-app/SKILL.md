@@ -1,6 +1,6 @@
 ---
 name: motherduck-build-cfa-app
-description: Design a MotherDuck-backed customer-facing analytics app. Use when building embedded or product analytics for external users and the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.
+description: Design a MotherDuck-backed customer-facing analytics app. Use for embedded analytics, multi-tenant SaaS reporting, or product analytics for external users -- whenever the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.
 argument-hint: [app-or-tenant-scenario]
 license: MIT
 ---

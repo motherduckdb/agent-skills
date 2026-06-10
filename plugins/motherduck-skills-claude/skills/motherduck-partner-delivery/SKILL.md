@@ -1,6 +1,6 @@
 ---
 name: motherduck-partner-delivery
-description: Deliver repeatable MotherDuck architectures across multiple clients. Use when standardizing isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions for a consultancy or partner delivery model.
+description: Deliver repeatable MotherDuck architectures across multiple clients. Use when a consultancy, agency, or multi-client product team needs to standardize isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions across client engagements.
 argument-hint: [client-delivery-scenario]
 license: MIT
 ---
@@ -80,7 +80,9 @@ Use this exact top-level shape when JSON is requested:
 
 ## References
 
-- `references/PARTNER_DELIVERY_GUIDE.md` -- preserved detailed guidance that used to live in this skill
+Read this as reference, not as a script to execute:
+
+- `references/PARTNER_DELIVERY_GUIDE.md` -- default multi-client pattern, standardize-versus-client-specific split, shares-versus-Dives-versus-apps choice, region/compliance handling, and provisioning starters
 
 ## Runnable Artifact
 
