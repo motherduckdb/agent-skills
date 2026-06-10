@@ -39,6 +39,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - If the database or workspace is unclear, ask which one should back the project before designing the solution.
 - Inspect schemas, tables, columns, joins, and time dimensions before inventing example models or rollout steps.
 - Call `get_dive_guide` before `save_dive` or `update_dive`.
+- Call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`.
 - Prefer Parquet when choosing formats.
 - Prefer comments on analytical tables and columns.
 - Prefer per-customer isolation for serious B2B customer-facing analytics.
@@ -75,6 +76,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | motherduck-model-data | `/motherduck-model-data` | Design analytics-ready schemas and tables. |
 | motherduck-share-data | `/motherduck-share-data` | Distribute data with shares and share Dive-backed data safely. |
 | motherduck-create-dive | `/motherduck-create-dive` | Build, theme, preview, save, and update Dives. |
+| motherduck-create-flight | `/motherduck-create-flight` | Create, schedule, run, and debug Flights — Python jobs on MotherDuck compute. |
 | motherduck-ducklake | `/motherduck-ducklake` | Decide when DuckLake is appropriate and how to use it safely. |
 | motherduck-security-governance | `/motherduck-security-governance` | Answer security, governance, access, and residency questions. |
 | motherduck-pricing-roi | `/motherduck-pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |

@@ -27,6 +27,7 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 - `motherduck-model-data`: design analytics-ready schemas, tables, and views.
 - `motherduck-share-data`: publish, consume, and govern MotherDuck shares safely.
 - `motherduck-create-dive`: build, theme, preview, save, and update Dives.
+- `motherduck-create-flight`: create, schedule, run, and debug Flights (Python jobs on MotherDuck compute).
 - `motherduck-ducklake`: decide whether DuckLake fits and how to apply it safely.
 - `motherduck-security-governance`: answer security, access, governance, and residency questions.
 - `motherduck-pricing-roi`: frame workload cost drivers, pricing posture, and ROI tradeoffs.
