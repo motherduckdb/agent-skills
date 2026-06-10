@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version (X.Y.Z, no leading v)'
+        required: true
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  prepare-release:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Bump all version surfaces
+        run: uv run scripts/bump_version.py "${{ inputs.version }}"
+
+      - name: Validate skills and manifests
+        run: |
+          uv run scripts/validate_skills.py
+          uv run scripts/check_claude_plugin_sync.py
+          uv run --with duckdb --with pyyaml python tests/validate_snippets.py
+          python3 scripts/package_gemini_extension.py
+
+      - name: Open release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${{ inputs.version }}"
+          branch="release/v${version}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "chore: bump version to ${version}"
+          git push -u origin "$branch"
+          gh pr create \
+            --base main \
+            --title "Release v${version}" \
+            --body "$(printf 'Automated version bump to %s across manifests, INTEGRATION_VERSION, and watermark strings.\n\nAfter merging, tag the merge commit to publish the release:\n\n```\ngit tag v%s && git push origin v%s\n```\n\nNote: CI checks do not run automatically on PRs opened by GITHUB_TOKEN; the bump was validated inside the release workflow before this PR was opened.' "$version" "$version" "$version")"
+
+  publish-release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Verify tag matches repo version surfaces
+        run: uv run scripts/bump_version.py --check "${GITHUB_REF_NAME#v}"
+
+      - name: Validate skills and manifests
+        run: |
+          uv run scripts/validate_skills.py
+          uv run scripts/check_claude_plugin_sync.py
+
+      - name: Build Gemini extension archive
+        run: python3 scripts/package_gemini_extension.py
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            release/motherduck-skills.tar.gz

@@ -26,6 +26,7 @@ Primary source-of-truth files:
 - `ARCHITECTURE.md`: invariants and dependency rules
 - `docs/skill-authoring.md`: repo-specific authoring guidance
 - `docs/skills-sync.md`: docs-to-skills drift workflow
+- `docs/release-process.md`: version bump and release publishing workflow
 - `docs/install-matrix.md`: copy-paste install routes by harness
 - `CLAUDE.md`: Claude-facing catalog/context
 - `.claude-plugin/marketplace.json`: Claude marketplace manifest
@@ -119,6 +120,11 @@ Run this when changing use-case skill output contracts or use-case reference gui
 ```bash
 uv run scripts/test_codex_use_cases.py
 ```
+
+## Releasing
+
+- Never hand-edit version numbers or `agent-skills/<version>` watermarks; run `uv run scripts/bump_version.py <X.Y.Z>` so every surface moves together.
+- Releases are published by tagging `v<X.Y.Z>` on main; the tag-triggered workflow verifies version consistency before publishing. See `docs/release-process.md`.
 
 ## Common Drift Traps
 
