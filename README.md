@@ -1,80 +1,40 @@
 <h1><img src="assets/duck_skills.png" alt="MotherDuck Skills" height="80" align="center" /> MotherDuck Skills Plugin</h1>
 
-To work in MotherDuck an agent needs to choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, understand Dives and sharing, and keep production analytics patterns safe.
+[![Latest release](https://img.shields.io/github/v/release/motherduckdb/agent-skills)](https://github.com/motherduckdb/agent-skills/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-MotherDuck Skills package opinionated defaults to answer these and more questions in the best way possible and package this as an installable skill catalog for coding agents.
+MotherDuck Skills is an installable skill catalog that teaches coding agents to work with [MotherDuck](https://motherduck.com): choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, use Dives and shares, and keep production analytics patterns safe.
 
-**[Install the plugin](#install-in-60-seconds)**
+18 skills in three layers: **utility** (connect, explore, query, SQL syntax, REST API), **workflow** (load, model, share, Dives, DuckLake, security, pricing), and **use-case** (apps, dashboards, pipelines, migrations, rollouts). See the [full catalog](#skills-overview).
 
-## One Catalog, Three Layers
+## Quick Install
 
-### Utility Skills
-
-Use these when the agent needs exact MotherDuck mechanics: connect, explore, query, use the REST API, or check DuckDB SQL behavior.
-
-- `motherduck-connect`
-- `motherduck-explore`
-- `motherduck-query`
-- `motherduck-duckdb-sql`
-- `motherduck-rest-api`
-
-### Workflow Skills
-
-Use these when the work has multiple steps and MotherDuck-specific tradeoffs.
-
-- `motherduck-load-data`
-- `motherduck-model-data`
-- `motherduck-share-data`
-- `motherduck-create-dive`
-- `motherduck-ducklake`
-- `motherduck-security-governance`
-- `motherduck-pricing-roi`
-
-### Use-Case Skills
-
-Use these when the agent is designing or shipping a product surface, rollout, migration, or partner implementation.
-
-- `motherduck-build-cfa-app`
-- `motherduck-build-dashboard`
-- `motherduck-build-data-pipeline`
-- `motherduck-migrate-to-motherduck`
-- `motherduck-enable-self-serve-analytics`
-- `motherduck-partner-delivery`
-
-## Install in 60 Seconds
-
-### Prerequisites
-
-Before you install, make sure you have:
-
-- Git available on your PATH.
-- Node.js 18+ if you use the Skills CLI or host plugin tooling.
-
-For live MotherDuck work, authenticate through your normal path: `MOTHERDUCK_TOKEN`, the Postgres endpoint credentials, a native `md:` DuckDB connection, or MotherDuck MCP. Do not paste tokens into prompts or skill files.
-
-### Install Matrix
-
-Use this table when you want the fastest copy-paste install route for a specific harness.
+Pick your harness and paste:
 
 | Harness | Install |
 | --- | --- |
-| `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
 | `Claude Code` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
+| `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
 | `Codex` | `codex plugin marketplace add motherduckdb/agent-skills`, then install **MotherDuck Skills** from `/plugins` |
 | `Cursor` | `npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global` |
 | `Gemini CLI` | `gemini extensions install https://github.com/motherduckdb/agent-skills --consent` |
+| Anything else | `npx -y skills add motherduckdb/agent-skills --skill '*' --yes --global` |
+
+Requirements: Git on your PATH, and Node.js 18+ for the Skills CLI route. For live MotherDuck work, authenticate through your normal path (`MOTHERDUCK_TOKEN`, Postgres endpoint credentials, a native `md:` DuckDB connection, or MotherDuck MCP) — never paste tokens into prompts or skill files.
+
+Done? Jump to [Verify the Installation](#verify-the-installation). Per-harness details and alternatives are below.
+
+## Install Details by Harness
 
 ### Skills CLI
 
-This is the most portable path for Cursor, VS Code/GitHub Copilot, Codex, Claude Code, custom agents, and project-level installs. 
-
-For the shared Skills CLI route:
+The most portable path for Cursor, VS Code/GitHub Copilot, Codex, Claude Code, custom agents, and project-level installs:
 
 ```bash
 npx -y skills add motherduckdb/agent-skills --skill '*' --yes --global
 ```
 
-We deafult to global (`--global`) install, so the skills are available across all projects, and across all agents (`--all`)
+Default to a global (`--global`) install so the skills are available across all projects; drop the flag for a project-scoped install.
 
 Check what got installed:
 
@@ -291,6 +251,8 @@ For narrow technical work, start with `motherduck-connect`, then `motherduck-exp
 
 ## Skills Overview
 
+The catalog has three layers: **utility** skills cover exact MotherDuck mechanics, **workflow** skills cover multi-step work with MotherDuck-specific tradeoffs, and **use-case** skills orchestrate the lower layers for product surfaces, rollouts, migrations, and partner implementations.
+
 | Skill | Layer | Use it when |
 | --- | --- | --- |
 | `motherduck-connect` | Utility | you need to choose the right connection path before writing code or SQL |
@@ -359,6 +321,8 @@ uv run scripts/check_claude_plugin_sync.py
 uv run scripts/check_codex_plugin_sync.py
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
 ```
+
+To cut a release, see [docs/release-process.md](docs/release-process.md); never hand-edit version numbers, use `scripts/bump_version.py`.
 
 ## Links
 
