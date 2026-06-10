@@ -21,7 +21,7 @@ Keep changes targeted. Prefer small, mechanical updates over broad rewrites.
 The catalog is a three-layer graph:
 
 - `utility`: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`
-- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-create-flight`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
 - `use-case`: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Important source-of-truth files:

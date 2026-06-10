@@ -130,6 +130,33 @@
     ],
     "needs_live_discovery": false
   },
+  "motherduck-create-flight": {
+    "name": "motherduck-create-flight",
+    "description": "Create, schedule, run, and debug MotherDuck Flights — Python jobs that run on MotherDuck compute. Use whenever someone wants to create a flight, schedule a Python script or recurring job on MotherDuck, set up scheduled ingestion from Postgres, dlt sources, S3, BigQuery, Snowflake, or APIs, refresh aggregates or transformations on a cron, or operate flights with get_flight_guide, create_flight, run_flight, flight logs, secrets, schedules, and versions.",
+    "layer": "workflow",
+    "depends_on": [
+      "motherduck-connect",
+      "motherduck-query",
+      "motherduck-explore"
+    ],
+    "references": [
+      "references/FLIGHTS_GUIDE.md",
+      "references/FLIGHT_EXAMPLES.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/flights/",
+      "https://motherduck.com/docs/concepts/flights/",
+      "https://motherduck.com/docs/sql-reference/mcp/get-flight-guide/",
+      "https://motherduck.com/docs/sql-reference/mcp/create-flight/",
+      "https://motherduck.com/docs/sql-reference/mcp/update-flight/",
+      "https://motherduck.com/docs/sql-reference/mcp/run-flight/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/",
+      "https://github.com/motherduckdb/motherduck-examples/tree/main/flight-plans"
+    ],
+    "needs_live_discovery": false
+  },
   "motherduck-duckdb-sql": {
     "name": "motherduck-duckdb-sql",
     "description": "DuckDB SQL reference for MotherDuck. Use when you need exact DuckDB syntax or function behavior, friendly SQL features like QUALIFY, GROUP BY ALL, or list/struct types, MotherDuck-specific SQL such as shares, secrets, snapshots, or UNDROP, or to fix SQL errors and PostgreSQL-style SQL that fails on MotherDuck.",
