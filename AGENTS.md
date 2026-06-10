@@ -69,6 +69,9 @@ Important supporting surfaces:
 ## Editing Rules
 
 - Keep changes targeted. This repo is mostly documentation and manifests; broad rewrites create drift.
+- Write for current frontier models: keep MotherDuck-specific signal, cut explanations of general concepts the model already knows.
+- Keep `skills/catalog.json` descriptions byte-identical to SKILL.md frontmatter descriptions; `scripts/validate_skills.py` enforces this.
+- Give every `references/` file over 100 lines a `## Contents` table of contents, and keep references linked one level deep from `SKILL.md`.
 - When updating one catalog surface, check the others in the same pass.
 - Prefer deduplicating repeated guidance by pointing to the owning skill instead of copying blocks between skills.
 - If you shrink a skill, move preserved detail into `references/`; do not silently delete useful content.

@@ -53,7 +53,7 @@ For lower-level Dive mechanics, use `motherduck-create-dive`.
 2. Explore the real schema and metrics first.
 3. Pick the dashboard story.
 4. Write one query per section.
-5. Compose the dashboard in a Dive.
+5. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before `save_dive` or `update_dive`.
 6. Save only after preview iteration is approved.
 
 When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.2.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.

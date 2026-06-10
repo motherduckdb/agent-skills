@@ -4,6 +4,21 @@ Reference for selecting a MotherDuck connection method, configuring authenticati
 
 This file picks the **connection method** (PG endpoint, native DuckDB API, pg_duckdb, WASM). Pick the **runtime** that executes the connection (MCP server, Python with `uv` or `pip`, Node, or the DuckDB CLI) in `RUNTIME_SELECTION.md`.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| Choose a Connection Method | Decision tree: PG endpoint vs native DuckDB vs pg_duckdb vs WASM |
+| Operational Defaults | Pooling, read scaling, attach-mode defaults |
+| Language Focus | Python vs TypeScript/JavaScript vs CLI |
+| Steps 1-3 | Token env var, PG endpoint connection examples, verification |
+| Native DuckDB API Alternative | `md:` connections, watermarking, Python/Node/JDBC examples |
+| Authentication | Token types, service tokens, token best practices |
+| Read Scaling and Session Affinity | `session_hint`, `access_mode`, replica freshness |
+| Attach Modes | Workspace vs single mode |
+| Key Rules / Common Mistakes | PG endpoint constraints and failure patterns |
+| PG Endpoint Limitations vs Native DuckDB API | Capability comparison table |
+
 ## Choose a Connection Method
 
 Pick one. Do not mix methods in the same application.
@@ -30,39 +45,11 @@ Use the PG endpoint for backend applications and BI tools that already want Post
 - Use workspace mode only when the client intentionally wants shared, persistent attachment state across sessions.
 - Use a native `md:` workspace connection for database bootstrap, multi-database exploration, and temporary validation environments.
 
-## Prerequisites
-
-1. A MotherDuck account
-2. A MotherDuck access token
-3. A database created in MotherDuck
-
 ## Language Focus
 
-- Prefer **Python** for data pipelines, notebooks, FastAPI backends, ETL, orchestration, and ad hoc operational scripts. Default to `uv run --with duckdb` for scripts; use `psycopg` or SQLAlchemy on the PG endpoint and `duckdb` for native DuckDB API usage.
+- Prefer **Python** for data pipelines, notebooks, FastAPI backends, ETL, orchestration, and ad hoc operational scripts. Default to `uv run --with duckdb` for scripts; use `psycopg2` or SQLAlchemy on the PG endpoint and `duckdb` for native DuckDB API usage.
 - Prefer **TypeScript/Javascript** for backend APIs, serverless functions, Next.js or Express applications, and customer-facing analytics products. Default to `pg` for the PG endpoint and `@duckdb/node-api` for native DuckDB API usage.
 - For shell-driven ad hoc work where neither Python nor Node is appropriate, fall back to the DuckDB CLI. See `RUNTIME_SELECTION.md` for the install path and the runtime priority order overall.
-
-## Typed Environment Pattern
-
-Use small helpers so connection setup fails early and clearly.
-
-```ts
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing env var: ${name}`);
-  return value;
-}
-```
-
-```python
-import os
-
-def require_env(name: str) -> str:
-    value = os.environ.get(name)
-    if not value:
-        raise RuntimeError(f"Missing env var: {name}")
-    return value
-```
 
 ## Step 1: Set the Environment Variable
 
@@ -202,10 +189,12 @@ import os
 
 USE_CASE_USER_AGENT = "agent-skills/2.2.0(harness-<harness>;llm-<llm>)"
 
+# Default: token picked up from the MOTHERDUCK_TOKEN env var
 conn = duckdb.connect(
     f"md:my_database?custom_user_agent={USE_CASE_USER_AGENT}"
 )
 
+# Alternative: pass the token explicitly (still sourced from the env var)
 conn = duckdb.connect(
     "md:my_database"
     f"?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
@@ -272,6 +261,7 @@ Requires the DuckDB JDBC driver, not the PostgreSQL driver.
 - Use read-scaling tokens for read-heavy workloads.
 - Revoke compromised tokens immediately.
 - Scope each service to its own token when possible.
+- `MOTHERDUCK_ADMIN_TOKEN` is a separate env var used only for REST control-plane admin calls (service accounts, token management; see `motherduck-rest-api`). Database connections always use `MOTHERDUCK_TOKEN` or `MOTHERDUCK_READ_SCALING_TOKEN`.
 
 ## Read Scaling and Session Affinity
 
@@ -337,19 +327,18 @@ const db = await DuckDBInstance.create(
 
 ### Writing PostgreSQL SQL Instead of DuckDB SQL
 
-Wrong:
+Wrong (PostgreSQL idioms that fail on MotherDuck):
 
 ```sql
-SELECT * FROM my_table WHERE created_at::date = CURRENT_DATE;
-SELECT array_agg(name) FROM users GROUP BY department;
+SELECT to_char(order_date, 'YYYY-MM') AS month FROM my_table;
 CREATE INDEX idx_name ON my_table(name);
 ```
 
 Right:
 
 ```sql
-SELECT * FROM my_table WHERE CAST(created_at AS DATE) = current_date;
-SELECT list(name) FROM users GROUP BY department;
+SELECT strftime(order_date, '%Y-%m') AS month FROM my_table;
+-- MotherDuck columnar storage does not use user-created indexes; rely on filters and pre-aggregation
 ```
 
 ### Hardcoding Tokens

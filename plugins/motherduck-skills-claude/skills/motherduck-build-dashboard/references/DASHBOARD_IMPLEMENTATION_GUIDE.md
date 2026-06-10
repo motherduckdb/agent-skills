@@ -5,6 +5,22 @@
 
 Use this skill when creating a multi-chart, multi-KPI interactive dashboard with live MotherDuck data. This is a use-case skill -- it ties together `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, and `motherduck-duckdb-sql` into a single end-to-end workflow.
 
+## Contents
+
+- [Source Of Truth](#source-of-truth)
+- [Verified Delivery Defaults](#verified-delivery-defaults)
+- [Validation Signals](#validation-signals)
+- [Language Focus: TypeScript/Javascript and Python](#language-focus-typescriptjavascript-and-python)
+- [TypeScript/TSX Starter](#typescripttsx-starter)
+- [Python Validation Starter](#python-validation-starter)
+- [When to Use](#when-to-use)
+- [Prerequisites](#prerequisites)
+- [Dashboard Workflow](#dashboard-workflow)
+- [Dashboard Design Principles](#dashboard-design-principles)
+- [Key Rules](#key-rules)
+- [Common Mistakes](#common-mistakes)
+- [Related Skills](#related-skills)
+
 ## Source Of Truth
 
 - Prefer the current MotherDuck Dive guide and public Dives docs first.
@@ -340,50 +356,11 @@ export default function MyDashboard() {
 }
 ```
 
-**Critical rules:**
+Dive component mechanics -- `export default function`, the `N()` helper, `Array.isArray` guards, per-section loading skeletons and spinners, `ResponsiveContainer` -- are owned by `motherduck-create-dive`. Follow that skill's rules; `references/DASHBOARD_PATTERNS.md` shows them applied in complete dashboard templates.
 
-- Every Dive MUST have `export default function`.
-- ALWAYS define and use the `N()` helper for ALL numeric values from queries.
-- ALWAYS guard data with `Array.isArray(data) ? data : []`.
-- Each section renders its own loading state independently. Never use a single full-page spinner.
-- Wrap every chart in `<ResponsiveContainer width="100%" height={260}>`.
+The dashboard-specific rule: each section renders its own loading state independently. Never use a single full-page spinner.
 
-**Loading patterns:**
-
-```tsx
-// KPI skeleton
-{kpiLoading ? (
-  <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
-) : (
-  <p className="text-5xl font-bold" style={{ color: "#231f20" }}>
-    ${N(kpiRows[0]?.total_revenue).toLocaleString()}
-  </p>
-)}
-
-// Chart spinner
-{trendLoading ? (
-  <div className="flex items-center justify-center h-64">
-    <Loader2 className="animate-spin" size={32} style={{ color: "#0777b3" }} />
-  </div>
-) : (
-  <ResponsiveContainer width="100%" height={260}>
-    {/* chart */}
-  </ResponsiveContainer>
-)}
-
-// Table skeleton
-{detailLoading ? (
-  <div className="space-y-3">
-    {[...Array(5)].map((_, i) => (
-      <div key={i} className="h-8 bg-gray-200 animate-pulse rounded" />
-    ))}
-  </div>
-) : (
-  <table>{/* ... */}</table>
-)}
-```
-
-Create the Dive via `MD_CREATE_DIVE` (SQL) or `save_dive` (MCP).
+Create the Dive via `MD_CREATE_DIVE` (SQL) or `save_dive` (MCP). When MCP is available, call `get_dive_guide` first.
 
 ---
 
@@ -423,59 +400,16 @@ Common iteration fixes:
 
 ---
 
-## Multi-Query Pattern
-
-Each dashboard section gets its own `useSQLQuery` call. This ensures independent loading, independent error handling, and simpler SQL per query.
-
-```tsx
-// Separate queries for each dashboard section
-const { data: kpiData, isLoading: kpiLoading } = useSQLQuery(`
-  SELECT SUM(revenue) AS total_revenue,
-         COUNT(DISTINCT order_id) AS order_count,
-         ROUND(AVG(revenue), 2) AS avg_order_value,
-         COUNT(DISTINCT customer_id) AS customer_count
-  FROM "my_db"."main"."orders"
-`);
-const kpiRows = Array.isArray(kpiData) ? kpiData : [];
-
-const { data: trendData, isLoading: trendLoading } = useSQLQuery(`
-  SELECT strftime(date_trunc('month', order_date), '%Y-%m') AS month,
-         SUM(revenue) AS revenue
-  FROM "my_db"."main"."orders"
-  GROUP BY 1 ORDER BY 1
-`);
-const trendRows = Array.isArray(trendData) ? trendData : [];
-
-const { data: breakdownData, isLoading: breakdownLoading } = useSQLQuery(`
-  SELECT category, SUM(revenue) AS revenue
-  FROM "my_db"."main"."orders"
-  GROUP BY 1 ORDER BY 2 DESC LIMIT 8
-`);
-const breakdownRows = Array.isArray(breakdownData) ? breakdownData : [];
-
-const { data: detailData, isLoading: detailLoading } = useSQLQuery(`
-  SELECT product_name, category,
-         SUM(revenue) AS revenue, COUNT(*) AS orders
-  FROM "my_db"."main"."order_items"
-  GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10
-`);
-const detailRows = Array.isArray(detailData) ? detailData : [];
-```
-
----
-
 ## Key Rules
 
 - **One dashboard = one story.** Do not mix unrelated metrics.
 - **Max 5 KPIs, 2 charts, 1 table.** More than this and the dashboard becomes noisy.
 - **Every section has independent loading.** Each `useSQLQuery` manages its own `isLoading` state.
 - **Pre-aggregate in SQL, not JavaScript.** The component renders values; it does not compute them.
-- **Use `N()` for ALL numeric values.** Query results return `unknown` types. Forgetting `N()` produces `NaN`.
 - **Format dates in SQL with `strftime()`.** Never use `new Date()` or date parsing in JavaScript.
 - **Use fully qualified table names.** Always `"database"."schema"."table"`.
-- **No Tailwind bracket syntax.** Use inline `style` for custom values.
 - **Background `#f8f8f8`, no card borders, no card shadows.**
-- **Default export required.** Every Dive must have `export default function`.
+- **Follow `motherduck-create-dive` component rules.** `export default function`, `N()` for all numeric query values, `Array.isArray` guards, no Tailwind bracket syntax.
 
 ---
 

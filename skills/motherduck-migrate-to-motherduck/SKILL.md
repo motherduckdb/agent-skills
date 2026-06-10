@@ -1,6 +1,6 @@
 ---
 name: motherduck-migrate-to-motherduck
-description: Plan a migration onto MotherDuck. Use when moving from Snowflake, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, validation, rollback, and native-versus-DuckLake posture.
+description: Plan a migration onto MotherDuck. Use when moving from Snowflake, BigQuery, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, source-vs-target validation, rollback, and native-versus-DuckLake posture.
 license: MIT
 ---
 
@@ -88,8 +88,10 @@ Use this exact top-level shape when JSON is requested:
 
 ## References
 
-- `references/MIGRATION_PLAYBOOK.md` -- preserved detailed migration guidance that used to live in this skill
-- `references/MIGRATION_VALIDATION.md` -- validation checks and comparison helpers
+Read these as reference, not as scripts to execute:
+
+- `references/MIGRATION_PLAYBOOK.md` -- target-pattern selection, migration decision matrix, DuckLake posture, and source-specific questions (Snowflake, Redshift, Postgres, dbt, lakehouse)
+- `references/MIGRATION_VALIDATION.md` -- copy-adaptable validation SQL (row counts, metrics with `pct_variance`, new/deleted/changed records) and a Python orchestrator
 
 ## Runnable Artifact
 

@@ -91,11 +91,14 @@ Repo maintenance layout:
 
 ## Writing Style
 
-- prefer direct trigger phrases in descriptions
-- keep the main skill concise
-- prefer references over duplicated prose
-- prefer concrete defaults over hedging
+- prefer direct trigger phrases in descriptions; write descriptions in third person and say both what the skill does and when to use it
+- keep the main skill concise; assume a capable model and only state MotherDuck-specific behavior, constraints, defaults, and gotchas
+- prefer references over duplicated prose; do not restate SKILL.md sections inside references
+- prefer concrete defaults over hedging; give one default plus an escape hatch instead of option menus
 - preserve scenario-based guidance when multiple MotherDuck paths are valid
+- link references one level deep from `SKILL.md`; give every `references/` file over 100 lines a `## Contents` table of contents at the top
+- make artifact intent explicit: "Run X" for executables, "Read X as reference" for guidance
+- avoid time-sensitive phrasing (version pins, plan names, "currently in preview") in durable guidance; when a claim can drift, tell the reader to verify it against current MotherDuck docs
 
 ## Required Checks
 

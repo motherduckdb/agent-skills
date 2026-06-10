@@ -1,6 +1,6 @@
 ---
 name: motherduck-create-dive
-description: Create, edit, manage, share, or embed MotherDuck Dives. Use when the work involves Dive authoring, live React + SQL components, MCP get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.
+description: Create, edit, manage, share, or embed MotherDuck Dives — live React + SQL dashboards, charts, and data apps saved in the workspace. Use for any dashboard, chart, KPI display, or data visualization over MotherDuck data, and for Dive authoring mechanics such as get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.
 argument-hint: [dive-goal]
 license: MIT
 ---
@@ -12,11 +12,10 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 ## Source Of Truth
 
 - Prefer current MotherDuck Dive docs first.
-- If MotherDuck MCP is available, call `get_dive_guide` before generating, saving, or updating a Dive.
+- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before generating Dive code and always before `save_dive` or `update_dive`. The guide defines the current component API and runtime libraries.
 - Use the blessed Dives example repo as the reference implementation for local preview, Dives-as-code layout, metadata, CI previews, and deploy scripts.
 - Use Dives SQL functions when the user wants a scriptable SQL-native create/read/update/delete workflow instead of MCP tools.
-- Treat ordinary Dives and embedded Dives separately: current public materials say Dives are available on all plans, while embedding requires a Business plan.
-- Keep authoring, local-preview, required-resource, sharing, versioning, code-management, and embedding guidance aligned with current docs.
+- Treat ordinary Dives and embedded Dives separately: current public materials say Dives are available on all plans, while embedding requires a Business plan. Verify plan entitlements against live docs before promising an embed rollout.
 
 ## Default Posture
 
@@ -38,12 +37,12 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 2. Explore the live schema and validate the core SQL first.
 3. Call `get_dive_guide` if MCP is available, then design the story, sections, interactions, and theme.
 4. Build or edit the Dive component, using local preview/hot reload when possible.
-5. Save, update, or deploy only after queries, loading states, required resources, and visual behavior are correct.
+5. Call `save_dive`, `update_dive`, or deploy only after queries, loading states, required resources, and visual behavior are correct.
 6. If teammates or application users need access, configure the underlying shares or embed-session flow explicitly.
 
 ## Open Next
 
-- `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas
+- Read `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas
 
 ## Related Skills
 

@@ -2,6 +2,20 @@
 
 Detailed architecture patterns, complete code examples, and scaling playbook for building customer-facing analytics applications on MotherDuck.
 
+## Contents
+
+- [Choose the Connection Posture First](#choose-the-connection-posture-first)
+- [3-Tier Architecture Diagram](#3-tier-architecture-diagram)
+- [Complete Python Backend Example (FastAPI + psycopg2)](#complete-python-backend-example-fastapi--psycopg2)
+- [Node.js Backend Example (Express + pg)](#nodejs-backend-example-express--pg)
+- [1.5-Tier Architecture with DuckDB-Wasm](#15-tier-architecture-with-duckdb-wasm)
+- [Service Account Management](#service-account-management)
+- [Scaling Playbook](#scaling-playbook)
+- [Multi-Tenant Data Loading Patterns](#multi-tenant-data-loading-patterns)
+- [Connection Pooling](#connection-pooling)
+- [Monitoring and Observability](#monitoring-and-observability)
+- [Troubleshooting](#troubleshooting)
+
 ---
 
 ## Choose the Connection Posture First
@@ -177,7 +191,7 @@ def health():
 
 ### Key design decisions in this example:
 
-- **Read Scaling tokens** are used for the `/motherduck-query` endpoint. Write tokens are reserved for data ingestion and data transformation.
+- **Read Scaling tokens** are used for the `/query` endpoint. Write tokens are reserved for data ingestion and data transformation.
 - **Query validation** rejects non-SELECT statements. In production, use a more sophisticated allowlist or parameterized query templates.
 - **Connections are not pooled.** For higher throughput, add connection pooling with `psycopg2.pool.ThreadedConnectionPool` or switch to `psycopg` (v3) with async support.
 - **JWT authentication** maps each request to a `customer_id`. Replace with your product's auth system.

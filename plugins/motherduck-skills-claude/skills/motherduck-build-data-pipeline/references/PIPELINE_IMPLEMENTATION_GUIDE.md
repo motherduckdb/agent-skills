@@ -5,6 +5,29 @@
 
 Use this skill when designing an end-to-end workflow that moves data from raw sources through transformation stages into analytics-ready output. This is a use-case skill -- it ties together lower-level skills into a complete pipeline.
 
+## Contents
+
+- [Source Of Truth](#source-of-truth)
+- [Language Focus: TypeScript/Javascript and Python](#language-focus-typescriptjavascript-and-python)
+- [TypeScript/Javascript Orchestration Starter](#typescriptjavascript-orchestration-starter)
+- [Prerequisites](#prerequisites)
+- [Runnable Reference Project](#runnable-reference-project)
+- [Verified Delivery Defaults](#verified-delivery-defaults)
+- [Validation Signals](#validation-signals)
+- [Pipeline Architecture](#pipeline-architecture)
+- [Step 1: Design the Target Schema](#step-1-design-the-target-schema)
+- [Step 2: Ingest Raw Data into Raw](#step-2-ingest-raw-data-into-raw)
+- [Step 3: Promote Into Staging and Write Transformation Queries](#step-3-promote-into-staging-and-write-transformation-queries)
+- [Step 4: Materialize Analytics Tables](#step-4-materialize-analytics-tables)
+- [Step 5: Validate Data Quality](#step-5-validate-data-quality)
+- [Step 6: Serve Results](#step-6-serve-results)
+- [Incremental Load Patterns](#incremental-load-patterns)
+- [Complete Pipeline Example](#complete-pipeline-example)
+- [Scheduling Considerations](#scheduling-considerations)
+- [Key Rules](#key-rules)
+- [Common Mistakes](#common-mistakes)
+- [Related Skills](#related-skills)
+
 ## Source Of Truth
 
 - Prefer current MotherDuck loading, connection, tagging, and storage docs first.
@@ -45,7 +68,9 @@ Native DuckDB path for Node.js:
 import { DuckDBInstance } from "@duckdb/node-api";
 import { readFile } from "node:fs/promises";
 
-const instance = await DuckDBInstance.create("md:?custom_user_agent=agent-skills/2.2.0");
+const instance = await DuckDBInstance.create(
+  "md:?custom_user_agent=agent-skills/2.2.0(harness-<harness>;llm-<llm>)"
+);
 const conn = await instance.connect();
 for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
   await conn.run(await readFile(`sql/pipeline/${file}`, "utf8"));

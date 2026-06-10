@@ -4,9 +4,20 @@ Use this guide for control-plane workflows against `https://api.motherduck.com`.
 
 The REST API is not the SQL query path. Use it for organization administration, service-account provisioning, supported token lifecycle work, Duckling configuration, active-account inspection, and Dive embed sessions.
 
+## Contents
+
+- [Authentication](#authentication)
+- [Endpoint Summary](#endpoint-summary)
+- [Service Account Provisioning](#service-account-provisioning)
+- [Token Lifecycle](#token-lifecycle)
+- [Duckling Configuration](#duckling-configuration)
+- [Active Accounts](#active-accounts)
+- [Dive Embed Sessions](#dive-embed-sessions)
+- [Error Responses](#error-responses)
+
 ## Authentication
 
-All endpoints in the supplied spec use bearer authentication:
+All endpoints use bearer authentication:
 
 ```bash
 export MD_API="https://api.motherduck.com"
@@ -23,7 +34,6 @@ Operational rules:
 - Keep `MOTHERDUCK_ADMIN_TOKEN` in a backend secret manager or local environment variable, never source code.
 - Do not send admin bearer tokens to browsers.
 - Do not use read-scaling tokens for REST API administration.
-- Treat `401` as invalid credentials and `403` as valid credentials without permission.
 - Log status codes and error `code` or `message`, but do not log bearer tokens or newly minted access tokens.
 
 ## Endpoint Summary
@@ -60,7 +70,7 @@ Username constraints from the runtime validator:
 - unique within the organization
 - case-insensitive for identity
 
-The public endpoint path still says `/v1/users`, but this creation endpoint currently creates service accounts, not arbitrary human users or arbitrary-role users. Do not document role updates, service-account impersonation, share attachment routes, or attachment management as public REST API capabilities unless the current public spec exposes them.
+The endpoint path says `/v1/users`, but it creates service accounts, not arbitrary human users or arbitrary-role users. Do not document role updates, service-account impersonation, share attachment routes, or attachment management as public REST API capabilities unless the current public spec exposes them.
 
 Delete a user only after explicit confirmation:
 
@@ -218,7 +228,7 @@ Duckling fields:
 - `type`: `read_write` or `read_scaling`
 - `status`: `active` or `cooldown`
 
-The supplied spec marks this endpoint as preview, so avoid building brittle operational automation around response details without checking current docs.
+The public OpenAPI spec marks this endpoint as preview, so avoid building brittle operational automation around response details without checking current docs.
 
 ## Dive Embed Sessions
 
@@ -237,7 +247,7 @@ Request fields:
 - `username`: required service account username within the organization
 - `session_hint`: optional non-empty hint used to reuse the same read-scaling session across embed requests
 
-Current public materials say ordinary Dives are available on all plans, while Embedded Dives require a Business plan. Organizations without embed access should expect a `403`.
+Embedded Dives require a Business plan (ordinary Dives are available on all plans); verify plan requirements against current docs. Organizations without embed access should expect a `403`.
 
 The response contains an opaque `session` string backed by a short-lived read-scaling token that runs as the service account. Treat it as a runtime credential:
 

@@ -1,6 +1,6 @@
 ---
 name: motherduck-pricing-roi
-description: Explain MotherDuck pricing and ROI tradeoffs. Use when an economic_buyer, technical_owner, or analytics_lead is asking about spend, budget guardrails, workload cost drivers, plan fit, or whether MotherDuck is worth adopting.
+description: Explain MotherDuck pricing and ROI tradeoffs. Use for any pricing, cost, billing, plan-comparison, instance-sizing, chargeback, or budget question — when an economic_buyer, technical_owner, or analytics_lead asks about spend, budget guardrails, workload cost drivers, plan fit, vendor cost comparisons, or whether MotherDuck is worth adopting.
 argument-hint: [workload-or-pricing-question]
 license: MIT
 ---
@@ -33,7 +33,7 @@ Use this skill when the user is asking whether MotherDuck is financially sensibl
 
 ## Open Next
 
-- `references/PRICING_ROI_PLAYBOOK.md` for workload-to-cost mapping, publicly safe talking points, ROI framing, and what not to promise
+- Read `references/PRICING_ROI_PLAYBOOK.md` for workload-to-cost mapping, publicly safe talking points, ROI framing, and what not to promise
 
 ## Related Skills
 

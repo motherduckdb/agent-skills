@@ -5,6 +5,17 @@
 
 Use this skill when a consultancy, implementation partner, or multi-client product team is delivering MotherDuck solutions repeatedly across customer accounts. Partners often work across different industries — retail, healthcare, fintech, logistics — so client data models and schemas will differ by industry. What stays consistent is the architecture: isolation, provisioning, connection patterns, and deployment structure. This skill focuses on the repeatable infrastructure layer, not the client-specific data model.
 
+## Contents
+
+- Source of truth and verified delivery defaults
+- Validation Signals (maintainer/reviewer checks)
+- Language focus and starter snippets (TypeScript client config, Python provisioning/validation)
+- Public product anchors (Hypertenancy, read scaling, Dives, shares)
+- Default multi-client pattern
+- What to standardize vs keep client-specific
+- Shares vs Dives vs full apps
+- Region and compliance handling
+
 ## Source Of Truth
 
 - Prefer current MotherDuck public docs and product pages.
@@ -13,7 +24,7 @@ Use this skill when a consultancy, implementation partner, or multi-client produ
 
 ## Verified Delivery Defaults
 
-The repeated repo runs point to a stable partner-delivery posture:
+Defaults that hold across partner deliveries:
 
 - standardize the isolation and provisioning pattern, not the client schema
 - keep one database namespace and one credential boundary per client unless the customer has a stronger requirement
@@ -28,12 +39,6 @@ Use these signals for testing, review, and regression checks. They are not an in
 - verify each client gets its own database entry in the output payload
 - verify the delivery pattern still states one database and one credential boundary per client
 - treat any partner template that assumes a shared client schema as a regression
-
-## When To Use
-
-- The user needs a repeatable architecture for several customers.
-- The user is deciding how much to standardize across clients.
-- The user needs region-aware deployment or sharing guidance for a client delivery model.
 
 ## Language Focus: TypeScript/Javascript and Python
 
@@ -171,7 +176,7 @@ These are the architecture-level patterns that should be consistent across clien
 - service account policy
 - sharing model
 
-Schemas, table structures, dashboard layouts, and Dive templates will vary by industry. Clients in different industries (e.g., retail vs. healthcare vs. fintech) have different source systems, metrics, and data models. Use `motherduck-model-data` to design the right schema for each industry rather than forcing a single starter schema across all client engagements.
+Schemas, table structures, dashboard layouts, and Dive templates will vary by industry. Use `motherduck-model-data` to design the right schema for each client rather than forcing a single starter schema across all engagements.
 
 ## When To Use Shares vs Dives vs Full Apps
 

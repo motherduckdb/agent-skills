@@ -2,6 +2,21 @@
 
 Advanced reference for data ingestion into MotherDuck. Covers format-specific options, cloud authentication, table formats (Delta Lake, Iceberg), large dataset strategies, and database replication patterns.
 
+## Contents
+
+| Section | Covers |
+| --- | --- |
+| Choose the client path first | Native DuckDB client vs Postgres-endpoint thin client, decision guide, PG-endpoint SQL patterns, local DuckDB database upload |
+| CSV Advanced Options | `read_csv` parameters, common scenarios, all-VARCHAR fallback |
+| Parquet Advanced Options | Hive partitioning, schema evolution with `union_by_name` |
+| JSON Advanced Options | Format types, nested JSON extraction |
+| Cloud Storage Authentication | S3, GCS, Azure secrets and credential options |
+| Delta Lake Ingestion | `delta_scan` patterns |
+| Iceberg Ingestion | `iceberg_scan` patterns |
+| Large Dataset Strategies | Filter during load, partitioned loads, column pruning, `COPY` / `COPY TO` |
+| Database Replication Patterns | PostgreSQL, MySQL, MongoDB, API sources via dlt |
+| Troubleshooting | Common load failures and fixes |
+
 ---
 
 ## Choose the client path first
@@ -28,10 +43,7 @@ Use them when you need:
 - extension-backed reads
 - local execution behavior such as `MD_RUN = LOCAL`
 
-In practice:
-
-- Node.js `@duckdb/node-api` and Python `duckdb` can use the richer DuckDB ingestion patterns
-- these paths are the default when the data starts on local disk, in memory, or in a local DuckDB workflow
+These paths are the default when the data starts on local disk, in memory, or in a local DuckDB workflow.
 
 ### Postgres-endpoint thin client paths
 
@@ -63,8 +75,7 @@ Do not use the PG endpoint for:
 | --- | --- |
 | Local file on disk | Native DuckDB client |
 | Dataframe or Arrow buffer in memory | Native DuckDB client |
-| Existing Node.js service already built on PostgreSQL drivers | PG endpoint, but prefer remote-read CTAS or batched multi-row inserts |
-| Existing Python service already built on PostgreSQL drivers | PG endpoint, but prefer remote-read CTAS or batched multi-row inserts |
+| Existing service already built on PostgreSQL drivers (Node.js, Python, etc.) | PG endpoint, but prefer remote-read CTAS or batched multi-row inserts |
 | Files already in S3, GCS, R2, Azure, or HTTPS | PG endpoint or native DuckDB client; default to remote-read SQL |
 | Need `CREATE SECRET` before loading | Native DuckDB client first, then PG endpoint is optional |
 

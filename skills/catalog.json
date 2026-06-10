@@ -1,7 +1,7 @@
 {
   "motherduck-build-cfa-app": {
     "name": "motherduck-build-cfa-app",
-    "description": "Design a MotherDuck-backed customer-facing analytics app. Use when building embedded or product analytics for external users and the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.",
+    "description": "Design a MotherDuck-backed customer-facing analytics app. Use for embedded analytics, multi-tenant SaaS reporting, or product analytics for external users -- whenever the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -54,7 +54,7 @@
   },
   "motherduck-build-data-pipeline": {
     "name": "motherduck-build-data-pipeline",
-    "description": "Design an end-to-end MotherDuck pipeline. Use when choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, publication targets, or whether DuckLake is actually required.",
+    "description": "Design an end-to-end MotherDuck data pipeline. Use for ETL/ELT workflows -- choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, dlt/dbt integration, publication targets, or whether DuckLake is actually required.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -103,7 +103,7 @@
   },
   "motherduck-create-dive": {
     "name": "motherduck-create-dive",
-    "description": "Create, edit, manage, share, or embed MotherDuck Dives. Use when the work involves Dive authoring, live React + SQL components, MCP get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.",
+    "description": "Create, edit, manage, share, or embed MotherDuck Dives \u2014 live React + SQL dashboards, charts, and data apps saved in the workspace. Use for any dashboard, chart, KPI display, or data visualization over MotherDuck data, and for Dive authoring mechanics such as get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-explore",
@@ -132,7 +132,7 @@
   },
   "motherduck-duckdb-sql": {
     "name": "motherduck-duckdb-sql",
-    "description": "DuckDB SQL reference for MotherDuck. Use when you need exact DuckDB syntax, function behavior, supported MotherDuck SQL features, or to resolve whether PostgreSQL-oriented SQL will fail on MotherDuck.",
+    "description": "DuckDB SQL reference for MotherDuck. Use when you need exact DuckDB syntax or function behavior, friendly SQL features like QUALIFY, GROUP BY ALL, or list/struct types, MotherDuck-specific SQL such as shares, secrets, snapshots, or UNDROP, or to fix SQL errors and PostgreSQL-style SQL that fails on MotherDuck.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -151,7 +151,7 @@
   },
   "motherduck-ducklake": {
     "name": "motherduck-ducklake",
-    "description": "Decide when DuckLake is the right MotherDuck storage pattern. Use when evaluating fully managed DuckLake, BYOB, own-compute DuckLake access, data inlining, object-storage layout, or file-aware maintenance instead of native MotherDuck storage.",
+    "description": "Decide when DuckLake is the right MotherDuck storage pattern versus native MotherDuck storage (the default). Use when evaluating lakehouse or open table format storage, Iceberg-style requirements, fully managed DuckLake, BYOB buckets, own-compute DuckLake access, data inlining, time travel, object-storage layout, or file-aware compaction and maintenance.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -217,7 +217,7 @@
   },
   "motherduck-load-data": {
     "name": "motherduck-load-data",
-    "description": "Load data into MotherDuck from local files, object storage, HTTPS, dataframes, or external databases. Use when choosing a MotherDuck-specific ingestion path, especially CTAS and INSERT...SELECT, bulk loading, secrets, and Postgres-endpoint versus DuckDB-client tradeoffs.",
+    "description": "Load and ingest data into MotherDuck from local files, object storage (S3, GCS, Azure, R2), HTTPS, dataframes, or external databases. Use for any import or bulk-load task \u2014 CSV, Parquet, JSON, Delta, Iceberg, local DuckDB database upload \u2014 and for choosing between CTAS, INSERT...SELECT, COPY, cloud-storage secrets, and Postgres-endpoint versus native DuckDB-client paths.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -240,7 +240,7 @@
   },
   "motherduck-migrate-to-motherduck": {
     "name": "motherduck-migrate-to-motherduck",
-    "description": "Plan a migration onto MotherDuck. Use when moving from Snowflake, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, validation, rollback, and native-versus-DuckLake posture.",
+    "description": "Plan a migration onto MotherDuck. Use when moving from Snowflake, BigQuery, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, source-vs-target validation, rollback, and native-versus-DuckLake posture.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -268,7 +268,7 @@
   },
   "motherduck-model-data": {
     "name": "motherduck-model-data",
-    "description": "Design and build database schemas and data models in MotherDuck. Produces a file-based project scaffold. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.",
+    "description": "Design and build database schemas and data models in MotherDuck. Produces a file-based SQL project scaffold with a model manifest. Use for any schema design or data modeling task \u2014 creating tables, choosing data types, star schemas, wide denormalized tables, raw/staging/analytics layers, dbt-style transformation projects, or restructuring data for analytics workloads.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-duckdb-sql",
@@ -287,7 +287,7 @@
   },
   "motherduck-partner-delivery": {
     "name": "motherduck-partner-delivery",
-    "description": "Deliver repeatable MotherDuck architectures across multiple clients. Use when standardizing isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions for a consultancy or partner delivery model.",
+    "description": "Deliver repeatable MotherDuck architectures across multiple clients. Use when a consultancy, agency, or multi-client product team needs to standardize isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions across client engagements.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -314,7 +314,7 @@
   },
   "motherduck-pricing-roi": {
     "name": "motherduck-pricing-roi",
-    "description": "Explain MotherDuck pricing and ROI tradeoffs. Use when an economic_buyer, technical_owner, or analytics_lead is asking about spend, budget guardrails, workload cost drivers, plan fit, or whether MotherDuck is worth adopting.",
+    "description": "Explain MotherDuck pricing and ROI tradeoffs. Use for any pricing, cost, billing, plan-comparison, instance-sizing, chargeback, or budget question \u2014 when an economic_buyer, technical_owner, or analytics_lead asks about spend, budget guardrails, workload cost drivers, plan fit, vendor cost comparisons, or whether MotherDuck is worth adopting.",
     "layer": "workflow",
     "depends_on": [],
     "references": [
@@ -351,7 +351,7 @@
   },
   "motherduck-rest-api": {
     "name": "motherduck-rest-api",
-    "description": "Use when automating or advising on MotherDuck REST API control-plane workflows for service-account provisioning, supported access-token lifecycle operations, Duckling instance configuration, active account inspection, or Dive embed sessions. Do not use for SQL or data-plane query work.",
+    "description": "MotherDuck REST API control-plane reference. Use when calling api.motherduck.com to provision service accounts, create, list, rotate, or revoke access tokens, configure Duckling instance sizes and read scaling, inspect active accounts, or mint Dive embed sessions. Not for SQL or data-plane query work.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -373,7 +373,7 @@
   },
   "motherduck-security-governance": {
     "name": "motherduck-security-governance",
-    "description": "Explain MotherDuck security, governance, and access-control patterns. Use when a security_compliance_owner, technical_owner, or application_builder is asking about residency, access boundaries, service accounts, isolation, sharing, or governance posture.",
+    "description": "Explain MotherDuck security, governance, and access-control patterns. Use for any question about SOC 2, GDPR, compliance, data residency, regions, SSO, service accounts, token handling, tenant isolation, sharing boundaries, snapshots and recovery, or governance posture \u2014 including when a security_compliance_owner, technical_owner, or application_builder is evaluating MotherDuck.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -395,7 +395,7 @@
   },
   "motherduck-share-data": {
     "name": "motherduck-share-data",
-    "description": "Create and manage MotherDuck data shares for zero-copy data distribution. Use when sharing databases with team members, other organizations, or making data publicly available.",
+    "description": "Create and manage MotherDuck data shares for zero-copy, read-only data distribution. Use whenever someone wants to share a database with team members, another organization, or the public \u2014 covers CREATE SHARE, access/visibility/update modes, GRANT READ ON SHARE, attaching share URLs, UPDATE SHARE, and REFRESH DATABASE.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",

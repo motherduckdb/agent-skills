@@ -1,6 +1,6 @@
 ---
 name: motherduck-build-data-pipeline
-description: Design an end-to-end MotherDuck pipeline. Use when choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, publication targets, or whether DuckLake is actually required.
+description: Design an end-to-end MotherDuck data pipeline. Use for ETL/ELT workflows -- choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, dlt/dbt integration, publication targets, or whether DuckLake is actually required.
 argument-hint: [pipeline-goal]
 license: MIT
 ---

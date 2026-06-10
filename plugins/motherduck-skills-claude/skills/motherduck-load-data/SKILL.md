@@ -1,6 +1,6 @@
 ---
 name: motherduck-load-data
-description: Load data into MotherDuck from local files, object storage, HTTPS, dataframes, or external databases. Use when choosing a MotherDuck-specific ingestion path, especially CTAS and INSERT...SELECT, bulk loading, secrets, and Postgres-endpoint versus DuckDB-client tradeoffs.
+description: Load and ingest data into MotherDuck from local files, object storage (S3, GCS, Azure, R2), HTTPS, dataframes, or external databases. Use for any import or bulk-load task — CSV, Parquet, JSON, Delta, Iceberg, local DuckDB database upload — and for choosing between CTAS, INSERT...SELECT, COPY, cloud-storage secrets, and Postgres-endpoint versus native DuckDB-client paths.
 argument-hint: [source-and-target]
 license: MIT
 ---
@@ -45,7 +45,7 @@ Use this skill when the job is getting data into MotherDuck correctly and effici
 
 ## Open Next
 
-- `references/INGESTION_PATTERNS.md` for format-specific options, cloud-storage secrets, Postgres-endpoint loading tradeoffs, Python dataframe paths, and advanced ingestion patterns
+- Read `references/INGESTION_PATTERNS.md` for format-specific options, cloud-storage secrets, Postgres-endpoint loading tradeoffs, Python dataframe paths, and advanced ingestion patterns.
 
 ## Related Skills
 

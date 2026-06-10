@@ -1,6 +1,6 @@
 ---
 name: motherduck-model-data
-description: Design and build database schemas and data models in MotherDuck. Produces a file-based project scaffold. Use when creating tables, choosing data types, defining relationships, or restructuring data for analytics workloads.
+description: Design and build database schemas and data models in MotherDuck. Produces a file-based SQL project scaffold with a model manifest. Use for any schema design or data modeling task — creating tables, choosing data types, star schemas, wide denormalized tables, raw/staging/analytics layers, dbt-style transformation projects, or restructuring data for analytics workloads.
 license: MIT
 ---
 
@@ -66,7 +66,7 @@ If the user explicitly asks for a single table, a quick DDL statement, or an ad-
 
 ## Open Next
 
-- `references/MODELING_PLAYBOOK.md` for schema patterns, data-type guidance, CTAS/view decisions, complex types, constraints, project scaffold conventions, and common modeling mistakes
+- Read `references/MODELING_PLAYBOOK.md` for schema patterns, data-type guidance, CTAS/view decisions, complex types, constraints, project scaffold conventions, and common modeling mistakes.
 
 ## Related Skills
 
