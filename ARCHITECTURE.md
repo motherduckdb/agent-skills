@@ -44,7 +44,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
 - Related-skill discovery stays in prose sections like `Related Skills`; we do not add repo-specific frontmatter for that.
-- Shipped skill content must be self-contained; `motherduck-examples` may inform authoring but must not appear as a runtime dependency in plugin-facing guidance.
+- Shipped skill content must be self-contained; `motherduck-cookbook` may inform authoring but must not appear as a runtime dependency in plugin-facing guidance.
 - In use-case skills, structured JSON is an explicit test/tooling contract, not the default human-facing response format.
 - `Validation Signals` sections are maintainer/reviewer guidance for testing and regression checks, not a required heading in normal user-facing replies.
 

@@ -77,7 +77,7 @@ Important supporting surfaces:
 - Prefer deduplicating repeated guidance by pointing to the owning skill instead of copying blocks between skills.
 - If you shrink a skill, move preserved detail into `references/`; do not silently delete useful content.
 - If a change affects real MotherDuck behavior, update the runnable artifact or reference project, not just the prose.
-- Do not point shipped skill content at `motherduck-examples`; it is a maintainer-only comparison input, not a plugin/runtime dependency.
+- Do not point shipped skill content at `motherduck-cookbook`; it is a maintainer-only comparison input, not a plugin/runtime dependency.
 - In use-case skills, structured JSON output is only for explicit test/tooling flows. Normal human-facing use can stay in prose unless JSON is explicitly requested.
 - `Validation Signals` sections in references are for testing, review, and regression checks; they should not be treated as a required heading in normal user-facing replies.
 - Preserve the layer graph:
@@ -133,7 +133,7 @@ uv run scripts/test_codex_use_cases.py
 - `motherduck-build-dashboard` reintroducing duplicated `motherduck-create-dive` mechanics
 - accidental PostgreSQL-specific claims in SQL examples
 - artifacts drifting into local-only behavior when the repo now claims MotherDuck-backed validation
-- shipped references accidentally telling plugin users to consult `motherduck-examples`
+- shipped references accidentally telling plugin users to consult `motherduck-cookbook`
 - use-case skills drifting away from the strict raw-JSON contract used by the Codex test harness
 - overcommitting to a single connection path when the guidance should stay scenario-based
 

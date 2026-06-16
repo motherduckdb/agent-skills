@@ -125,7 +125,7 @@ uv run python pipeline/cleanup.py
 ## Editing Guidelines
 
 - Keep shared source skills portable. Claude-only metadata such as `argument-hint` belongs in the dedicated Claude package sync layer, not in `skills/`.
-- Do not point shipped skill content at `motherduck-examples`; internalize useful guidance into this repo first.
+- Do not point shipped skill content at `motherduck-cookbook`; internalize useful guidance into this repo first.
 - If you shrink a skill, move preserved detail into `references/` rather than deleting it.
 - If a change affects real MotherDuck behavior, update the runnable artifact or reference project, not just the prose.
 - Preserve the layer graph:
