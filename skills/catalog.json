@@ -153,7 +153,7 @@
       "https://motherduck.com/docs/sql-reference/mcp/run-flight/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/",
-      "https://github.com/motherduckdb/motherduck-examples/tree/main/flight-plans"
+      "https://github.com/motherduckdb/motherduck-cookbook/tree/main/flight-plans"
     ],
     "needs_live_discovery": false
   },

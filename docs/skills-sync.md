@@ -32,7 +32,7 @@ The intended review loop is:
    - the runnable examples in `artifacts/`
    - the TypeScript companion artifact when the catalog or skill references one
    - any fuller reference project shipped under `references/`
-   - optional maintainer-only comparison inputs such as `motherduck-examples`
+   - optional maintainer-only comparison inputs such as `motherduck-cookbook`
 4. update the skill and references
 5. run the artifacts that represent the use case
 6. run any deeper reference project if that skill ships one

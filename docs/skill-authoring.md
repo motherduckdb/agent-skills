@@ -34,7 +34,7 @@ Put detailed guidance in `references/`:
 
 When shrinking a skill, move content into `references/`; do not delete it.
 
-Do not point shipped `SKILL.md`, `references/`, or `artifacts/` content at `motherduck-examples`.
+Do not point shipped `SKILL.md`, `references/`, or `artifacts/` content at `motherduck-cookbook`.
 That repo is an authoring-only comparison source for maintainers. If it teaches us something useful, copy the learning into this repo's guidance or artifacts before shipping.
 
 ## What Goes in `artifacts/`
