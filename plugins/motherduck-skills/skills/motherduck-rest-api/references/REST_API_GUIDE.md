@@ -4,9 +4,30 @@ Use this guide for control-plane workflows against `https://api.motherduck.com`.
 
 The REST API is not the SQL query path. Use it for organization administration, service-account provisioning, supported token lifecycle work, Duckling configuration, active-account inspection, and Dive embed sessions.
 
+## MotherDuck MCP
+
+When the MotherDuck MCP server is connected and user-admin tools are enabled, prefer MCP
+admin tools over curl. The server exchanges the caller's credential for a regional SLT and
+calls `api.<region>.motherduck.com`, not the global routing host. Call `get_user_admin_guide`
+for the in-session copy of this guide.
+
+Confirm destructive MCP calls (`delete_user`, `invalidate_access_token`) before invoking.
+Store newly minted token secrets immediately — they are shown once.
+
+## Contents
+
+- [Authentication](#authentication)
+- [Endpoint Summary](#endpoint-summary)
+- [Service Account Provisioning](#service-account-provisioning)
+- [Token Lifecycle](#token-lifecycle)
+- [Duckling Configuration](#duckling-configuration)
+- [Active Accounts](#active-accounts)
+- [Dive Embed Sessions](#dive-embed-sessions)
+- [Error Responses](#error-responses)
+
 ## Authentication
 
-All endpoints in the supplied spec use bearer authentication:
+All endpoints use bearer authentication:
 
 ```bash
 export MD_API="https://api.motherduck.com"
@@ -23,22 +44,22 @@ Operational rules:
 - Keep `MOTHERDUCK_ADMIN_TOKEN` in a backend secret manager or local environment variable, never source code.
 - Do not send admin bearer tokens to browsers.
 - Do not use read-scaling tokens for REST API administration.
-- Treat `401` as invalid credentials and `403` as valid credentials without permission.
 - Log status codes and error `code` or `message`, but do not log bearer tokens or newly minted access tokens.
 
 ## Endpoint Summary
 
-| Operation | Method and path | Purpose | Notes |
+| Operation | MCP tool | Method and path | Notes |
 |---|---|---|---|
-| Create service account | `POST /v1/users` | Create a service account with the `Member` role | Username must be unique within the organization; no role field is accepted. |
-| Delete user | `DELETE /v1/users/{username}` | Permanently delete a user and all their data | Destructive and cannot be undone. Confirm first. |
-| Create token | `POST /v1/users/{username}/tokens` | Create an access token for a user | Response includes the token secret once. Store it immediately. |
-| List tokens | `GET /v1/users/{username}/tokens` | List metadata for a user's tokens | Does not return token secret values. |
-| Delete token | `DELETE /v1/users/{username}/tokens/{token_id}` | Invalidate a user access token | Use the token `id`, not the token secret. |
-| Get Duckling config | `GET /v1/users/{username}/instances` | Read a user's Duckling instance configuration | Requires admin role. |
-| Set Duckling config | `PUT /v1/users/{username}/instances` | Configure read-write and read-scaling Ducklings | Payload requires both `read_write` and `read_scaling`. |
-| Get active accounts | `GET /v1/active_accounts` | Preview active accounts and active Ducklings | Preview endpoint; returns active Ducklings by account. |
-| Create Dive embed session | `POST /v1/dives/{dive_id}/embed-session` | Mint an embed session for a service account | Requires `username`; optional `session_hint` can reuse read-scaling sessions. |
+| Load admin guide | `get_user_admin_guide` | — | In-session copy of this guide. |
+| Create service account | `create_service_account` | `POST /v1/users` | Username unique in org; creates a service account only. |
+| Delete user | `delete_user` | `DELETE /v1/users/{username}` | Destructive; confirm first. |
+| Create token | `create_access_token` | `POST /v1/users/{username}/tokens` | Secret returned once. |
+| List tokens | `list_access_tokens` | `GET /v1/users/{username}/tokens` | Metadata only. |
+| Delete token | `invalidate_access_token` | `DELETE /v1/users/{username}/tokens/{token_id}` | Use token `id`, not the secret. |
+| Get Duckling config | `get_duckling_config` | `GET /v1/users/{username}/instances` | Requires admin role. |
+| Set Duckling config | `set_duckling_config` | `PUT /v1/users/{username}/instances` | Requires both `read_write` and `read_scaling`. |
+| Get active accounts | — | `GET /v1/active_accounts` | Preview endpoint. |
+| Create Dive embed session | `create_dive_embed_session` | `POST /v1/dives/{dive_id}/embed-session` | Requires service-account `username`; optional `session_hint`. |
 
 ## Service Account Provisioning
 
@@ -60,7 +81,7 @@ Username constraints from the runtime validator:
 - unique within the organization
 - case-insensitive for identity
 
-The public endpoint path still says `/v1/users`, but this creation endpoint currently creates service accounts, not arbitrary human users or arbitrary-role users. Do not document role updates, service-account impersonation, share attachment routes, or attachment management as public REST API capabilities unless the current public spec exposes them.
+The endpoint path says `/v1/users`, but it creates service accounts, not arbitrary human users or arbitrary-role users. Do not document role updates, service-account impersonation, share attachment routes, or attachment management as public REST API capabilities unless the current public spec exposes them.
 
 Delete a user only after explicit confirmation:
 
@@ -218,7 +239,7 @@ Duckling fields:
 - `type`: `read_write` or `read_scaling`
 - `status`: `active` or `cooldown`
 
-The supplied spec marks this endpoint as preview, so avoid building brittle operational automation around response details without checking current docs.
+The public OpenAPI spec marks this endpoint as preview, so avoid building brittle operational automation around response details without checking current docs.
 
 ## Dive Embed Sessions
 
@@ -237,7 +258,7 @@ Request fields:
 - `username`: required service account username within the organization
 - `session_hint`: optional non-empty hint used to reuse the same read-scaling session across embed requests
 
-Current public materials say ordinary Dives are available on all plans, while Embedded Dives require a Business plan. Organizations without embed access should expect a `403`.
+Embedded Dives require a Business plan (ordinary Dives are available on all plans); verify plan requirements against current docs. Organizations without embed access should expect a `403`.
 
 The response contains an opaque `session` string backed by a short-lived read-scaling token that runs as the service account. Treat it as a runtime credential:
 
