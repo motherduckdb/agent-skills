@@ -5,6 +5,16 @@
 
 Use this skill when a team wants broad internal access to analytics without turning every question into a central data-team ticket. This is a use-case skill focused on governed rollout, not just chart creation.
 
+## Contents
+
+- Source of truth and verified delivery defaults
+- Validation Signals (maintainer/reviewer checks)
+- Language focus and starter snippets (TSX Dive view, Python dataset)
+- Public product anchors (Dives, shares, read scaling)
+- What to publish first and the recommended sequence (curate, publish, expand)
+- Choosing between Dives and shares
+- Scale guidance and what not to promise
+
 ## Source Of Truth
 
 - Prefer MotherDuck public docs and product pages for Dives, sharing, pricing, and read scaling.
@@ -13,7 +23,7 @@ Use this skill when a team wants broad internal access to analytics without turn
 
 ## Verified Delivery Defaults
 
-The repeated repo runs point to a stable self-serve rollout posture:
+Defaults that hold across self-serve rollouts:
 
 - pick one audience first instead of launching broadly
 - publish one governed dataset before expanding the surface area
@@ -28,12 +38,6 @@ Use these signals for testing, review, and regression checks. They are not an in
 - verify the output names exactly one `first_audience` and one `first_asset`
 - verify the first asset is backed by a governed dataset rather than an ad hoc raw table
 - treat rollout plans without ownership and sharing boundaries as incomplete
-
-## When To Use
-
-- The user wants internal teams to explore data and answer their own questions.
-- The user needs a rollout plan for Dives, dashboards, or shared analytical datasets.
-- The user is trying to balance adoption with clear access boundaries.
 
 ## Language Focus: TypeScript/Javascript and Python
 
@@ -135,14 +139,6 @@ WHERE status IS NOT NULL
 """)
 conn.close()
 ```
-
-## Rollout Workflow
-
-1. Pick the first team and first use case.
-2. Prepare one clean analytical dataset.
-3. Build one shareable Dive or dashboard around that dataset.
-4. Define who can read, edit, and share.
-5. Expand only after the first workflow is stable and understood.
 
 ## Public Product Anchors To Use
 

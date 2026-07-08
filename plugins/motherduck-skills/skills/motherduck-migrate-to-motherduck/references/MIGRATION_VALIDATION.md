@@ -2,6 +2,16 @@
 
 Concrete SQL patterns and a Python orchestrator for validating that a migration to MotherDuck produced correct results. Every query outputs a `pct_variance` column so the user can decide what is acceptable.
 
+## Contents
+
+- Row count comparison
+- Side-by-side metric comparison
+- Uniqueness check on target
+- New / deleted records (EXCEPT queries)
+- Changed records tracking (column-level and hash-based)
+- Python validation orchestrator (`validate_migration`, `print_report`)
+- Investigating non-zero variance
+
 ---
 
 ## Row Count Comparison

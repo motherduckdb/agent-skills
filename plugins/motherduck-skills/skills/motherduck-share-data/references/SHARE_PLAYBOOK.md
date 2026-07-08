@@ -2,6 +2,26 @@
 
 Reference for creating, operating, and consuming MotherDuck shares safely.
 
+## Contents
+
+| Section | Covers |
+| --- | --- |
+| What Shares Are | Read-only, zero-copy, database-granularity semantics |
+| SQL-First Posture | Shares as explicit, auditable SQL operations |
+| Default Workflow | Owner-to-consumer sequence |
+| SQL Workflow Template | Copyable end-to-end owner and consumer SQL |
+| Create a Share | `CREATE SHARE` options |
+| Access Levels | ORGANIZATION vs RESTRICTED vs UNRESTRICTED |
+| Visibility Options | DISCOVERABLE vs HIDDEN |
+| Update Modes | MANUAL vs AUTOMATIC |
+| Common Share Patterns | Internal, named-recipient, link-based external |
+| Operating Shares | List, refresh, grant/revoke, drop |
+| Consuming Shares | Attach, refresh, query shared data |
+| Discovering and Exploring Shares | Find shares and inspect attached schemas |
+| Use Cases | Distribution patterns by scenario |
+| Key Rules | Sharing defaults in one list |
+| Common Mistakes | Frequent share failures and fixes |
+
 ## What Shares Are
 
 A share is a read-only reference to a MotherDuck database. When you create a share, MotherDuck records share metadata pointing at the source database. No bytes are copied. Recipients attach the share and query it as a read-only clone in their own workspace.
@@ -63,11 +83,11 @@ SELECT * FROM "partner_data"."main"."customers" LIMIT 10;
 CREATE SHARE IF NOT EXISTS my_data_share FROM my_database (
   ACCESS ORGANIZATION,
   VISIBILITY DISCOVERABLE,
-  UPDATE MANUAL
+  UPDATE AUTOMATIC
 );
 ```
 
-This creates a share named `my_data_share` from `my_database` that is visible to anyone in your organization, discoverable, and manual-update by default.
+This creates a share named `my_data_share` from `my_database` that anyone in your organization can discover and attach, and that updates automatically — the default posture for internal sharing. Always state access, visibility, and update mode explicitly.
 
 ## Access Levels
 
@@ -161,13 +181,7 @@ LIST SHARES;
 FROM MD_INFORMATION_SCHEMA.OWNED_SHARES;
 ```
 
-`LIST SHARES` lists shares created by the current user. For shares from other users, use `MD_INFORMATION_SCHEMA.SHARED_WITH_ME`.
-
-### List Shares Shared With You
-
-```sql
-FROM MD_INFORMATION_SCHEMA.SHARED_WITH_ME;
-```
+`LIST SHARES` lists shares created by the current user. For shares from other users, use `MD_INFORMATION_SCHEMA.SHARED_WITH_ME` (see Consuming Shares).
 
 ### Manually Refresh a Share
 
@@ -221,7 +235,7 @@ REFRESH DATABASE partner_data;
 Once attached, query shared tables like any other database. Use fully qualified names.
 
 ```sql
-SELECT * FROM partner_data.main.customers LIMIT 10;
+SELECT * FROM "partner_data"."main"."customers" LIMIT 10;
 ```
 
 ```sql
@@ -229,8 +243,8 @@ SELECT
     c.customer_id,
     c.name,
     o.order_total
-FROM partner_data.main.customers c
-JOIN my_db.main.orders o ON c.customer_id = o.customer_id;
+FROM "partner_data"."main"."customers" c
+JOIN "my_db"."main"."orders" o ON c.customer_id = o.customer_id;
 ```
 
 ### See What Is Shared With You
@@ -248,12 +262,6 @@ This returns share names, URLs, owners, and metadata. Use the URL to attach shar
 ```sql
 FROM MD_INFORMATION_SCHEMA.SHARED_WITH_ME
 WHERE url = '<share_url>';
-```
-
-### Browse All Shares You Own
-
-```sql
-LIST SHARES;
 ```
 
 ### Explore a Shared Database After Attaching
@@ -274,7 +282,7 @@ WHERE database_name = 'partner_data'
 ```
 
 ```sql
-SUMMARIZE partner_data.main.customers;
+SUMMARIZE "partner_data"."main"."customers";
 ```
 
 ## Use Cases
@@ -304,8 +312,8 @@ SUMMARIZE partner_data.main.customers;
 Shares are read-only. If a recipient needs to modify or extend shared data, they should copy it into their own database first:
 
 ```sql
-CREATE TABLE my_db.main.local_copy AS
-SELECT * FROM partner_data.main.customers;
+CREATE TABLE "my_db"."main"."local_copy" AS
+SELECT * FROM "partner_data"."main"."customers";
 ```
 
 ### Using Unrestricted Access for Sensitive Data

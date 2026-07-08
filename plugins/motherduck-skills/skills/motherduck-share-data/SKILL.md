@@ -1,6 +1,6 @@
 ---
 name: motherduck-share-data
-description: Create and manage MotherDuck data shares for zero-copy data distribution. Use when sharing databases with team members, other organizations, or making data publicly available.
+description: Create and manage MotherDuck data shares for zero-copy, read-only data distribution. Use whenever someone wants to share a database with team members, another organization, or the public — covers CREATE SHARE, access/visibility/update modes, GRANT READ ON SHARE, attaching share URLs, UPDATE SHARE, and REFRESH DATABASE.
 license: MIT
 ---
 
@@ -30,7 +30,7 @@ Use this skill when you need to distribute a MotherDuck database without copying
 - Use `UPDATE MANUAL` when the recipient needs a stable snapshot or versioned delivery.
 - Use `ACCESS RESTRICTED` or `VISIBILITY HIDDEN` when distribution should stay tightly controlled.
 - Confirm whether the recipient is an internal user, another organization, or public before choosing access and visibility.
-- For write-heavy publishers, verify the MotherDuck-supported DuckDB client version before relying on upstream checkpoint or concurrent-write improvements during share-update workflows.
+- For write-heavy publishers, verify the DuckDB client version is one MotherDuck supports before relying on checkpoint or concurrent-write behavior during share-update workflows.
 - Never treat a share as row-level security. Shares operate at database granularity.
 
 ## Workflow
@@ -44,7 +44,7 @@ Use this skill when you need to distribute a MotherDuck database without copying
 
 ## Open Next
 
-- `references/SHARE_PLAYBOOK.md` for the full SQL playbook, access/update decision matrix, consumer workflow, and common failure modes
+- Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, access/update decision matrix, consumer workflow, and common failure modes.
 
 ## Related Skills
 

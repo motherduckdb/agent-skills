@@ -5,6 +5,17 @@
 
 Use this skill when the user needs a migration plan from an existing warehouse, database, or analytics stack onto MotherDuck. This is a use-case skill: it combines connection strategy, ingestion, modeling, query migration, and rollout sequencing into one plan.
 
+## Contents
+
+- Source of truth and verified delivery defaults
+- Validation Signals (maintainer/reviewer checks)
+- Language focus and starter snippets (TypeScript cutover, Python validation)
+- Official product anchors (`pg_duckdb`, Hypertenancy, read scaling, DuckLake)
+- Step 1-6: classify, pick target pattern, move data, rebuild model, validate, cut over
+- Migration decision matrix
+- DuckLake guidance
+- Source-specific questions (Snowflake, Redshift, Postgres, dbt, lakehouse)
+
 ## Source Of Truth
 
 - Prefer current MotherDuck public documentation and product pages first.
@@ -18,7 +29,7 @@ Use this skill when the user needs a migration plan from an existing warehouse, 
 
 ## Verified Delivery Defaults
 
-The repeated repo runs point to a stable migration posture:
+Defaults that hold across migrations:
 
 - decide the target MotherDuck pattern before arguing about tooling
 - migrate in slices with source-vs-target validation at each step
@@ -33,12 +44,6 @@ Use these signals for testing, review, and regression checks. They are not an in
 - verify the output contains metric comparison plus `new_records` and `deleted_records`
 - require an explicit acceptable variance posture for every migration slice
 - treat plans without rollback and cutover checkpoints as incomplete
-
-## When To Use
-
-- The user is migrating from Snowflake, Redshift, Postgres, or another warehouse.
-- The user is asking about dbt, connectors, CDC, or cutover sequencing.
-- The user needs to decide whether to land on native MotherDuck storage or DuckLake.
 
 ## Language Focus: TypeScript/Javascript and Python
 
@@ -94,18 +99,6 @@ def find_missing_keys(conn, source_table: str, target_table: str, key_col: str) 
 ```
 
 See `references/MIGRATION_VALIDATION.md` for the full validation suite: row counts, metric comparisons with % variance, uniqueness checks, new/deleted/changed record tracking, and a Python orchestrator.
-
-## Migration Workflow
-
-Follow this order:
-
-1. Identify the current source of truth.
-2. Identify the serving pattern after migration.
-3. Pick the connection and ingestion path.
-4. Migrate schema and data.
-5. Port or rewrite critical SQL.
-6. Validate correctness.
-7. Cut over in phases.
 
 ## Official Product Anchors To Use
 

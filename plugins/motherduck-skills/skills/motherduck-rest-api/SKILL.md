@@ -1,6 +1,6 @@
 ---
 name: motherduck-rest-api
-description: Use when automating or advising on MotherDuck REST API control-plane workflows for service-account provisioning, supported access-token lifecycle operations, Duckling instance configuration, active account inspection, or Dive embed sessions. Do not use for SQL or data-plane query work.
+description: MotherDuck REST API control-plane reference. Use when calling api.motherduck.com or MotherDuck MCP admin tools to provision service accounts, manage tokens, configure Ducklings, or mint Dive embed sessions. Not for SQL or data-plane query work.
 license: MIT
 ---
 
@@ -17,7 +17,7 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 
 ## Default Posture
 
-- Treat the REST API as the control plane. Use `motherduck-query` for SQL and data-plane work.
+- Treat the REST API as the control plane; SQL and data-plane queries go through a database connection, not the REST API.
 - Use `https://api.motherduck.com` as the base URL unless the user provides another environment.
 - Authenticate with `Authorization: Bearer ${MOTHERDUCK_ADMIN_TOKEN}` and keep admin read-write tokens in backend-managed secrets.
 - Never use read-scaling tokens for REST API administration.
@@ -35,13 +35,15 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 4. For Duckling config changes, read the current config first, then update both `read_write` and `read_scaling` because the `PUT` payload requires both.
 5. Preserve response fields that are only returned once, especially newly created token strings and embed session strings.
 6. Surface API errors by status and response body; do not hide `400`, `401`, `403`, `404`, or `500` responses behind success-shaped fallbacks.
+7. When the MotherDuck MCP server is connected, prefer its admin tools over raw HTTP. Call `get_user_admin_guide` first, or read the MCP column in `references/REST_API_GUIDE.md`.
 
 ## Open Next
 
-- `references/REST_API_GUIDE.md` for endpoint summaries, auth headers, request payloads, curl examples, validation limits, and operational gotchas
+- Read `references/REST_API_GUIDE.md` for endpoint summaries, MCP tool mapping, curl examples, validation limits, and operational gotchas.
 
 ## Related Skills
 
+- `motherduck-query` for SQL and data-plane query work
 - `motherduck-connect` for connection tokens and application connection posture
 - `motherduck-security-governance` for admin-token handling, service-account posture, and access-boundary questions
 - `motherduck-create-dive` for designing Dives before minting embed sessions

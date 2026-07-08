@@ -1,6 +1,6 @@
 ---
 name: motherduck-rest-api
-description: MotherDuck REST API control-plane reference. Use when calling api.motherduck.com to provision service accounts, create, list, rotate, or revoke access tokens, configure Duckling instance sizes and read scaling, inspect active accounts, or mint Dive embed sessions. Not for SQL or data-plane query work.
+description: MotherDuck REST API control-plane reference. Use when calling api.motherduck.com or MotherDuck MCP admin tools to provision service accounts, manage tokens, configure Ducklings, or mint Dive embed sessions. Not for SQL or data-plane query work.
 license: MIT
 ---
 
@@ -35,10 +35,11 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 4. For Duckling config changes, read the current config first, then update both `read_write` and `read_scaling` because the `PUT` payload requires both.
 5. Preserve response fields that are only returned once, especially newly created token strings and embed session strings.
 6. Surface API errors by status and response body; do not hide `400`, `401`, `403`, `404`, or `500` responses behind success-shaped fallbacks.
+7. When the MotherDuck MCP server is connected, prefer its admin tools over raw HTTP. Call `get_user_admin_guide` first, or read the MCP column in `references/REST_API_GUIDE.md`.
 
 ## Open Next
 
-- Read `references/REST_API_GUIDE.md` for endpoint summaries, auth headers, request payloads, curl examples, validation limits, and operational gotchas.
+- Read `references/REST_API_GUIDE.md` for endpoint summaries, MCP tool mapping, curl examples, validation limits, and operational gotchas.
 
 ## Related Skills
 

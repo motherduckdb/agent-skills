@@ -2,6 +2,22 @@
 
 Reference for framing MotherDuck pricing, workload cost drivers, and ROI discussions without overpromising or hardcoding stale commercial details.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| SQL-First Cost Attribution Posture | custom_user_agent tagging, service accounts, QUERY_HISTORY |
+| How To Answer / Cost Framing Checklist | Workload shape, comparison baseline, real concern |
+| Best Practice for Compute Attribution | Tagging convention plus inspection SQL |
+| Service Accounts as Billing Boundaries | Duckling boundaries, per-customer attribution SQL |
+| Internal Chargeback and Customer Billing | Workload vs tenant chargeback models |
+| Storage and Lifecycle Visibility | STORAGE_INFO and retention-driven cost |
+| Public Pricing Structure / Compute Realities | Plans, instance types, cooldown, SHUTDOWN |
+| Workload-to-Cost Mapping | Instance-type heuristics |
+| ROI Questions and Guidance | What MotherDuck replaces or simplifies |
+| Plan-Aware Talking Points | Publicly positioned plan differences |
+| What Not To Do | Promises and numbers to avoid |
+
 ## When To Use
 
 - The user asks about pricing, spend, invoices, budget caps, or plan fit.
@@ -262,6 +278,8 @@ Frame ROI with concrete categories:
 - faster internal or external access to analytics
 
 ## Plan-Aware Talking Points
+
+Plan names, entitlements, and SLA figures change; verify against the live pricing page before quoting any of these in a durable answer.
 
 - Business is publicly positioned for production analytics, with more users, unlimited service accounts, read-scaling replicas, 90-day snapshot retention, query history, support from MotherDuck experts, and a 99.9% availability SLA.
 - Current public materials say Dives are available on all plans, while Embedded Dives are positioned as Business-plan functionality.

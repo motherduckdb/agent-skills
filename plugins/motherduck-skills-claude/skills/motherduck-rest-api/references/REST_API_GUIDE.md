@@ -4,6 +4,16 @@ Use this guide for control-plane workflows against `https://api.motherduck.com`.
 
 The REST API is not the SQL query path. Use it for organization administration, service-account provisioning, supported token lifecycle work, Duckling configuration, active-account inspection, and Dive embed sessions.
 
+## MotherDuck MCP
+
+When the MotherDuck MCP server is connected and user-admin tools are enabled, prefer MCP
+admin tools over curl. The server exchanges the caller's credential for a regional SLT and
+calls `api.<region>.motherduck.com`, not the global routing host. Call `get_user_admin_guide`
+for the in-session copy of this guide.
+
+Confirm destructive MCP calls (`delete_user`, `invalidate_access_token`) before invoking.
+Store newly minted token secrets immediately — they are shown once.
+
 ## Contents
 
 - [Authentication](#authentication)
@@ -38,17 +48,18 @@ Operational rules:
 
 ## Endpoint Summary
 
-| Operation | Method and path | Purpose | Notes |
+| Operation | MCP tool | Method and path | Notes |
 |---|---|---|---|
-| Create service account | `POST /v1/users` | Create a service account with the `Member` role | Username must be unique within the organization; no role field is accepted. |
-| Delete user | `DELETE /v1/users/{username}` | Permanently delete a user and all their data | Destructive and cannot be undone. Confirm first. |
-| Create token | `POST /v1/users/{username}/tokens` | Create an access token for a user | Response includes the token secret once. Store it immediately. |
-| List tokens | `GET /v1/users/{username}/tokens` | List metadata for a user's tokens | Does not return token secret values. |
-| Delete token | `DELETE /v1/users/{username}/tokens/{token_id}` | Invalidate a user access token | Use the token `id`, not the token secret. |
-| Get Duckling config | `GET /v1/users/{username}/instances` | Read a user's Duckling instance configuration | Requires admin role. |
-| Set Duckling config | `PUT /v1/users/{username}/instances` | Configure read-write and read-scaling Ducklings | Payload requires both `read_write` and `read_scaling`. |
-| Get active accounts | `GET /v1/active_accounts` | Preview active accounts and active Ducklings | Preview endpoint; returns active Ducklings by account. |
-| Create Dive embed session | `POST /v1/dives/{dive_id}/embed-session` | Mint an embed session for a service account | Requires `username`; optional `session_hint` can reuse read-scaling sessions. |
+| Load admin guide | `get_user_admin_guide` | — | In-session copy of this guide. |
+| Create service account | `create_service_account` | `POST /v1/users` | Username unique in org; creates a service account only. |
+| Delete user | `delete_user` | `DELETE /v1/users/{username}` | Destructive; confirm first. |
+| Create token | `create_access_token` | `POST /v1/users/{username}/tokens` | Secret returned once. |
+| List tokens | `list_access_tokens` | `GET /v1/users/{username}/tokens` | Metadata only. |
+| Delete token | `invalidate_access_token` | `DELETE /v1/users/{username}/tokens/{token_id}` | Use token `id`, not the secret. |
+| Get Duckling config | `get_duckling_config` | `GET /v1/users/{username}/instances` | Requires admin role. |
+| Set Duckling config | `set_duckling_config` | `PUT /v1/users/{username}/instances` | Requires both `read_write` and `read_scaling`. |
+| Get active accounts | — | `GET /v1/active_accounts` | Preview endpoint. |
+| Create Dive embed session | `create_dive_embed_session` | `POST /v1/dives/{dive_id}/embed-session` | Requires service-account `username`; optional `session_hint`. |
 
 ## Service Account Provisioning
 

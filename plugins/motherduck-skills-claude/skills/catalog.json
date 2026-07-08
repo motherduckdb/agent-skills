@@ -378,7 +378,7 @@
   },
   "motherduck-rest-api": {
     "name": "motherduck-rest-api",
-    "description": "MotherDuck REST API control-plane reference. Use when calling api.motherduck.com to provision service accounts, create, list, rotate, or revoke access tokens, configure Duckling instance sizes and read scaling, inspect active accounts, or mint Dive embed sessions. Not for SQL or data-plane query work.",
+    "description": "MotherDuck REST API control-plane reference. Use when calling api.motherduck.com or MotherDuck MCP admin tools to provision service accounts, manage tokens, configure Ducklings, or mint Dive embed sessions. Not for SQL or data-plane query work.",
     "layer": "utility",
     "depends_on": [],
     "references": [
