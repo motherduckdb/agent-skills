@@ -2,6 +2,29 @@
 
 Reference for creating, editing, managing, sharing, embedding, and polishing MotherDuck Dives. Use this for the practical mechanics after `motherduck-create-dive` has selected the right workflow.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| 1. What a Dive Is | When a Dive fits and when it does not |
+| 2. Workflow Selection | Choosing workspace, edit, code, or embed paths |
+| 3. Authoring Workflow | End-to-end build steps, `get_dive_guide` ordering |
+| 4. Component Contract | Required component shape and runtime libraries |
+| 5. Required Resources and Shared Data | `REQUIRED_DATABASES`, metadata, share aliases |
+| 6. Editing Existing Dives | MCP and SQL-function edit/version paths |
+| 7. Dives as Code | Git repo layout, preview, CI/CD deploy |
+| 8. Embedding Dives | Embed sessions, iframe, CSP, server vs dual mode |
+| 9-10. Theming | Theme prompt template and gallery shortlist |
+| 11. Recharts Component Reference | Chart components and props |
+| 12. Tailwind Utilities | Commonly used classes |
+| 13. Loading State Patterns | Skeletons, spinners, error states |
+| 14-15. Multi-Query and Table Patterns | Independent queries, table rules |
+| 16. Color Usage | Series, text, background, delta colors |
+| 17. Interactive Filters | Period selectors, metric toggles |
+| 18-19. Formatting and Chart Choice | Number formats, chart-selection table |
+| 20. Common Failure Modes | What breaks Dives in practice |
+| 21. Complete Annotated Example | Full working component |
+
 ---
 
 ## 1. What a Dive Is
@@ -36,11 +59,11 @@ Always start from live schema exploration when MCP or another MotherDuck connect
 
 1. Explore databases, tables, columns, and representative rows.
 2. Validate the core SQL outside the Dive first.
-3. Call `get_dive_guide` when MCP is available so the current component API and runtime libraries are in scope.
+3. Call `get_dive_guide` when MCP is available so the current component API and runtime libraries are in scope. Never call `save_dive` or `update_dive` without having called `get_dive_guide` first in the session.
 4. Design the data story: primary question, sections, filters, and interaction model.
 5. Build a React component with `useSQLQuery`, a default export, safe value conversion, and per-query loading/empty/error states.
 6. Preview locally when possible.
-7. Save or update only after the queries and UI behavior are correct.
+7. Call `save_dive` or `update_dive` only after the queries and UI behavior are correct.
 8. Share data or configure embed sessions only after the saved Dive works.
 
 Prefer incremental edits. A saved Dive can be updated in place, and every content update creates a version.

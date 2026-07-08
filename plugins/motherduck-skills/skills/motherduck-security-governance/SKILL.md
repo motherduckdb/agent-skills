@@ -1,6 +1,6 @@
 ---
 name: motherduck-security-governance
-description: Explain MotherDuck security, governance, and access-control patterns. Use when a security_compliance_owner, technical_owner, or application_builder is asking about residency, access boundaries, service accounts, isolation, sharing, or governance posture.
+description: Explain MotherDuck security, governance, and access-control patterns. Use for any question about SOC 2, GDPR, compliance, data residency, regions, SSO, service accounts, token handling, tenant isolation, sharing boundaries, snapshots and recovery, or governance posture — including when a security_compliance_owner, technical_owner, or application_builder is evaluating MotherDuck.
 license: MIT
 ---
 
@@ -34,7 +34,7 @@ Use this skill when the user is evaluating whether MotherDuck can meet their sec
 
 ## Open Next
 
-- `references/SECURITY_GOVERNANCE_PLAYBOOK.md` for public security anchors, service-account posture, residency framing, sharing boundaries, and what not to overstate
+- Read `references/SECURITY_GOVERNANCE_PLAYBOOK.md` for public security anchors, service-account posture, residency framing, sharing boundaries, and what not to overstate
 
 ## Related Skills
 

@@ -87,5 +87,8 @@ jobs:
       - name: Verify packaged Claude plugin matches source skills
         run: uv run scripts/check_claude_plugin_sync.py
 
+      - name: Verify packaged Codex plugin matches source skills
+        run: uv run scripts/check_codex_plugin_sync.py
+
       - name: Build Gemini extension archive
         run: python3 scripts/package_gemini_extension.py

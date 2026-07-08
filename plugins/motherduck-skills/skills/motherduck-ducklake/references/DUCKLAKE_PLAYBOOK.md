@@ -2,7 +2,21 @@
 
 Use this reference when the question is no longer "what is DuckLake?" but "should we use it here, and if so, how?"
 
-Upstream DuckLake v1.0 is a production-ready lakehouse specification and DuckDB 1.5.2 includes support for DuckLake v1.0. MotherDuck has announced managed DuckLake 1.0 support, but the MotherDuck DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
+## Contents
+
+| Section | Covers |
+|---|---|
+| MotherDuck-first position | When native storage stays the default |
+| Choose the mode deliberately | Fully managed vs BYOB vs own compute |
+| Default decision rules | Native-vs-DuckLake heuristics |
+| SQL patterns | CREATE DATABASE options, BYOB, metadata attach |
+| Data inlining posture | When inlining helps and how to flush |
+| Maintenance is explicit | Compaction, CHECKPOINT, ownership of upkeep |
+| Sharing and write constraints | Share limits and single-writer realities |
+| Gotchas | Common DuckLake mistakes |
+| Escalate to higher-level skills | When another skill owns the question |
+
+Upstream DuckLake v1.0 is a production-ready lakehouse specification supported by current DuckDB releases (verify the exact version matrix in current docs). MotherDuck has announced managed DuckLake 1.0 support, but the MotherDuck DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
 
 ## MotherDuck-first position
 

@@ -2,6 +2,17 @@
 
 Reference for discovering databases, tables, columns, views, shares, and data quality signals in MotherDuck.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| Language Focus | Python vs TypeScript/JavaScript starters |
+| Exploration Workflow (Steps 1-5) | Databases, tables/views, columns, `SUMMARIZE`, previews |
+| Working with Shares | Listing, attaching, refreshing, querying shares |
+| MCP Tools Available | MotherDuck MCP tool table and `query_rw` boundaries |
+| Advanced Exploration Patterns | Pattern search, type search, row counts, nested types |
+| Key Rules / Common Mistakes | Hard rules and failure patterns |
+
 ## Language Focus
 
 - Prefer **Python** when exploration is part of notebook work, profiling source data before modeling, or batch validation scripts.

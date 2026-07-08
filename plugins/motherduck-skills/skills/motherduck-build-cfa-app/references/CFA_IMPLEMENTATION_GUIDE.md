@@ -7,6 +7,23 @@ Use this skill when embedding analytics directly into your product for external 
 
 This is a use-case skill. It ties together `motherduck-connect`, `motherduck-model-data`, `motherduck-query`, `motherduck-load-data`, and `motherduck-explore` into a production architecture.
 
+## Contents
+
+- [Source Of Truth](#source-of-truth)
+- [Verified Delivery Defaults](#verified-delivery-defaults)
+- [Validation Signals](#validation-signals)
+- [Language Focus: TypeScript/Javascript and Python](#language-focus-typescriptjavascript-and-python)
+- [Prerequisites](#prerequisites)
+- [What Is Customer-Facing Analytics](#what-is-customer-facing-analytics)
+- [Choose an Architecture](#choose-an-architecture)
+- [Step-by-Step: Build a 3-Tier CFA App](#step-by-step-build-a-3-tier-cfa-app)
+- [Hypertenancy Explained](#hypertenancy-explained)
+- [Read Scaling Deep Dive](#read-scaling-deep-dive)
+- [Security](#security)
+- [Key Rules](#key-rules)
+- [Common Mistakes](#common-mistakes)
+- [Related Skills](#related-skills)
+
 ## Source Of Truth
 
 - Prefer current MotherDuck docs for service accounts, connection paths, read scaling, and the Hypertenancy product guidance.
@@ -167,15 +184,6 @@ Use a consistent naming convention: `customer_<slug>` for database names. This m
 ### Step 2: Create Service Accounts
 
 Create service accounts per customer or per workload boundary when isolation, sizing, or revocation blast radius matters. Service accounts can be created in the MotherDuck UI or programmatically via the Admin API.
-
-### TypeScript backend shape
-
-For Node.js or TypeScript services, use a backend-only pattern:
-
-- authenticate the end user in your app
-- map the user to the correct customer database or service account
-- execute DuckDB SQL from the server
-- never expose MotherDuck tokens in the browser
 
 1. Go to **MotherDuck UI > Settings > Service Accounts**.
 2. Create a service account for each customer (e.g., `svc_acme`, `svc_globex`).
@@ -381,7 +389,7 @@ Per-customer databases are the foundation of CFA security. Follow these rules wi
 
 - **Use the 3-tier architecture for production CFA.** Backend API between browser and MotherDuck. No exceptions for customer-facing products.
 - **One database per customer for isolation.** This is a security requirement. Do not use a single database with `tenant_id` filtering for CFA.
-- **Use the PG endpoint for backend connectivity.** It works with any PostgreSQL driver. No DuckDB installation needed on the backend.
+- **Pick the connection path by backend shape.** Native DuckDB (`md:`) when the backend needs direct MotherDuck control; the PG endpoint when the stack already runs PostgreSQL drivers or installing DuckDB is impractical.
 - **Use Read Scaling tokens for concurrent reads.** Reserve Read/Write tokens for data ingestion only.
 - **Keep serving tables lean and pre-aggregated.** Do not push raw multi-billion-row scans through end-user request paths if a curated serving table can answer the question.
 - **Never expose service tokens to the frontend.** Tokens live in the backend. The browser never sees them.

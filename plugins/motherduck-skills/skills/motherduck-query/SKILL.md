@@ -10,8 +10,8 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 
 ## Prerequisites
 
-- MotherDuck connection established via `motherduck-connect`
-- Target database and tables identified via `motherduck-explore`
+- An established MotherDuck connection (or an active MotherDuck MCP server)
+- Target database and tables identified
 
 ## Default Posture
 
@@ -20,7 +20,7 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 - Preserve the intended grain of every result set; state the grain before optimizing or materializing a query.
 - Filter early, aggregate early, and prefer serving tables or summaries for repeated reads.
 - Keep SQL obvious, multi-line, and explicit about grain, filters, and output shape.
-- Treat DDL, DML, `ATTACH`, `DETACH`, recovery commands such as `CREATE SNAPSHOT`, `ALTER DATABASE ... SET SNAPSHOT`, `UNDROP DATABASE`, and lifecycle commands such as `SHUTDOWN` as writes. Use MCP `query_rw` only when the user explicitly asks for the change and confirms it.
+- Treat DDL, DML, `ATTACH`, `DETACH`, recovery commands such as `CREATE SNAPSHOT`, `ALTER DATABASE ... SET SNAPSHOT`, `UNDROP DATABASE`, and lifecycle commands such as `SHUTDOWN` as writes. Use the MotherDuck MCP `query_rw` tool only when the user explicitly asks for the change and confirms it.
 - Tag long-lived integrations with `custom_user_agent` when the connection path supports it.
 
 ## Workflow
@@ -33,7 +33,7 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 
 ## Open Next
 
-- `references/QUERY_PLAYBOOK.md` for DuckDB query patterns, exploration SQL, performance rules, common analytical shapes, and common mistakes
+- Read `references/QUERY_PLAYBOOK.md` for DuckDB query patterns, exploration SQL, performance rules, common analytical shapes, and common mistakes
 
 ## Related Skills
 

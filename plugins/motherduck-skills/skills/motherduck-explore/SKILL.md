@@ -10,14 +10,14 @@ Use this skill when you need to discover what databases, tables, and columns exi
 
 ## Prerequisites
 
-- Establish a MotherDuck connection first via `motherduck-connect`.
+- An established MotherDuck connection (or an active MotherDuck MCP server)
 
 ## Default Posture
 
 - Explore top-down: databases, then tables/views, then columns, then statistics, then sample rows.
 - Use fully qualified table names once more than one database is attached.
 - Check shared databases before concluding that data is unavailable.
-- Use MCP exploration tools when available because they return structured results faster than ad hoc SQL.
+- Use the MotherDuck MCP tools (`list_databases`, `list_tables`, `list_columns`, `search_catalog`) when available because they return structured results faster than ad hoc SQL.
 - Return a concise schema map with table grain, join keys, date columns, and likely measures before moving into modeling or dashboard work.
 
 ## Workflow
@@ -30,7 +30,7 @@ Use this skill when you need to discover what databases, tables, and columns exi
 
 ## Open Next
 
-- `references/EXPLORATION_PLAYBOOK.md` for the full SQL workflow, share discovery patterns, MCP tool guidance, and common exploration mistakes
+- Read `references/EXPLORATION_PLAYBOOK.md` for the full SQL workflow, share discovery patterns, MCP tool guidance, and common exploration mistakes
 
 ## Related Skills
 

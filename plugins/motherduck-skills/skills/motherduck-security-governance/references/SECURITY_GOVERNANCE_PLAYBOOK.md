@@ -2,6 +2,21 @@
 
 Reference for discussing MotherDuck security posture, access-control boundaries, residency framing, and governance-safe architecture defaults.
 
+## Contents
+
+| Section | Covers |
+|---|---|
+| SQL Review Checks | Queries that verify the claimed governance boundary |
+| Secure Defaults | Service accounts, credentials, isolation posture |
+| Publicly Documented Security Anchors | SOC 2, GDPR, service accounts, shares, SSO, recovery |
+| Governance Checklist | Questions every design must answer |
+| Region and Residency Guidance | Region availability vs residency vs contracts |
+| Product-Specific Patterns To Prefer | Hypertenancy, per-boundary service accounts, read tokens |
+| Dives and Sharing Guidance | Share vs Dive vs application boundaries |
+| SSO Guidance | Plan gating, verified domains, IdP rollout |
+| Recovery and Retention Guidance | Snapshots, restore windows, UNDROP DATABASE |
+| What Not To Overstate | Compliance claims requiring commercial confirmation |
+
 ## When To Use
 
 - The user asks about residency, isolation, access control, auditing, sharing, or governance.
@@ -89,15 +104,6 @@ If the design claims governed distribution, also ask:
 
 If the user is really asking for a residency guarantee or legal assurance, direct them to current Trust & Security materials and the account/security channel rather than improvising.
 
-## Topics This Skill Should Cover
-
-- service accounts and token handling
-- SSO and organization login controls
-- database-level isolation vs shared-database tradeoffs
-- regional endpoint selection
-- share and Dive sharing boundaries
-- governance implications of app architecture choices
-
 ## Product-Specific Patterns To Prefer
 
 - Hypertenancy for strong per-customer or per-user compute isolation
@@ -124,7 +130,7 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 ## Recovery and Retention Guidance
 
 - Treat recovery posture as a governance requirement when the user asks about rollback, deletion recovery, audit readiness, or operational resilience.
-- Verify the plan-specific retention window before promising a recovery target; Business supports configurable retention up to 90 days, while lower tiers have narrower documented defaults.
+- Verify the plan-specific retention window before promising a recovery target; current docs give Business configurable retention up to 90 days, with narrower defaults on lower tiers.
 - Use named snapshots for explicit restore points that should survive automatic snapshot garbage collection.
 - `UNDROP DATABASE` can recover dropped databases only within the documented recovery window.
 

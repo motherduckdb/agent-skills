@@ -2,6 +2,24 @@
 
 Reference for analytical schema design, data-type selection, CTAS and view patterns, complex types, and DuckDB constraint behavior in MotherDuck.
 
+## Contents
+
+| Section | Covers |
+| --- | --- |
+| SQL-First Modeling Posture | Explicit, reviewable SQL as the model definition |
+| Schema Design Principles | OLAP-first defaults: wide tables, comments, qualified names |
+| `CREATE TABLE` Patterns | DDL, CTAS, `CREATE OR REPLACE`, comments |
+| Data Type Selection Guide | Recommended types per use case |
+| Schema Organization | Multi-database lifecycle pattern, schema usage |
+| Analytical Modeling Patterns | Wide denormalized, star schema, materialized summaries |
+| Views vs Tables | Decision guide for views vs CTAS materialization |
+| Complex Types for Semi-Structured Data | STRUCT, LIST, MAP, JSON selection |
+| `ALTER TABLE` Patterns | Column add/drop/rename |
+| Constraints | What MotherDuck enforces (`NOT NULL` only) |
+| Key Rules | Modeling defaults in one list |
+| Project Scaffold Conventions | File naming, `model_manifest.yml` format, framework mapping |
+| Common Mistakes | Frequent modeling errors |
+
 ## SQL-First Modeling Posture
 
 - Keep model definitions as explicit SQL DDL or CTAS statements, not dynamic code generation.
