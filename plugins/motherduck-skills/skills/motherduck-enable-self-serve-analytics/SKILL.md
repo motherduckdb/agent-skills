@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-quer
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this first.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the user has not named the target database, ask which database or workspace will power the rollout.
+- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the rollout.
 - Explore the live data model before defining the rollout:
   - trusted source tables
   - candidate curated views
@@ -25,14 +23,7 @@ Always determine this first.
 
 Use the actual data model to pick the first audience and first asset.
 
-If no server is active, ask for a table list and target audience before drafting the rollout.
-
-## Use This Skill When
-
-- The user wants internal teams to answer their own questions.
-- The user needs a first rollout plan for Dives, dashboards, or shares.
-- The user needs adoption plus governance, not just chart creation.
-- The audience is internal; for external users or embedded product analytics, use `motherduck-build-cfa-app`.
+If no server is active, use any supplied schema and audience context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
 
 ## Rollout Defaults
 
@@ -44,7 +35,7 @@ If no server is active, ask for a table list and target audience before drafting
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied schema context.
 2. Inspect the data model that internal teams would use.
 3. Pick the first audience and first use case.
 4. Publish one trusted dataset.
@@ -52,7 +43,9 @@ If no server is active, ask for a table list and target audience before drafting
 6. Publish one Dive or one share.
 7. Expand only after the first workflow is stable.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested rollout artifacts; build or change work creates the requested in-scope dataset, Dive, or share and validates it. Ask before broader access grants, destructive changes, or external writes not already authorized.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

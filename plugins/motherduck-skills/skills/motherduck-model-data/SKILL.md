@@ -6,11 +6,9 @@ license: MIT
 
 # Model Data in MotherDuck
 
-Use this skill when creating data models, tables, designing schemas, choosing data types, defining relationships between tables, or restructuring data for analytical workloads.
-
 ## Core Behavior
 
-**When a user asks questions like "build a data model", "model my data", or "create a transformation layer", the default output is a file-based project scaffold — not just SQL executed directly in the warehouse.**
+For multi-model or transformation-layer work, default to a file-based project scaffold rather than warehouse-only SQL execution.
 
 The project scaffold includes:
 
@@ -33,8 +31,6 @@ This is a lightweight framework-agnostic convention for organizing SQL transform
 - Use `NOT NULL` aggressively; do not assume primary keys or foreign keys are enforced.
 - Reuse an existing dbt, SQLMesh, or repo-local modeling convention when one is already present; create the lightweight scaffold only when there is no established project shape.
 - Separate `raw`, `staging`, and `analytics` lifecycle stages when the project is non-trivial.
-- Always produce SQL files — never execute transformations directly in the warehouse without first writing them to files.
-- Always produce a manifest — every model must declare its dependencies so the DAG is explicit and reproducible.
 
 ## Workflow
 
@@ -43,7 +39,7 @@ This is a lightweight framework-agnostic convention for organizing SQL transform
 3. Create the project directory structure with SQL files and manifest.
 4. Author each model as a standalone SQL file. Use explicit types, nullability, comments, and fully qualified names. Decide between a table, CTAS rebuild, or view based on freshness and cost.
 5. Fill in the manifest with model metadata: name, path, stage, materialization, database, and `depends_on` references.
-6. Run the models against the warehouse and verify the resulting tables match expected grain and row counts. If MCP is the runner, DDL or CTAS execution uses `query_rw` only after explicit user approval; the default deliverable remains checked-in SQL files plus the manifest.
+6. When the request includes implementation, run the models and verify that the resulting tables match the expected grain and row counts. If MCP is the runner, use `query_rw` because DDL and CTAS are writes; the user's implementation request authorizes in-scope execution. For answer, review, or planning requests, keep the deliverable to SQL files plus the manifest and do not mutate the warehouse.
 
 ## Expected Project Structure
 

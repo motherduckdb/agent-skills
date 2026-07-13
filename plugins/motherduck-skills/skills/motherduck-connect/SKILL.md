@@ -28,6 +28,8 @@ Use this skill when establishing database connectivity from any application, scr
 
 Pick the connection method (above) and the runtime separately. The runtime is what actually executes queries: an MCP server, a Python script, a Node script, or the DuckDB CLI.
 
+For answer, review, or planning requests, inspect the available runtimes and recommend a path without installing anything. Install or configure a runtime only when the user asks to connect, build, or change the application.
+
 Classify the workload first:
 
 - **Ad-hoc / exploration**: one-shot, interactive, may be discarded. No artifact ships.

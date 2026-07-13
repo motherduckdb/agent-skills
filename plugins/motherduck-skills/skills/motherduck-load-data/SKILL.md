@@ -42,6 +42,8 @@ Use this skill when the job is getting data into MotherDuck correctly and effici
 4. Validate row counts, types, and a few business aggregates immediately after the load.
 5. Promote into modeled tables only after the landing step is correct.
 
+For answer, review, or planning requests, recommend the loading path without mutating data. For load or implementation requests, perform the requested in-scope write and validation; ask before destructive replacement or a broader external write.
+
 ## Open Next
 
 - Read `references/INGESTION_PATTERNS.md` for format-specific options, cloud-storage secrets, Postgres-endpoint loading tradeoffs, Python dataframe paths, and advanced ingestion patterns.

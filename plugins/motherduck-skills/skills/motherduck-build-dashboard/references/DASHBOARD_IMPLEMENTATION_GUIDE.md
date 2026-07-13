@@ -135,7 +135,7 @@ export default function MonthlyRevenueDashboard() {
 ```python
 import duckdb
 
-USE_CASE_USER_AGENT = "agent-skills/2.3.0(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.4.0(harness-<harness>;llm-<llm>)"
 
 conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 rows = conn.sql("""

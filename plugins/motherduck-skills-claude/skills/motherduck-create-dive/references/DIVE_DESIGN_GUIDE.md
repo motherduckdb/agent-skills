@@ -80,7 +80,7 @@ Every Dive component should have:
 - safe value conversion for unknown query values
 - loading, empty, and error states for each independent query
 
-Supported runtime libraries currently include React, `@motherduck/react-sql-query`, Recharts, and `lucide-react`. Verify with `get_dive_guide` before relying on a newly added library.
+The included examples use React, `@motherduck/react-sql-query`, Recharts, and `lucide-react`. Treat `get_dive_guide` as authoritative for the supported runtime libraries before generating or updating code.
 
 Use this baseline shape:
 
@@ -223,7 +223,7 @@ Deployment scripts should read source from the Dive folder, strip local-only `RE
 
 Use embedding when an existing application needs a live read-only Dive surface without building a full custom analytics app.
 
-Current public materials say ordinary Dives are available on all plans, while Embedded Dives require a Business plan. Verify plan access before promising an embed rollout.
+Verify ordinary-Dive and embedded-Dive entitlements against current public docs before promising an embed rollout. Do not carry plan names or availability claims forward from this reference.
 
 Embedding flow:
 

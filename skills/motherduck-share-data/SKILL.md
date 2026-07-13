@@ -42,6 +42,8 @@ Use this skill when you need to distribute a MotherDuck database without copying
 5. Have recipients `ATTACH` the shared database and query it read-only.
 6. If the share uses `UPDATE MANUAL`, the owner runs `UPDATE SHARE` and consumers run `REFRESH DATABASE` when a new snapshot is ready.
 
+For answer, review, or planning requests, return the sharing design and SQL without provisioning. For create, update, grant, or revoke requests, perform the requested in-scope operation and validate the resulting access; ask before public exposure, destructive revocation, or unrelated grants.
+
 ## Open Next
 
 - Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, access/update decision matrix, consumer workflow, and common failure modes.

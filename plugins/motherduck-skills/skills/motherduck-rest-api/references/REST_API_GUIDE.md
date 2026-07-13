@@ -58,7 +58,7 @@ Operational rules:
 | Delete token | `invalidate_access_token` | `DELETE /v1/users/{username}/tokens/{token_id}` | Use token `id`, not the secret. |
 | Get Duckling config | `get_duckling_config` | `GET /v1/users/{username}/instances` | Requires admin role. |
 | Set Duckling config | `set_duckling_config` | `PUT /v1/users/{username}/instances` | Requires both `read_write` and `read_scaling`. |
-| Get active accounts | — | `GET /v1/active_accounts` | Preview endpoint. |
+| Get active accounts | — | `GET /v1/active_accounts` | Verify lifecycle status and response shape in the current OpenAPI spec. |
 | Create Dive embed session | `create_dive_embed_session` | `POST /v1/dives/{dive_id}/embed-session` | Requires service-account `username`; optional `session_hint`. |
 
 ## Service Account Provisioning
@@ -239,7 +239,7 @@ Duckling fields:
 - `type`: `read_write` or `read_scaling`
 - `status`: `active` or `cooldown`
 
-The public OpenAPI spec marks this endpoint as preview, so avoid building brittle operational automation around response details without checking current docs.
+Check the current OpenAPI spec for this endpoint's lifecycle status and response shape before building operational automation around it.
 
 ## Dive Embed Sessions
 
@@ -258,7 +258,7 @@ Request fields:
 - `username`: required service account username within the organization
 - `session_hint`: optional non-empty hint used to reuse the same read-scaling session across embed requests
 
-Embedded Dives require a Business plan (ordinary Dives are available on all plans); verify plan requirements against current docs. Organizations without embed access should expect a `403`.
+Verify embedded-Dive entitlements against current docs. An organization without embed access may receive `403`; preserve the actual status and response body rather than assuming the cause.
 
 The response contains an opaque `session` string backed by a short-lived read-scaling token that runs as the service account. Treat it as a runtime credential:
 

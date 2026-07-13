@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-load
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this first.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the user already knows the destination database, confirm it before designing stages.
+- If the user names the destination database, use it without adding a confirmation step.
 - Explore the live environment:
   - current databases and schemas
   - raw, staging, and analytics boundaries if they already exist
@@ -28,14 +26,7 @@ Use that discovery to decide whether the pipeline is:
 - extending an existing warehouse layout
 - publishing into an existing analytics model
 
-If no server is active, ask for source shape and target shape before drafting the pipeline.
-
-## Use This Skill When
-
-- The user needs ingestion plus transformation plus serving output.
-- The work spans raw landing, curation, and publication.
-- The user needs a stage-by-stage pipeline pattern rather than one command.
-- The problem is bigger than a single import step or one ad hoc transformation.
+If no server is active, use any supplied source and target context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
 
 ## Pipeline Defaults
 
@@ -49,7 +40,7 @@ If no server is active, ask for source shape and target shape before drafting th
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied source and target context.
 2. Inspect the current workspace and target data model.
 3. Define raw, staging, and analytics boundaries.
 4. Ingest raw data.
@@ -57,7 +48,9 @@ If no server is active, ask for source shape and target shape before drafting th
 6. Materialize analytics-ready outputs.
 7. Validate counts, freshness, uniqueness, and business metrics before publishing downstream assets.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested pipeline artifacts; build or change work creates the requested in-scope files and warehouse objects and validates them. Ask before destructive actions, unrelated external writes, or a material expansion of scope.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 
@@ -129,7 +122,7 @@ uv run python pipeline/cleanup.py
 ## Verified Notes
 
 - Bootstrap the target MotherDuck database before running `dlt`. The `motherduck` destination does not create the database for you.
-- Keep this stack on Python 3.11 or 3.12 for now. The tested `dbt-duckdb` path here was not reliable on Python 3.14.
+- Use Python 3.11 or 3.12 to reproduce this reference project; its tested `dbt-duckdb` path did not run reliably on Python 3.14.
 - If you want exact schema names like `raw`, `staging`, and `analytics` in dbt, override `generate_schema_name`.
 - When a long-lived Python process loads data and a separate `dbt` subprocess builds models, run post-build validation in a fresh process or refresh database state before reading new relations.
 

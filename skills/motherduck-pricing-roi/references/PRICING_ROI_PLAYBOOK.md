@@ -64,7 +64,7 @@ Use this when the team needs to answer:
 
 Important:
 
-- `QUERY_HISTORY` is currently a Business-plan, admin-only, preview feature
+- verify `QUERY_HISTORY` availability, required role, and lifecycle status against current docs before relying on it
 - this is an internal accounting pattern, not a native MotherDuck chargeback feature
 
 ### Tagging convention
@@ -222,20 +222,11 @@ This is especially important when the user is confused by:
 
 ## Public Pricing Structure To Reference
 
-The public pricing page currently frames MotherDuck around:
-
-- Lite
-- Business
-- Enterprise
-- instance types: Pulse, Standard, Jumbo, Mega, Giga
-- optional read-scaling replicas
-- snapshot retention, query history, and plan-specific commercial features
-
-Use the current pricing page for exact numbers. Do not hardcode numbers in durable answers unless you have verified them in the current turn.
+Use the live pricing page to identify the current plan names, instance classes, read-scaling options, retention, query-history access, and commercial features. Do not carry labels, entitlements, or numbers forward from this reference; quote them only after verification in the current turn.
 
 ## Compute and Storage Realities To Call Out
 
-- Pulse is usage-based and fits bursty or smaller read-heavy work well.
+- Map the current entry-level and capacity options to the workload shape only after verifying their billing model and limits.
 - Standard, Jumbo, Mega, and Giga are wall-clock metered instance types with cooldown behavior. Their cooldown periods are configurable from 1 minute to 24 hours; Pulse does not accept `cooldown_seconds`.
 - For batch or CI/CD workloads, `SHUTDOWN` can skip idle cooldown after work completes, while `SHUTDOWN TERMINATE` force-stops running work. Both still have the documented minimum billing period.
 - Storage billing is for compressed MotherDuck-managed storage plus retained recoverability windows, not just the current visible table size.
@@ -281,9 +272,9 @@ Frame ROI with concrete categories:
 
 Plan names, entitlements, and SLA figures change; verify against the live pricing page before quoting any of these in a durable answer.
 
-- Business is publicly positioned for production analytics, with more users, unlimited service accounts, read-scaling replicas, 90-day snapshot retention, query history, support from MotherDuck experts, and a 99.9% availability SLA.
-- Current public materials say Dives are available on all plans, while Embedded Dives are positioned as Business-plan functionality.
-- Enterprise is publicly positioned for larger-scale deployments with custom commercial terms, fixed-cost capacity pricing, and AWS PrivateLink connectivity.
+- Verify which current plan covers production analytics, service accounts, read scaling, retention, query history, support, and SLA requirements.
+- Verify ordinary-Dive and embedded-Dive entitlements separately.
+- Verify which current commercial path covers custom terms, fixed-cost capacity, or private connectivity.
 - Trust and compliance can matter to ROI because security review friction, support level, and procurement constraints affect total adoption cost.
 
 ## What Not To Do

@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-expl
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this first.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the user has not said which database backs the project, ask for the target database or workspace before designing the app.
+- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the design or execution.
 - Then inspect the live data model:
   - databases and schemas
   - tables and views
@@ -27,15 +25,7 @@ Always determine this first.
 
 Do not jump straight to an architecture diagram if live data discovery is available.
 
-If no server is active, ask for a representative schema excerpt or table list and keep assumptions explicit.
-
-## Use This Skill When
-
-- The user needs embedded or product-facing analytics.
-- Tenant isolation or blast radius matters.
-- Read concurrency and latency matter.
-- The project needs a backend contract, not just a Dive.
-- The requirement is stronger than an internal dashboard or a read-only embed.
+If no server is active, use any supplied schema or table context. For planning work, proceed with explicit assumptions when safe; ask for missing schema details only when they block a reliable result.
 
 ## Default Serving Choices
 
@@ -52,7 +42,7 @@ If no server is active, ask for a representative schema excerpt or table list an
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied schema context.
 2. Explore the actual data model that will back the app.
 3. Choose the serving pattern:
    - 3-tier app
@@ -65,7 +55,9 @@ If no server is active, ask for a representative schema excerpt or table list an
 6. Choose the connection path and read-scaling posture.
 7. Produce the implementation plan, API contract, and rollout sequence.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested architecture artifacts; build or change work creates the requested in-scope files or services and validates them. Ask before destructive actions, external writes not already requested, or a material expansion of scope.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

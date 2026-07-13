@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-expl
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this before writing a migration plan.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- Ask which MotherDuck database or workspace will receive the migration if the user has not specified it.
+- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the migration.
 - Explore the live target side first when available:
   - existing databases and schemas
   - current landing zones
@@ -31,14 +29,7 @@ Also capture the source-side shape:
 - validation keys
 - serving workloads after cutover
 
-If no server is active, ask for representative source and target schemas before finalizing the migration plan.
-
-## Use This Skill When
-
-- The user is moving from Snowflake, Redshift, Postgres, or similar.
-- The user needs cutover sequencing and validation.
-- The user needs to decide between native MotherDuck, `pg_duckdb`, or DuckLake.
-- The migration plan needs rollback, not just a list of copy commands.
+If no server is active, use any supplied source and target context. For planning work, proceed with explicit assumptions when safe; ask for missing schema details only when they block a reliable result.
 
 ## Migration Defaults
 
@@ -50,7 +41,7 @@ If no server is active, ask for representative source and target schemas before 
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied source and target context.
 2. Classify the source system and the target serving pattern.
 3. Inspect the target-side MotherDuck layout if available.
 4. Pick the connection and ingestion path.
@@ -59,7 +50,9 @@ If no server is active, ask for representative source and target schemas before 
 7. Run source-vs-target validation.
 8. Cut over one workload at a time.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested migration artifacts; build or change work executes only the requested in-scope migration slice and validates it. Require confirmation for cutover, destructive source changes, or external writes not already authorized.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

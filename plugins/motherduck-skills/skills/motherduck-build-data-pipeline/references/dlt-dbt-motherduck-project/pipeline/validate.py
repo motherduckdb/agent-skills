@@ -22,6 +22,7 @@ EXPECTED_SUMMARY = [
 
 def validate_pipeline() -> None:
     settings = load_settings()
+    database = f'"{settings.database}"'
 
     conn = duckdb.connect(
         f"md:{settings.database}",
@@ -32,18 +33,18 @@ def validate_pipeline() -> None:
     )
     try:
         counts = conn.sql(
-            """
+            f"""
             SELECT
-                (SELECT count(*) FROM "raw"."customers_raw") AS raw_customers,
-                (SELECT count(*) FROM "raw"."orders_raw") AS raw_orders,
-                (SELECT count(*) FROM "staging"."stg_orders") AS staged_orders,
-                (SELECT count(*) FROM "analytics"."fct_customer_revenue") AS mart_rows
+                (SELECT count(*) FROM {database}."raw"."customers_raw") AS raw_customers,
+                (SELECT count(*) FROM {database}."raw"."orders_raw") AS raw_orders,
+                (SELECT count(*) FROM {database}."staging"."stg_orders") AS staged_orders,
+                (SELECT count(*) FROM {database}."analytics"."fct_customer_revenue") AS mart_rows
             """
         ).fetchone()
         assert counts == (3, 6, 4, 3), counts
 
         summary = conn.sql(
-            """
+            f"""
             SELECT
                 customer_id,
                 customer_name,
@@ -52,7 +53,7 @@ def validate_pipeline() -> None:
                 order_count,
                 total_amount,
                 last_order_date
-            FROM "analytics"."fct_customer_revenue"
+            FROM {database}."analytics"."fct_customer_revenue"
             ORDER BY customer_id
             """
         ).fetchall()

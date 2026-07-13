@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 TS_CHECK_SCRIPT = Path(__file__).resolve().parents[1] / "ts_syntax_check.js"
+ROOT = Path(__file__).resolve().parents[2]
 TS_LANGUAGES = {"ts", "tsx", "typescript", "javascript", "js"}
 LANGUAGE_KINDS = {"ts": "TS", "tsx": "TSX", "javascript": "JS", "js": "JS"}
 
@@ -73,7 +74,7 @@ def _run_typescript_check(batch: list[dict[str, str]]) -> subprocess.CompletedPr
     with tempfile.TemporaryDirectory(prefix="md-skills-ts-") as temp_dir:
         temp_path = Path(temp_dir)
         subprocess.run(
-            ["npm", "install", "--silent", "--prefix", str(temp_path), "typescript"],
+            ["npm", "install", "--silent", "--prefix", str(temp_path), _locked_typescript_spec()],
             capture_output=True,
             text=True,
             timeout=60,
@@ -84,6 +85,19 @@ def _run_typescript_check(batch: list[dict[str, str]]) -> subprocess.CompletedPr
         existing_node_path = env.get("NODE_PATH")
         env["NODE_PATH"] = node_path if not existing_node_path else f"{node_path}{os.pathsep}{existing_node_path}"
         return _invoke_ts_checker(batch, env=env)
+
+
+def _locked_typescript_spec() -> str:
+    package_lock_path = ROOT / "package-lock.json"
+    package_lock = json.loads(package_lock_path.read_text())
+    version = (
+        package_lock.get("packages", {})
+        .get("node_modules/typescript", {})
+        .get("version")
+    )
+    if not isinstance(version, str) or not version:
+        raise RuntimeError(f"Could not find locked TypeScript version in {package_lock_path}")
+    return f"typescript@{version}"
 
 
 def _invoke_ts_checker(

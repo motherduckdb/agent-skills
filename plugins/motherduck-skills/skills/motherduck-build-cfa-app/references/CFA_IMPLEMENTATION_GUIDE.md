@@ -96,7 +96,7 @@ Use the 3-tier architecture for production CFA. The other options exist for spec
 Production CFA (recommended):
   Browser ──> Backend API ──> MotherDuck (per-customer databases)
 
-Lightweight dashboards only (<1GB per user):
+Lightweight dashboards with a device-tested data bound:
   Browser (DuckDB-Wasm) ──> MotherDuck
 
 Simple multi-tenant (weak isolation, low security):
@@ -120,7 +120,7 @@ Simple multi-tenant (weak isolation, low security):
 
 ### 1.5-Tier Architecture (DuckDB-Wasm)
 
-Use only when datasets are under 1GB per user and the use case is a lightweight, read-only dashboard. The browser runs DuckDB-Wasm and connects directly to MotherDuck. No backend needed, but data isolation is harder to enforce and datasets must be small enough for browser-side execution.
+Use only for a lightweight, read-only dashboard after testing the dataset, memory use, transfer size, and latency on representative target devices. The browser runs DuckDB-Wasm and connects directly to MotherDuck. No backend is needed, but data isolation is harder to enforce and the practical data bound depends on the browser and device.
 
 ### Embedded Dives
 
@@ -203,7 +203,7 @@ Native DuckDB gives full SQL support, cross-database queries, and no driver tran
 # Python backend example (FastAPI + duckdb)
 import duckdb
 
-CFA_USER_AGENT = "agent-skills/2.3.0(harness-<harness>;llm-<llm>)"
+CFA_USER_AGENT = "agent-skills/2.4.0(harness-<harness>;llm-<llm>)"
 
 def get_customer_connection(customer_db: str, customer_token: str):
     """Create a native DuckDB connection to a customer's MotherDuck database."""
@@ -380,7 +380,7 @@ Per-customer databases are the foundation of CFA security. Follow these rules wi
 - **Use service accounts with minimum permissions.** CFA query endpoints need Read Scaling tokens only. Do not use Read/Write tokens for serving queries.
 - **Never expose MotherDuck tokens to the frontend.** Tokens stay in the backend. The browser communicates with your API, which holds the tokens server-side.
 - **Validate all queries before execution.** Even with per-customer isolation, validate that incoming queries are well-formed and within allowed patterns. Use parameterized queries or an allowlist of query templates.
-- **Rotate tokens on a regular cadence.** Set expiration dates on all service tokens and rotate them every 90 days or sooner.
+- **Rotate tokens on an organization-defined cadence.** Set expiration dates on service tokens, automate rotation before expiry, and shorten the cadence where the risk model requires it.
 - **Revoke tokens immediately if compromised.** Use the MotherDuck UI to revoke tokens. Generate new tokens and update your secrets manager.
 
 ---

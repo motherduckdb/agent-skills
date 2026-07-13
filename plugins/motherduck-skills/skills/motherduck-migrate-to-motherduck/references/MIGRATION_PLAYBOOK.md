@@ -223,7 +223,7 @@ Do not recommend DuckLake by default when:
 - the user wants the simplest managed path
 - the team does not have a concrete interoperability or storage-ownership requirement
 
-MotherDuck's public DuckLake guidance currently distinguishes:
+Use the live MotherDuck DuckLake guidance to distinguish:
 
 - fully-managed DuckLake for the easiest start
 - bring-your-own-bucket DuckLake when storage must remain in the user's cloud
