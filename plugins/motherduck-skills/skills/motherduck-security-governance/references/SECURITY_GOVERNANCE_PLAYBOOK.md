@@ -95,7 +95,7 @@ If the design claims governed distribution, also ask:
 ## Region and Residency Guidance
 
 - Treat region and residency as first-class architectural constraints.
-- Verify current public region availability before answering. MotherDuck's public pricing page currently lists AWS `us-east-1` and AWS `eu-central-1`.
+- Verify current public region availability before answering; do not preserve a region list in durable guidance.
 - Distinguish clearly between:
   - region availability
   - data residency expectations
@@ -122,7 +122,7 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 ## SSO Guidance
 
 - Treat SSO as an organization-level authentication control, not a data-access boundary.
-- Current public docs place SSO on Business and Enterprise plans; verify the organization plan before proposing implementation work.
+- Verify the current SSO entitlement and organization requirements before proposing implementation work.
 - Confirm verified domains, IdP ownership, and domain conflicts before activation.
 - Once SSO is active for matching domains, users should expect to authenticate through the identity provider rather than unmanaged login paths.
 - If the user needs multi-org SSO behavior, verify current docs before committing; do not infer it from ordinary SAML or OIDC support.
@@ -130,7 +130,7 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 ## Recovery and Retention Guidance
 
 - Treat recovery posture as a governance requirement when the user asks about rollback, deletion recovery, audit readiness, or operational resilience.
-- Verify the plan-specific retention window before promising a recovery target; current docs give Business configurable retention up to 90 days, with narrower defaults on lower tiers.
+- Verify the plan-specific retention window before promising a recovery target; do not carry a plan name or day count forward from this reference.
 - Use named snapshots for explicit restore points that should survive automatic snapshot garbage collection.
 - `UNDROP DATABASE` can recover dropped databases only within the documented recovery window.
 

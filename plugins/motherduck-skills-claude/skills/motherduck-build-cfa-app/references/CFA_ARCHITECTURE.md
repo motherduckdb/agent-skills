@@ -281,7 +281,7 @@ For production, replace `new pg.Client()` with a per-customer `pg.Pool` for conn
 
 Use the 1.5-tier pattern only when ALL of these conditions are true:
 
-- Datasets are under 1GB per user.
+- The dataset, transfer size, and memory use pass tests on representative target devices.
 - The use case is a read-only dashboard (no writes from the browser).
 - You do not need strict, server-enforced data isolation.
 - You accept that the token is visible in the browser (lower security).
@@ -309,7 +309,7 @@ Use the 1.5-tier pattern only when ALL of these conditions are true:
 | Aspect | 1.5-Tier | 3-Tier |
 |---|---|---|
 | Latency | Ultra-low (local execution) | Low (network round-trip) |
-| Data size per user | <1GB practical limit | No practical limit |
+| Data size per user | Device-tested browser bound | Backend-managed; still validate serving-query limits |
 | Token security | Token visible in browser | Token stays on server |
 | Data isolation | Relies on per-user tokens | Per-database structural isolation |
 | Write support | Limited | Full |
@@ -341,7 +341,7 @@ Use the 1.5-tier pattern only when ALL of these conditions are true:
 
 ### Token Rotation Strategy
 
-Set 90-day expiration on all tokens. At day 80, generate a new token and store it in the secrets manager. At day 85, verify the application uses the new token. At day 90, the old token expires. Automate this with your secrets manager's rotation feature. Revoke compromised tokens immediately -- do not wait for expiration.
+Set an organization-defined expiration on every token. Generate and store the replacement before expiry, verify the application has switched, then revoke the old token. Automate this with the secrets manager's rotation feature. Revoke compromised tokens immediately rather than waiting for scheduled expiry.
 
 ---
 

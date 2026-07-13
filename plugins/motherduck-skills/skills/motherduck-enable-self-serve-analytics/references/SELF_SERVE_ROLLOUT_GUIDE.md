@@ -128,7 +128,7 @@ export default function TeamKpiView() {
 ```python
 import duckdb
 
-USE_CASE_USER_AGENT = "agent-skills/2.3.0(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.4.0(harness-<harness>;llm-<llm>)"
 
 conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 conn.sql("""
@@ -185,7 +185,7 @@ SELECT min(created_date) AS earliest,
 FROM "analytics"."main"."source_table";
 ```
 
-If the latest date is older than expected, confirm with the user before proceeding.
+If the latest date is older than expected, surface the freshness gap. Proceed with an explicit caveat only when the requested result remains meaningful; ask when the stale-data decision materially changes the rollout.
 
 ### Step 2: Publish The First Asset
 

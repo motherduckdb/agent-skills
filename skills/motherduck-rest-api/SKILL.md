@@ -30,12 +30,14 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 ## Workflow
 
 1. Identify whether the task is service-account provisioning, token management, Duckling sizing, active-account inspection, or Dive embedding.
-2. Confirm the admin token location and the target `username` or `dive_id`; never invent production identifiers.
+2. Resolve the admin token from the existing environment and identify the target `username` or `dive_id`; ask only when a required value cannot be discovered, and never invent production identifiers.
 3. Check token scope before calling token endpoints: users can create tokens for themselves, and admins can create tokens for service accounts, but admins cannot create tokens for other non-service-account members through the API.
 4. For Duckling config changes, read the current config first, then update both `read_write` and `read_scaling` because the `PUT` payload requires both.
 5. Preserve response fields that are only returned once, especially newly created token strings and embed session strings.
 6. Surface API errors by status and response body; do not hide `400`, `401`, `403`, `404`, or `500` responses behind success-shaped fallbacks.
 7. When the MotherDuck MCP server is connected, prefer its admin tools over raw HTTP. Call `get_user_admin_guide` first, or read the MCP column in `references/REST_API_GUIDE.md`.
+
+For answer, review, or planning requests, inspect and report without mutating the control plane. For create or update requests, perform the requested in-scope operation and verify the response; retain confirmation for destructive deletes or broader administrative changes.
 
 ## Open Next
 

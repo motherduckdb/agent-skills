@@ -11,21 +11,21 @@ Use this skill when the user needs Python to run *on MotherDuck* — on a schedu
 ## Source Of Truth
 
 - **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`. The guide defines the current authoring contract, runtime limits, and tool semantics.
-- Prefer current MotherDuck Flights docs over memory; the feature is in Preview and details shift.
+- Prefer current MotherDuck Flights docs over memory. Verify lifecycle status, runtime limits, and tool semantics instead of preserving them as durable prompt claims.
 - Without MCP, the same operations exist as SQL functions (`MD_CREATE_FLIGHT`, `MD_RUN_FLIGHT`, `MD_FLIGHTS()`, ...) that execute server-side on a MotherDuck connection. Parameter names differ slightly between the two surfaces; see the naming table in `references/FLIGHTS_GUIDE.md`.
 
 ## Default Posture
 
 - One Flight = one single-file Python script with `def main(): ...` and `if __name__ == "__main__": main()`. No CLI args — every knob comes from env vars via `config` (non-secret) or `TYPE flights` secrets (sensitive).
 - Connect with `duckdb.connect("md:")`; the runtime injects `MOTHERDUCK_TOKEN` automatically. Never hardcode a token in source, config, or requirements.
-- Always pin dependencies in `requirements_txt`, and pin `duckdb` to the latest MotherDuck-supported version (currently `duckdb==1.5.2`); an unpinned `duckdb` can install a release MotherDuck does not accept yet and fail at connect.
+- Always pin dependencies in `requirements_txt`. Resolve the highest MotherDuck-supported DuckDB version from `https://motherduck.com/docs/duckdb-versions.json` before authoring a new Flight; use the tested pin in the included templates only when reproducing those examples. An unpinned or unsupported `duckdb` can fail at connect.
 - Each secret param arrives as the env var `<secret_name>_<PARAM>`, not the bare param name. This is the single most common authoring mistake.
 - Bulk-load, never row-by-row: stage to `/tmp/` and `read_csv_auto`/`read_json_auto`/`read_parquet`, or one CTAS / `INSERT ... SELECT`. No `executemany()` against MotherDuck.
 - Make every run idempotent: `CREATE OR REPLACE TABLE` full refresh, partition `DELETE` + `INSERT`, or dlt `write_disposition="merge"` with a primary key. Bootstrap with `CREATE DATABASE IF NOT EXISTS` / `CREATE SCHEMA IF NOT EXISTS` so the first run succeeds on a fresh account.
 - Validate any config-supplied identifier (database, schema, table names) against `[A-Za-z_][A-Za-z0-9_]*` before interpolating it into DDL; bind all data values as `?` parameters.
 - Create the flight **without** a schedule first, trigger one on-demand run, read the logs, and only then attach `schedule_cron` (5-field cron, UTC).
 - For production, use a service-account token via `access_token_name` and keep its database permissions as narrow as the workload allows.
-- A Flight is sized for orchestration and light processing (2 cores, 16GB RAM, ~150GB scratch at `/tmp/`), not for crunching large tables in Python memory — push heavy compute into SQL.
+- Treat a Flight as orchestration and light processing, not a place to crunch large tables in Python memory. Push heavy compute into SQL and verify runtime capacity with `get_flight_guide` before sizing disk- or memory-intensive work.
 
 ## Workflow
 
@@ -35,6 +35,8 @@ Use this skill when the user needs Python to run *on MotherDuck* — on a schedu
 4. Create any required `TYPE flights` secret first, then `create_flight` with `name`, `source_code`, pinned `requirements_txt`, `config`, and secret names — no `schedule_cron` yet.
 5. `run_flight`, poll `list_flight_runs` until terminal, and read `get_flight_logs`. Iterate with `edit_flight_source` (surgical) or `update_flight` (full field replacement); each content change creates a new version.
 6. Once a run succeeds, set the schedule with `update_flight(schedule_cron = ...)` and tell the user the cron is UTC. Clear it later with `schedule_cron = ""`.
+
+For answer, review, or planning requests, do not create or schedule a Flight. For create or update requests, complete the requested in-scope deployment and on-demand validation; attaching a recurring schedule is authorized only when the request includes scheduling.
 
 ## Open Next
 

@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-quer
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this before designing the dashboard.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the target database is unclear, ask which database or workspace the dashboard should run against.
+- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the dashboard.
 - Explore the live data model before choosing the dashboard structure:
   - available tables and views
   - business grain
@@ -26,14 +24,7 @@ Always determine this before designing the dashboard.
 
 The discovered data model should determine the dashboard story and sections.
 
-If no server is active, ask for a table list or schema excerpt and make the assumptions visible.
-
-## Use This Skill When
-
-- The user wants KPIs plus trend and breakdown views in one artifact.
-- The result should be a saved, shareable Dive.
-- The work needs dashboard composition, not just chart mechanics.
-- The result is a workspace analytics surface, not a customer-facing product backend.
+If no server is active, use any supplied schema or table context. For planning work, proceed with explicit assumptions when safe; ask for missing schema details only when they block a reliable result.
 
 For lower-level Dive mechanics, use `motherduck-create-dive`.
 
@@ -48,14 +39,16 @@ For lower-level Dive mechanics, use `motherduck-create-dive`.
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied schema context.
 2. Explore the real schema and metrics first.
 3. Pick the dashboard story.
 4. Write one query per section.
 5. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before `save_dive` or `update_dive`.
-6. Save only after preview iteration is approved.
+6. When the request includes creating or updating the Dive, save after preview validation; do not add a second approval gate for the requested in-scope write.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested dashboard artifacts; build or change work creates or updates the requested in-scope Dive and validates it. Ask before destructive replacement, unrelated external writes, or a material expansion of scope.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

@@ -23,6 +23,8 @@ from _lib.codex import (
     use_case_skill_names,
 )
 from _lib.repo import ROOT
+
+
 REQUIRED_KEYS = [
     "summary",
     "assumptions",
@@ -48,7 +50,22 @@ def parse_json_output(raw: str, *, skill_name: str) -> dict:
         raise UseCaseTestError(f"{skill_name} returned invalid JSON: {exc}") from exc
 
 
-def run_use_case(env: dict[str, str], plugin_name: str, skill_name: str) -> dict[str, object]:
+def _tail(value: str | bytes | None, length: int = 1000) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        value = value.decode(errors="replace")
+    return value[-length:]
+
+
+def run_use_case(
+    env: dict[str, str],
+    plugin_name: str,
+    skill_name: str,
+    *,
+    model: str | None,
+    timeout_seconds: int,
+) -> dict[str, object]:
     prompt = (
         f"Use ${plugin_name}:{skill_name} to create a concise but concrete full use case. "
         "Ground it in real MotherDuck execution, preserve the skill's defaults and best practices, "
@@ -58,27 +75,46 @@ def run_use_case(env: dict[str, str], plugin_name: str, skill_name: str) -> dict
         output_path = Path(handle.name)
 
     start = time.perf_counter()
-    result = subprocess.run(
-        ["codex", "exec", "-C", str(ROOT), "-o", str(output_path), prompt],
-        text=True,
-        capture_output=True,
-        env=env,
-    )
-    elapsed = round(time.perf_counter() - start, 3)
-
-    entry: dict[str, object] = {
-        "skill": skill_name,
-        "elapsed_seconds": elapsed,
-        "exit_code": result.returncode,
-    }
-    if result.returncode != 0:
-        entry["stdout_tail"] = result.stdout[-1000:]
-        entry["stderr_tail"] = result.stderr[-1000:]
-        return entry
-
     try:
+        try:
+            command = ["codex", "exec", "--ignore-user-config"]
+            if model is not None:
+                command.extend(["--model", model])
+            command.extend(["-C", str(ROOT), "-o", str(output_path), prompt])
+            result = subprocess.run(
+                command,
+                text=True,
+                capture_output=True,
+                env=env,
+                timeout=timeout_seconds,
+            )
+        except subprocess.TimeoutExpired as exc:
+            return {
+                "skill": skill_name,
+                "model": model or "default",
+                "elapsed_seconds": round(time.perf_counter() - start, 3),
+                "exit_code": None,
+                "timed_out": True,
+                "timeout_seconds": timeout_seconds,
+                "stdout_tail": _tail(exc.stdout),
+                "stderr_tail": _tail(exc.stderr),
+            }
+
+        entry: dict[str, object] = {
+            "skill": skill_name,
+            "model": model or "default",
+            "elapsed_seconds": round(time.perf_counter() - start, 3),
+            "exit_code": result.returncode,
+        }
+        if result.returncode != 0:
+            entry["stdout_tail"] = _tail(result.stdout)
+            entry["stderr_tail"] = _tail(result.stderr)
+            return entry
+
         raw = output_path.read_text()
         payload = parse_json_output(raw, skill_name=skill_name)
+        if not isinstance(payload, dict):
+            raise UseCaseTestError(f"{skill_name} returned {type(payload).__name__}; expected a JSON object")
         missing = [key for key in REQUIRED_KEYS if key not in payload]
         if missing:
             raise UseCaseTestError(f"{skill_name} output missing keys: {missing}")
@@ -99,6 +135,16 @@ def main() -> int:
         nargs="*",
         help="Optional subset of use-case skill names to run. Defaults to all top-level use-case skills.",
     )
+    parser.add_argument(
+        "--model",
+        help="Optional Codex model override, for example gpt-5.6. Defaults to the account-supported model.",
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=int,
+        default=300,
+        help="Maximum seconds to allow each codex exec use-case invocation.",
+    )
     args = parser.parse_args()
 
     current_plugin_name = plugin_name()
@@ -108,10 +154,20 @@ def main() -> int:
     with IsolatedCodexHome(prefix="codex-usecase-home-") as (_, env):
         with CodexAppServer(env=env) as server:
             server.call("plugin/install", {"marketplacePath": str(MARKETPLACE), "pluginName": current_plugin_name})
-            results = [run_use_case(env, current_plugin_name, skill_name) for skill_name in selected_skills]
+            results = [
+                run_use_case(
+                    env,
+                    current_plugin_name,
+                    skill_name,
+                    model=args.model,
+                    timeout_seconds=args.timeout_seconds,
+                )
+                for skill_name in selected_skills
+            ]
 
     print(json.dumps(results, indent=2))
-    return 0
+    failed = [entry for entry in results if entry.get("exit_code") != 0]
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ Use this reference when the question is no longer "what is DuckLake?" but "shoul
 | Gotchas | Common DuckLake mistakes |
 | Escalate to higher-level skills | When another skill owns the question |
 
-Upstream DuckLake v1.0 is a production-ready lakehouse specification supported by current DuckDB releases (verify the exact version matrix in current docs). MotherDuck has announced managed DuckLake 1.0 support, but the MotherDuck DuckLake docs still define what is available on MotherDuck and currently label DuckLake as a preview product surface. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
+MotherDuck's current DuckLake docs define the supported specification versions, lifecycle status, and compatibility matrix. Verify those live rather than carrying a version or status forward from this reference. Treat DuckLake as an opt-in open-table-format path, not as the default storage posture for every analytical workload.
 
 ## MotherDuck-first position
 

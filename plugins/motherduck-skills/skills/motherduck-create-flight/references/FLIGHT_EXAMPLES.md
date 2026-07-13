@@ -24,7 +24,7 @@ Every template follows the same contract; preserve these when adapting:
 - `CREATE DATABASE IF NOT EXISTS` / `CREATE SCHEMA IF NOT EXISTS` bootstrap so the first run works on a fresh account.
 - Idempotent writes (merge, atomic `CREATE OR REPLACE`, or partition `DELETE` + `INSERT`) plus an append-only run ledger with `run_at TIMESTAMPTZ` first.
 - `print()`/`logging` to stdout (captured as run logs); exit non-zero on failure.
-- Pinned `requirements_txt` with `duckdb==1.5.2` (latest MotherDuck-supported release).
+- Pinned `requirements_txt` with the examples' tested `duckdb==1.5.2`. Before adapting a template for deployment, resolve the highest supported version from `https://motherduck.com/docs/duckdb-versions.json` and retest.
 
 ## Example: dlt Ingestion Flight
 

@@ -12,10 +12,8 @@ This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-expl
 
 ## Start Here: Is a MotherDuck Server Active?
 
-Always determine this first.
-
 - If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the delivery will run against an existing workspace, ask which client databases or workspaces are already in scope.
+- Discover the client databases or workspaces from the active context. Ask only when multiple plausible targets remain and the choice would materially change the delivery model.
 - Explore the live setup when available:
   - current client database boundaries
   - regional layout
@@ -24,14 +22,7 @@ Always determine this first.
 
 Use that discovery to decide what can be standardized and what must stay client-specific.
 
-If no server is active, ask for representative client patterns and regions before proposing the standard delivery model.
-
-## Use This Skill When
-
-- The user is delivering MotherDuck solutions across multiple clients.
-- The user needs region-aware, repeatable architecture.
-- The user needs standard provisioning with explicit client exceptions.
-- The goal is a reusable delivery pattern, not a one-off single-client implementation.
+If no server is active, use any supplied client and region context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
 
 ## Delivery Defaults
 
@@ -43,7 +34,7 @@ If no server is active, ask for representative client patterns and regions befor
 
 ## Workflow
 
-1. Confirm whether live MotherDuck discovery is available.
+1. Inspect the available MotherDuck server or supplied client context.
 2. Classify the client patterns.
 3. Inspect the existing regional and database layout if available.
 4. Standardize the architecture and provisioning path.
@@ -51,7 +42,9 @@ If no server is active, ask for representative client patterns and regions befor
 6. Document client-specific exceptions.
 7. Produce the handoff assets and validation checks.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+Match execution to the request: answer, review, or planning work returns the requested delivery artifacts; build or change work creates the requested in-scope templates or client assets and validates them. Ask before provisioning additional client environments, destructive changes, or external writes not already authorized.
+
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

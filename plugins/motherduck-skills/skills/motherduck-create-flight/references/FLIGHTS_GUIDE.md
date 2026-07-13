@@ -8,7 +8,7 @@ Condensed from the MotherDuck Flights docs (concepts, key tasks, MCP tool pages,
 | --- | --- |
 | What a Flight Is | Concept, execution model, when to use one |
 | Anatomy of a Flight | Fields: name, source, requirements, token, config, secrets, schedule |
-| Runtime Environment | CPU/RAM/disk, run sequence, shared-infra Preview caveat |
+| Runtime Environment | CPU/RAM/disk, run sequence, and lifecycle/isolation caveats to verify live |
 | Authentication | MOTHERDUCK_TOKEN injection, access token labels, service accounts |
 | Config vs Secrets | Env-var injection rules, the `<secret_name>_<PARAM>` gotcha |
 | Scheduling | UTC cron syntax, clearing schedules, schedule status |
@@ -43,16 +43,13 @@ Use a flight when a job should run unattended on MotherDuck, retry on a schedule
 
 Each run executes this sequence: allocate a Python runtime → inject `MOTHERDUCK_TOKEN`, config keys, and secret params as env vars → `pip install` the requirements → execute `main()` capturing stdout+stderr → record status and logs.
 
-The container is constrained:
+The container is constrained. Call `get_flight_guide` for the current CPU, memory, scratch-disk, timeout, and concurrency limits before sizing a workload. Prefer bounded concurrency, disk-buffered loading, and cleanup of `/tmp/` between batches.
 
-- **2 CPU cores** — a large thread pool will not speed things up.
-- **16GB RAM ceiling** — exceeding it kills the run. Prefer disk-buffered loading over holding datasets in memory.
-- **~150GB scratch disk at `/tmp/`** — use it for staging files and on-disk DuckDB databases; clean up between batches.
 - It is a Linux process: `subprocess` works, `apt-get install` of Debian packages works (git, ffmpeg, Playwright). dlt and similar tools that write under `HOME` should set `os.environ.setdefault("HOME", "/tmp")`.
 - DuckDB extensions can be installed inside the flight's *local* DuckDB process (`INSTALL postgres`, `INSTALL bigquery FROM community`) — the no-runtime-extension rule applies to MotherDuck's server-side engine, not to the flight container.
 - Python version, run timeout, and concurrency quotas are not publicly documented; treat long runs and parallel runs conservatively.
 
-**Preview caveat:** flights run on shared compute infrastructure across tenants. During Preview, do not process, store, or log ePHI, payment card data, or other regulated or sensitive personal data in flights.
+Before using Flights for regulated or sensitive data, verify the current lifecycle status, isolation model, and workload restrictions in the live Flights guide. Do not infer those guarantees from this reference.
 
 ## Authentication
 
@@ -145,10 +142,10 @@ Match the strategy to volume:
 | --- | --- |
 | < ~1K rows | Direct `INSERT` is fine. |
 | ~1K rows – ~50MB | Write CSV/JSON to `/tmp/`, bulk-load with `read_csv_auto` / `read_json_auto`; or accumulate a DataFrame and let DuckDB query it. O(1) memory. |
-| 50MB+ | Stage into a local on-disk DuckDB file (compressed, ~150GB scratch), flush in 10–100MB batches, then copy into MotherDuck. |
+| 50MB+ | Stage into a local on-disk DuckDB file, flush in bounded batches, then copy into MotherDuck; verify scratch capacity first. |
 | Very large / max throughput | Write Parquet to S3 and load from there (parallel reads); needs cloud credentials. |
 
-Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-trips (~50–100ms each), and uncompressed temp tables that blow the 16GB ceiling (if you must, `CHECKPOINT` periodically). Prefer one bulk multi-row `INSERT` with bound parameters when inserting from Python lists.
+Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-trips, and uncompressed temp tables that exceed the runtime memory limit. Prefer one bulk multi-row `INSERT` with bound parameters when inserting from Python lists.
 
 ## Ingestion and Transformation Patterns
 
@@ -173,10 +170,10 @@ Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-tr
 | --- | --- |
 | Run `FAILED`, non-zero `exit_code` | Python exception in `main()` — read `get_flight_logs` for the traceback. |
 | `ImportError` / `ModuleNotFoundError` | Package missing from `requirements_txt` or version mismatch; fix and `update_flight`. |
-| Fails at `duckdb.connect("md:")` with a version error | Unpinned or too-new `duckdb`; pin the latest MotherDuck-supported release (`duckdb==1.5.2`). |
+| Fails at `duckdb.connect("md:")` with a version error | Unpinned or unsupported `duckdb`; resolve and pin a version from `https://motherduck.com/docs/duckdb-versions.json`. The included examples retain their tested pin for reproducibility. |
 | `KeyError` on a secret env var | Reading the bare param name instead of `<secret_name>_<PARAM>`, or the secret name was not passed in `flight_secret_names`. |
 | `MOTHERDUCK_TOKEN` missing | Wrong `access_token_name` label. |
 | Schedule didn't fire | Schedule `disabled`, or the cron is UTC and you expected local time. |
 | New version not picked up | The run started before the update; runs lock to the version current at start. |
-| Run killed without a traceback | Likely the 16GB RAM ceiling; switch to disk-buffered loading. |
+| Run killed without a traceback | Check the current memory limit, then switch to disk-buffered loading. |
 | Older flight reports empty `config` on runs | Flight predates per-run config overrides; one `update_flight` redeploys it. |

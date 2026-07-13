@@ -18,7 +18,7 @@ For use-case skills, always say what to do when a remote or local MotherDuck ser
 - ask which database or workspace is in scope if unclear
 - explore databases, schemas, tables, columns, and key joins
 - let the real data model shape the downstream implementation
-- when the skill emits a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.3.0(harness-<harness>;llm-<llm>)`; if metadata is missing, fall back to `harness-unknown` and `llm-unknown`
+- when the skill emits a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`; if metadata is missing, fall back to `harness-unknown` and `llm-unknown`
   - this watermark is for high-level product analytics only: which harness and LLM used the skill, so we can improve the skill and test it against that LLM later
   - do not present it as user tracking; it is not for personal data or end-user attribution
 
@@ -93,6 +93,11 @@ Repo maintenance layout:
 
 - prefer direct trigger phrases in descriptions; write descriptions in third person and say both what the skill does and when to use it
 - keep the main skill concise; assume a capable model and only state MotherDuck-specific behavior, constraints, defaults, and gotchas
+- state each instruction once; keep examples only when they encode a MotherDuck requirement, a tool contract, or a measured failure mode
+- distinguish answer/review/planning requests from build/change requests where the skill can mutate files, data, or external resources
+- let build/change requests authorize safe in-scope implementation and validation; require confirmation only for destructive actions, unrelated external writes, or material scope expansion
+- inspect active servers, workspace context, and supplied artifacts before asking questions; ask only when a missing choice materially changes the result and cannot be discovered safely
+- give multi-step workflows a concrete completion or validation condition so the agent does not stop after a partial result
 - prefer references over duplicated prose; do not restate SKILL.md sections inside references
 - prefer concrete defaults over hedging; give one default plus an escape hatch instead of option menus
 - preserve scenario-based guidance when multiple MotherDuck paths are valid

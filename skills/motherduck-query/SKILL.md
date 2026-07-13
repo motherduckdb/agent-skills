@@ -20,7 +20,7 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 - Preserve the intended grain of every result set; state the grain before optimizing or materializing a query.
 - Filter early, aggregate early, and prefer serving tables or summaries for repeated reads.
 - Keep SQL obvious, multi-line, and explicit about grain, filters, and output shape.
-- Treat DDL, DML, `ATTACH`, `DETACH`, recovery commands such as `CREATE SNAPSHOT`, `ALTER DATABASE ... SET SNAPSHOT`, `UNDROP DATABASE`, and lifecycle commands such as `SHUTDOWN` as writes. Use the MotherDuck MCP `query_rw` tool only when the user explicitly asks for the change and confirms it.
+- Treat DDL, DML, `ATTACH`, `DETACH`, recovery commands such as `CREATE SNAPSHOT`, `ALTER DATABASE ... SET SNAPSHOT`, `UNDROP DATABASE`, and lifecycle commands such as `SHUTDOWN` as writes. Use the MotherDuck MCP `query_rw` tool when the user's change request authorizes the write. Ask for confirmation only when the action is destructive, externally visible, or outside the stated scope.
 - Tag long-lived integrations with `custom_user_agent` when the connection path supports it.
 
 ## Workflow

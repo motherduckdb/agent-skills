@@ -14,7 +14,7 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 - **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before generating Dive code and always before `save_dive` or `update_dive`. The guide defines the current component API and runtime libraries.
 - Use the blessed Dives example repo as the reference implementation for local preview, Dives-as-code layout, metadata, CI previews, and deploy scripts.
 - Use Dives SQL functions when the user wants a scriptable SQL-native create/read/update/delete workflow instead of MCP tools.
-- Treat ordinary Dives and embedded Dives separately: current public materials say Dives are available on all plans, while embedding requires a Business plan. Verify plan entitlements against live docs before promising an embed rollout.
+- Treat ordinary Dives and embedded Dives separately. Verify current plan entitlements before promising an embed rollout; do not preserve plan names or availability claims from memory.
 
 ## Default Posture
 
@@ -38,6 +38,8 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 4. Build or edit the Dive component, using local preview/hot reload when possible.
 5. Call `save_dive`, `update_dive`, or deploy only after queries, loading states, required resources, and visual behavior are correct.
 6. If teammates or application users need access, configure the underlying shares or embed-session flow explicitly.
+
+For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize.
 
 ## Open Next
 
