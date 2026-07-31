@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["duckdb"]
+# dependencies = []
 # ///
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ from _lib.motherduck_artifacts import (
     REFERENCE_PROJECT,
     artifact_env,
     expected_user_agent,
+    motherduck_duckdb_requirement,
     pipeline_env,
     require_motherduck_token,
     run_command,
@@ -55,10 +56,11 @@ def main() -> int:
 
     env = os.environ.copy()
     expected_agent = expected_user_agent(env)
+    duckdb_requirement = motherduck_duckdb_requirement(env)
 
     for artifact in selected_artifacts(args.artifacts):
         stdout = run_checked(
-            ["uv", "run", "--with", "duckdb", "python", str(artifact.path)],
+            ["uv", "run", "--with", duckdb_requirement, "python", str(artifact.path)],
             env=artifact_env(artifact.slug, env),
         )
         verify_artifact_output(

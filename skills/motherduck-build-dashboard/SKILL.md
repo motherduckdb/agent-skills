@@ -8,7 +8,7 @@ license: MIT
 
 Use this skill when the user wants a multi-section Dive-backed dashboard with a clear analytical story, not just a single chart.
 
-This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-query`, and `motherduck-create-dive`; use `motherduck-duckdb-sql` as supporting reference when exact syntax matters.
+This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, and `motherduck-design-dive`; use `motherduck-duckdb-sql` as supporting reference when exact syntax matters.
 
 ## Start Here: Is a MotherDuck Server Active?
 
@@ -31,7 +31,7 @@ For lower-level Dive mechanics, use `motherduck-create-dive`.
 ## Dashboard Defaults
 
 - One story per dashboard.
-- One KPI row.
+- One KPI group that stacks and reflows by viewport.
 - One primary trend chart.
 - Zero or one supporting chart.
 - Zero or one detail table.
@@ -43,12 +43,13 @@ For lower-level Dive mechanics, use `motherduck-create-dive`.
 2. Explore the real schema and metrics first.
 3. Pick the dashboard story.
 4. Write one query per section.
-5. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before `save_dive` or `update_dive`.
-6. When the request includes creating or updating the Dive, save after preview validation; do not add a second approval gate for the requested in-scope write.
+5. Apply `motherduck-design-dive`: start at 320 px, reserve the filter surface, use the reusable light/dark token system, and define the desktop reflow.
+6. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before `save_dive` or `update_dive`.
+7. When the request includes creating or updating the Dive, save only after responsive, theme, query-state, and data validation; do not add a second approval gate for the requested in-scope write.
 
 Match execution to the request: answer, review, or planning work returns the requested dashboard artifacts; build or change work creates or updates the requested in-scope Dive and validates it. Ask before destructive replacement, unrelated external writes, or a material expansion of scope.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 
@@ -109,4 +110,5 @@ uv run scripts/test_typescript_artifacts.py
 - `motherduck-explore` -- inspect the actual database before deciding the dashboard sections
 - `motherduck-query` -- validate each dashboard query
 - `motherduck-create-dive` -- useSQLQuery, theming, preview/save, loading, and visual mechanics
+- `motherduck-design-dive` -- responsive layout, filter capacity, light/dark tokens, reusable components, and visual QA
 - `motherduck-duckdb-sql` -- resolve syntax and function questions

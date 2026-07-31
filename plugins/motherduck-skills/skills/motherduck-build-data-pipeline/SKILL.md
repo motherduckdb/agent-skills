@@ -50,7 +50,7 @@ If no server is active, use any supplied source and target context. For planning
 
 Match execution to the request: answer, review, or planning work returns the requested pipeline artifacts; build or change work creates the requested in-scope files and warehouse objects and validates them. Ask before destructive actions, unrelated external writes, or a material expansion of scope.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

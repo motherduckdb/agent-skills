@@ -3,7 +3,7 @@
 
 # Build an Analytics Dashboard
 
-Use this skill when creating a multi-chart, multi-KPI interactive dashboard with live MotherDuck data. This is a use-case skill -- it ties together `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, and `motherduck-duckdb-sql` into a single end-to-end workflow.
+Use this skill when creating a multi-chart, multi-KPI interactive dashboard with live MotherDuck data. This is a use-case skill -- it ties together `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, `motherduck-design-dive`, and `motherduck-duckdb-sql` into a single end-to-end workflow.
 
 ## Contents
 
@@ -25,6 +25,7 @@ Use this skill when creating a multi-chart, multi-KPI interactive dashboard with
 
 - Prefer the current MotherDuck Dive guide and public Dives docs first.
 - If MotherDuck MCP is available, call `get_dive_guide` before saving or updating a dashboard Dive.
+- Apply `motherduck-design-dive` before copying presentation classes from this reference. Treat the examples here as query and composition patterns; the responsive shell, theme tokens, filter surface, and viewport QA come from the design skill.
 - Keep the dashboard guidance aligned with the documented product posture:
   - Dives are for live workspace analytics and the long tail of questions
   - heavy shaping belongs in SQL, not in React
@@ -91,11 +92,11 @@ export default function MonthlyRevenueDashboard() {
   }));
 
   return (
-    <div className="p-6" style={{ background: "#f8f8f8" }}>
+    <div className="min-h-screen px-4 py-6 sm:p-6 lg:p-8" style={{ background: "#f8f8f8" }}>
       <h1 className="text-2xl font-semibold" style={{ color: "#231f20" }}>Revenue</h1>
       <p className="text-sm mb-6" style={{ color: "#6a6a6a" }}>Monthly overview</p>
 
-      <div className="grid grid-cols-3 gap-8 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         {[
           { label: "Total Revenue", value: kpiRows[0]?.total_revenue, fmt: (v: number) => `$${(v / 1000).toFixed(0)}K` },
           { label: "Orders", value: kpiRows[0]?.order_count, fmt: (v: number) => v.toLocaleString() },
@@ -105,7 +106,7 @@ export default function MonthlyRevenueDashboard() {
             {kpis.isLoading ? (
               <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
             ) : (
-              <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{fmt(N(value))}</p>
+              <p className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: "#231f20" }}>{fmt(N(value))}</p>
             )}
             <p className="text-sm mt-2" style={{ color: "#6a6a6a" }}>{label}</p>
           </div>
@@ -135,7 +136,7 @@ export default function MonthlyRevenueDashboard() {
 ```python
 import duckdb
 
-USE_CASE_USER_AGENT = "agent-skills/2.4.0(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
 
 conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 rows = conn.sql("""
@@ -289,17 +290,17 @@ Follow these layout conventions for a consistent, professional dashboard.
 **Structure (top to bottom):**
 
 1. **Title** -- `text-2xl font-bold mb-8` with `color: "#231f20"`.
-2. **KPI row** -- `grid grid-cols-4 gap-8 mb-10` (use `grid-cols-3` or `grid-cols-5` if needed).
+2. **KPI group** -- start with `grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6`; preserve DOM reading order as the grid expands.
 3. **Primary chart** -- full width, 200-280px height, `mb-10`.
 4. **Secondary chart** -- full width, 200-280px height, `mb-10` (optional).
 5. **Detail table** -- full width with `overflow-x-auto` (optional).
 
 **Styling rules:**
 
-- Outermost container: `className="p-8 min-h-screen"` with `style={{ backgroundColor: "#f8f8f8" }}`.
+- Outermost container: `className="min-h-screen px-4 py-6 sm:p-6 lg:p-8"` with semantic theme tokens and a centered, fluid inner canvas.
 - No card borders, no card shadows. Content floats on the background.
 - KPI labels: `text-sm` with `color: "#6a6a6a"`.
-- KPI values: `text-5xl font-bold` with `color: "#231f20"`.
+- KPI values: `text-3xl sm:text-4xl font-bold tabular-nums` with the semantic text token; add a bounded sparkline or progress visual when trend data exists.
 - Section headings: `text-lg font-semibold mb-4` with `color: "#231f20"`.
 - Use inline `style` for brand colors. Never use Tailwind bracket syntax (`w-[200px]`).
 
@@ -345,7 +346,7 @@ export default function MyDashboard() {
   const detailRows = Array.isArray(detailData) ? detailData : [];
 
   return (
-    <div className="p-8 min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
+    <div className="min-h-screen px-4 py-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#f8f8f8" }}>
       {/* Title */}
       {/* KPIs with kpiLoading skeleton */}
       {/* Primary chart with trendLoading spinner */}

@@ -5,7 +5,7 @@
 
 MotherDuck Skills is an installable skill catalog that teaches coding agents to work with [MotherDuck](https://motherduck.com): choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, use Dives and shares, and keep production analytics patterns safe.
 
-18 skills in three layers: **utility** (connect, explore, query, SQL syntax, REST API), **workflow** (load, model, share, Dives, DuckLake, security, pricing), and **use-case** (apps, dashboards, pipelines, migrations, rollouts). See the [full catalog](#skills-overview).
+20 skills in three layers: **utility** (connect, explore, query, SQL syntax, REST API), **workflow** (load, model, share, Dives, Flights, DuckLake, security, pricing), and **use-case** (apps, dashboards, pipelines, migrations, rollouts). See the [full catalog](#skills-overview).
 
 ## Quick Install
 
@@ -239,6 +239,7 @@ For narrow technical work, start with `motherduck-connect`, then `motherduck-exp
 | Model schemas, tables, views, or transformation layers | `motherduck-model-data` |
 | Publish, consume, or govern shares | `motherduck-share-data` |
 | Build, theme, preview, save, update, or embed a Dive | `motherduck-create-dive` |
+| Design a responsive, reusable Dive with filters and light/dark themes | `motherduck-design-dive` |
 | Schedule a Python job (Flight) for ingestion or transformation | `motherduck-create-flight` |
 | Evaluate DuckLake | `motherduck-ducklake` |
 | Plan security, access, governance, or residency | `motherduck-security-governance` |
@@ -266,6 +267,7 @@ The catalog has three layers: **utility** skills cover exact MotherDuck mechanic
 | `motherduck-share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |
 | `motherduck-create-dive` | Workflow | you need to build, theme, preview, save, update, or embed a Dive |
 | `motherduck-create-flight` | Workflow | you need a scheduled or on-demand Python job (Flight) on MotherDuck for ingestion, transformation, or automation |
+| `motherduck-design-dive` | Workflow | you need a mobile-first, filter-ready Dive design that works in light and dark modes across customers |
 | `motherduck-ducklake` | Workflow | you need to decide whether DuckLake is appropriate and how to apply it safely |
 | `motherduck-security-governance` | Workflow | you need MotherDuck-specific guidance on security, access, governance, or residency |
 | `motherduck-pricing-roi` | Workflow | you need to frame workload cost drivers, pricing posture, or ROI tradeoffs |
