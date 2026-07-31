@@ -44,7 +44,7 @@ If no server is active, use any supplied client and region context. For planning
 
 Match execution to the request: answer, review, or planning work returns the requested delivery artifacts; build or change work creates the requested in-scope templates or client assets and validates them. Ask before provisioning additional client environments, destructive changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

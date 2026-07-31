@@ -52,7 +52,7 @@ If no server is active, use any supplied source and target context. For planning
 
 Match execution to the request: answer, review, or planning work returns the requested migration artifacts; build or change work executes only the requested in-scope migration slice and validates it. Require confirmation for cutover, destructive source changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.4.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

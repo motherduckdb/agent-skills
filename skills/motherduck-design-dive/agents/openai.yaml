@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design a MotherDuck Dive"
+  short_description: "Responsive, reusable Dive design system"
+  default_prompt: "Use $motherduck-design-dive to design a responsive, reusable MotherDuck Dive with filters and light/dark themes."

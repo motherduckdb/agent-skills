@@ -1,6 +1,6 @@
 # Dashboard Patterns
 
-Copy-pasteable dashboard templates. Each is a complete Dive component with proper imports, independent loading states, `N()` helper, and the standard color palette. Replace placeholder table names with your actual fully qualified names.
+Query and composition templates for common dashboard stories. Each shows complete Dive data wiring with proper imports, independent loading states, and the `N()` helper. Before using one, apply `motherduck-design-dive`: replace the presentation shell and literal palette with the responsive grid, semantic light/dark tokens, filter surface, and viewport QA from that skill's design-system reference. Replace placeholder table names with actual fully qualified names.
 
 ## Contents
 
@@ -57,16 +57,16 @@ export default function SalesDashboard() {
       {kpiLoading ? (
         <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
       ) : (
-        <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{prefix}{value}</p>
+        <p className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: "#231f20" }}>{prefix}{value}</p>
       )}
     </div>
   );
 
   return (
-    <div className="p-8 min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
+    <div className="min-h-screen px-4 py-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#f8f8f8" }}>
       <h1 className="text-2xl font-bold mb-8" style={{ color: "#231f20" }}>Sales Dashboard</h1>
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-8 mb-10">
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         <KPI label="Total Revenue" prefix="$" value={`${(N(kpiRows[0]?.total_revenue) / 1000).toFixed(0)}K`} />
         <KPI label="Order Count" value={N(kpiRows[0]?.order_count).toLocaleString()} />
         <KPI label="Avg Order Value" prefix="$" value={N(kpiRows[0]?.avg_order_value).toFixed(2)} />
@@ -213,16 +213,16 @@ export default function ProductAnalyticsDashboard() {
       {kpiLoading ? (
         <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
       ) : (
-        <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{value}{suffix}</p>
+        <p className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: "#231f20" }}>{value}{suffix}</p>
       )}
     </div>
   );
 
   return (
-    <div className="p-8 min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
+    <div className="min-h-screen px-4 py-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#f8f8f8" }}>
       <h1 className="text-2xl font-bold mb-8" style={{ color: "#231f20" }}>Product Analytics</h1>
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-8 mb-10">
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         <KPI label="Active Users (30d)" value={N(kpiRows[0]?.active_users).toLocaleString()} />
         <KPI label="Sessions" value={N(kpiRows[0]?.total_sessions).toLocaleString()} />
         <KPI label="Avg Session Duration" value={N(kpiRows[0]?.avg_session_min).toFixed(1)} suffix=" min" />
@@ -375,7 +375,7 @@ export default function OperationalMetricsDashboard() {
       {kpiLoading ? (
         <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
       ) : (
-        <p className="text-5xl font-bold" style={{ color: "#231f20" }}>{value}{suffix}</p>
+        <p className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: "#231f20" }}>{value}{suffix}</p>
       )}
     </div>
   );
@@ -387,17 +387,17 @@ export default function OperationalMetricsDashboard() {
   };
 
   return (
-    <div className="p-8 min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
+    <div className="min-h-screen px-4 py-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#f8f8f8" }}>
       <h1 className="text-2xl font-bold mb-8" style={{ color: "#231f20" }}>Operational Metrics</h1>
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-8 mb-10">
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         <KPI label="Total Requests (24h)" value={N(kpiRows[0]?.total_requests).toLocaleString()} />
         <div>
           <p className="text-sm mb-1" style={{ color: "#6a6a6a" }}>Error Rate</p>
           {kpiLoading ? (
             <div className="h-12 w-24 bg-gray-200 animate-pulse rounded" />
           ) : (
-            <p className="text-5xl font-bold"
+            <p className="text-3xl font-bold tabular-nums sm:text-4xl"
                style={{ color: errorRateColor(N(kpiRows[0]?.error_rate)) }}>
               {N(kpiRows[0]?.error_rate).toFixed(2)}%
             </p>

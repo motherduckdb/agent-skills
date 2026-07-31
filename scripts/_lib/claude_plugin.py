@@ -17,6 +17,7 @@ CLAUDE_SKILL_ARGUMENT_HINTS: dict[str, str] = {
     "motherduck-connect": "[app-or-runtime]",
     "motherduck-create-dive": "[dive-goal]",
     "motherduck-create-flight": "[flight-goal]",
+    "motherduck-design-dive": "[dive-or-design-goal]",
     "motherduck-duckdb-sql": "[syntax-or-error]",
     "motherduck-ducklake": "[storage-scenario]",
     "motherduck-enable-self-serve-analytics": "[team-or-rollout-scenario]",

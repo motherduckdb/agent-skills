@@ -49,5 +49,6 @@ For answer, review, or planning requests, stop at the requested design or code a
 
 - `motherduck-explore` for discovering the real tables, views, and dimensions before visualizing them
 - `motherduck-query` for validating the SQL each Dive section will run
+- `motherduck-design-dive` for mobile-first layout, light/dark themes, filter surfaces, reusable components, and responsive QA
 - `motherduck-build-dashboard` when the work is really a multi-section dashboard composition problem
 - `motherduck-build-cfa-app` when the requirement is a fuller product surface with per-customer isolation or backend policy control

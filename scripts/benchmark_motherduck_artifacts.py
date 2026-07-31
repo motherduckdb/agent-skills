@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["duckdb"]
+# dependencies = []
 # ///
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ import json
 from _lib.motherduck_artifacts import (
     REFERENCE_PROJECT,
     artifact_env,
+    motherduck_duckdb_requirement,
     pipeline_env,
     require_motherduck_token,
     run_command,
@@ -22,9 +23,10 @@ from _lib.repo import ROOT
 
 def benchmark_artifact(slug: str, path, runs: int) -> dict[str, object]:
     run_results: list[dict[str, object]] = []
+    duckdb_requirement = motherduck_duckdb_requirement()
     for _ in range(runs):
         result = run_command(
-            ["uv", "run", "--with", "duckdb", "python", str(path)],
+            ["uv", "run", "--with", duckdb_requirement, "python", str(path)],
             cwd=ROOT,
             env=artifact_env(slug),
         )

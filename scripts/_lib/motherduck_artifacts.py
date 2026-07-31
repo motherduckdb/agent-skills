@@ -43,6 +43,7 @@ ARTIFACT_TARGETS = [
     ArtifactTarget("motherduck-partner-delivery", ROOT / "skills" / "motherduck-partner-delivery" / "artifacts" / "client_delivery_example.py"),
 ]
 REFERENCE_PROJECT = ROOT / "skills" / "motherduck-build-data-pipeline" / "references" / "dlt-dbt-motherduck-project"
+DEFAULT_MOTHERDUCK_DUCKDB_VERSION = "1.5.4"
 
 
 def selected_artifacts(selected_slugs: list[str] | None = None) -> list[ArtifactTarget]:
@@ -55,6 +56,14 @@ def selected_artifacts(selected_slugs: list[str] | None = None) -> list[Artifact
 def require_motherduck_token(env: dict[str, str] | None = None) -> None:
     if not (env or os.environ).get("MOTHERDUCK_TOKEN"):
         raise RuntimeError("Missing MOTHERDUCK_TOKEN")
+
+
+def motherduck_duckdb_requirement(env: dict[str, str] | None = None) -> str:
+    version = (env or os.environ).get(
+        "MOTHERDUCK_DUCKDB_VERSION",
+        DEFAULT_MOTHERDUCK_DUCKDB_VERSION,
+    )
+    return f"duckdb=={version}"
 
 
 def run_command(
