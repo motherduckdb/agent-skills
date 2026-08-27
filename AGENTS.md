@@ -13,8 +13,8 @@ Optimize for:
 
 The catalog is a 3-layer graph:
 
-- `utility`: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`, `motherduck-rest-api`
-- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-create-flight`, `motherduck-design-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- `utility`: `motherduck-connect`, `motherduck-cli`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`, `motherduck-rest-api`
+- `workflow`: `motherduck-load-data`, `motherduck-model-data`, `motherduck-manage-guides`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-create-flight`, `motherduck-design-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
 - `use-case`: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Primary source-of-truth files:
@@ -64,6 +64,8 @@ Important supporting surfaces:
 - For use-case skills, if a remote or local MotherDuck server is active, start from the user's real database/schema instead of inventing one.
 - Prefer a native `md:` workspace connection for multi-database exploration, bootstrap flows, and temporary validation environments.
 - Call `get_dive_guide` before save/update Dive flows when MCP is available.
+- Call `get_query_guide` before business-semantic MCP queries and traverse only relevant Guide topics.
+- Prefer the MotherDuck CLI for file-shaped Dive/Flight work when a coding agent has a shell; prefer MCP for chat-only exploration.
 - Prefer Parquet over CSV when the format is under our control.
 - Prefer structural isolation over query-time tenant filtering for serious customer-facing analytics.
 

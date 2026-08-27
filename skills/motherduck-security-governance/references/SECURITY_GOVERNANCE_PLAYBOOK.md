@@ -11,6 +11,7 @@ Reference for discussing MotherDuck security posture, access-control boundaries,
 | Publicly Documented Security Anchors | SOC 2, GDPR, service accounts, shares, SSO, recovery |
 | Governance Checklist | Questions every design must answer |
 | Region and Residency Guidance | Region availability vs residency vs contracts |
+| Roles and Grants | Preset/custom roles, inheritance, assignments, and Share grants |
 | Product-Specific Patterns To Prefer | Hypertenancy, per-boundary service accounts, read tokens |
 | Dives and Sharing Guidance | Share vs Dive vs application boundaries |
 | SSO Guidance | Plan gating, verified domains, IdP rollout |
@@ -60,7 +61,7 @@ LIMIT 10;
 - Prefer backend-held credentials over browser-exposed credentials.
 - Prefer structural isolation over query-time tenant filtering for serious B2B or CFA workloads.
 - Prefer region-specific guidance when residency matters.
-- Use shares as database-level read-only publication boundaries, not as row-level security.
+- Use shares as read-only publication boundaries. Use `INCLUDE_PATTERN` for whole-table/view filtering, never as row-level or column-level security.
 
 ## Publicly Documented Security Anchors
 
@@ -70,7 +71,8 @@ These are safe public anchors to use:
 - MotherDuck publicly states that it is GDPR verified and that signed DPAs can be requested via `security@motherduck.com`.
 - Public pricing and trust pages state that compliance reports are available through the commercial process, and that some commercial or security features vary by plan.
 - MotherDuck publicly documents service accounts as organization-owned non-human identities for applications and automation.
-- MotherDuck publicly documents shares as read-only, zero-copy, database-level distribution rather than row-level or table-level entitlement enforcement.
+- MotherDuck publicly documents shares as read-only and zero-copy, with optional table/view filtering through `INCLUDE_PATTERN`; this is not row-level or column-level entitlement enforcement.
+- MotherDuck publicly documents preset and custom roles, role inheritance, user assignments, and role-based Share grants. Custom roles are plan-gated, so verify current entitlements before promising availability.
 - MotherDuck publicly documents SSO support with identity providers such as Okta, Microsoft Entra ID, and SAML/OIDC options. Verify current plan requirements and limitations before promising a rollout path.
 - MotherDuck publicly documents data recovery through automatic snapshots, named snapshots, point-in-time restore, and `UNDROP DATABASE`, with retention and availability varying by plan.
 
@@ -88,9 +90,10 @@ Answer these questions:
 
 If the design claims governed distribution, also ask:
 
-6. Which database is actually being shared?
-7. Is the shared database curated or just a raw internal workspace?
-8. Does the plan rely on query-time tenant filtering where a stronger database or service-account boundary is warranted?
+6. Which database is the share source and does it use an include pattern?
+7. Which users or roles receive the Share grant?
+8. Is the exposed catalog curated or just a raw internal workspace?
+9. Does the plan rely on query-time tenant filtering where a stronger database or service-account boundary is warranted?
 
 ## Region and Residency Guidance
 
@@ -112,10 +115,30 @@ If the user is really asking for a residency guarantee or legal assurance, direc
 - backend-only token handling for applications
 - careful sharing boundaries when using shares or Dives
 
+## Roles and Grants
+
+- Preset roles are concentric: `explorer` capabilities are included by `builder`, which is included by `admin`.
+- A custom role inherits platform permissions from one or more roles and can receive Share grants directly. Platform permissions are inherited as a unit; do not claim they can be individually assembled unless current docs say so.
+- A user's effective permissions are the union of all assigned roles. Revoking one role does not remove access supplied by another.
+- Grant restricted Shares to the lowest role that should receive them. Inheriting roles receive the same grant.
+- A roleless user can sign in but has no data access until a role is assigned.
+- Public share links sit outside role grants; treat them as a separate exposure path.
+
+Audit the live state before making a governance claim:
+
+```sql
+SHOW ALL ROLES;
+SHOW USERS OF ROLE finance;
+SHOW ROLES TO USER alice;
+SHOW GRANTS ON SHARE finance_share;
+```
+
+Use `GRANT ROLE ... TO USER ...`, `GRANT ROLE ... TO ROLE ...`, and `GRANT READ ON SHARE ... TO ROLE ...` only after confirming the caller has the required permissions. A grant determines who receives a Share; its include pattern determines which tables and views all its grantees see.
+
 ## Dives and Sharing Guidance
 
 - Dives are shareable live visualizations that persist in the MotherDuck workspace.
-- Shares are zero-copy, database-level, and read-only. Use them for governed distribution, not as a substitute for row-level entitlement logic.
+- Shares are zero-copy and read-only. They may expose the whole source database or a table/view subset. Use them for governed distribution, not as a substitute for row-level or column-level entitlement logic.
 - Do not assume Dives replace all BI tooling; MotherDuck positions them for the long tail of questions that do not justify a full dashboard.
 - For broad external or client-facing access, be explicit about whether the right pattern is a share, a Dive, or a full customer-facing application.
 

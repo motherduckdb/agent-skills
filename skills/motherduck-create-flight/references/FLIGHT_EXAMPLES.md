@@ -163,7 +163,7 @@ dlt[motherduck]==1.27.0
 httpx==0.28.1
 ```
 
-Config knobs (all optional): `DESTINATION_DATABASE`, `DATASET_NAME`, `TABLE_NAME`, `PIPELINE_NAME`, `PRIMARY_KEY`, `WRITE_DISPOSITION` (`append`/`merge`/`replace`), `RUN_LEDGER_TABLE`, `GITHUB_REPOS`. When you swap in a credentialed source, put the credentials in a `TYPE flights` secret and read them as `<secret_name>_<PARAM>` env vars.
+Config knobs (all optional): `DESTINATION_DATABASE`, `DATASET_NAME`, `TABLE_NAME`, `PIPELINE_NAME`, `PRIMARY_KEY`, `WRITE_DISPOSITION` (`append`/`merge`/`replace`), `RUN_LEDGER_TABLE`, `GITHUB_REPOS`. When you swap in a credentialed source, put credentials in a `TYPE flights` secret and prefer the stable namespaced `<secret_name>_<PARAM>` env vars. Bare aliases are conveniences only.
 
 ## Example: Postgres Ingestion Flight
 
@@ -234,7 +234,7 @@ log = logging.getLogger("pg2md")
 SYSTEM_SCHEMAS = {"information_schema", "pg_catalog", "pg_toast"}
 
 # Postgres connection params from the flight secret.
-# The secret injects each as `<secret_name>_<KEY>`
+# The secret injects each as `<KEY>` and `<secret_name>_<KEY>`
 PG_PARAMS = (
     ("HOST", "PGHOST", None, True),
     ("PORT", "PGPORT", "5432", False),
@@ -403,7 +403,7 @@ def main() -> None:
     INCLUDED_TABLES = csv_set("INCLUDED_TABLES")
     EXCLUDED_TABLES = csv_set("EXCLUDED_TABLES")
     # MotherDuck Flights secret holding the Postgres connection; its params arrive as
-    # <SECRET_NAME>_HOST, <SECRET_NAME>_PORT, ... Change it to point at another secret.
+    # stable namespaced keys plus bare convenience aliases. Change this name to use another secret.
     SECRET_NAME = "pg"
 
     log.info("Run %s -> target %r", RUN_ID, TARGET_DB)
@@ -628,7 +628,7 @@ create_flight(
 ```
 
    With SQL, the same call is `FROM MD_CREATE_FLIGHT(name := ..., source_code := ..., requirements_txt := ..., flight_secret_names := ['pg'], config := MAP {...})`.
-3. Trigger one on-demand run (`run_flight`), poll `list_flight_runs` until terminal, and read `get_flight_logs`. Fix issues with `edit_flight_source`.
+3. Trigger one on-demand run (`run_flight`), poll `get_flight_run` until terminal when available (otherwise use `list_flight_runs`), and read `get_flight_logs`. Fix issues with `edit_flight_source`.
 4. Attach the schedule only after a clean run: `update_flight(id, schedule_cron = "0 6 * * *")` — cron is UTC, and schedule changes do not create a new version.
 
 ## Choosing a Template

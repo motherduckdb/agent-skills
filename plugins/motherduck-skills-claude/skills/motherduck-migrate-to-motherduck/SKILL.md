@@ -39,6 +39,8 @@ If no server is active, use any supplied source and target context. For planning
 - validate before cutover
 - port SQL dialect and data types deliberately before performance tuning
 - phased cutover over big-bang replacement
+- remote DuckDB database-file import when the source is already packaged in cloud storage
+- capture validated business definitions, join rules, and cutover caveats in Guides after the target model stabilizes
 
 ## Workflow
 
@@ -49,11 +51,12 @@ If no server is active, use any supplied source and target context. For planning
 5. Inventory incompatible SQL, functions, data types, and operational assumptions.
 6. Rebuild the analytical model in DuckDB SQL.
 7. Run source-vs-target validation.
-8. Cut over one workload at a time.
+8. Create or update the relevant MotherDuck Guides so post-cutover agents use the validated target definitions.
+9. Cut over one workload at a time.
 
 Match execution to the request: answer, review, or planning work returns the requested migration artifacts; build or change work executes only the requested in-scope migration slice and validates it. Require confirmation for cutover, destructive source changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 
@@ -119,3 +122,4 @@ uv run scripts/test_typescript_artifacts.py
 - `motherduck-model-data` -- shape the target analytical model
 - `motherduck-query` -- port and validate critical SQL
 - `motherduck-ducklake` -- only when open-table-format requirements are explicit
+- `motherduck-manage-guides` -- preserve validated target semantics and migration caveats

@@ -6,12 +6,14 @@ Reference for creating, operating, and consuming MotherDuck shares safely.
 
 | Section | Covers |
 | --- | --- |
-| What Shares Are | Read-only, zero-copy, database-granularity semantics |
+| What Shares Are | Read-only, zero-copy semantics with optional table/view filtering |
 | SQL-First Posture | Shares as explicit, auditable SQL operations |
 | Default Workflow | Owner-to-consumer sequence |
 | SQL Workflow Template | Copyable end-to-end owner and consumer SQL |
 | Create a Share | `CREATE SHARE` options |
+| Table-Level Security | `INCLUDE_PATTERN`, preview, alter, and limitations |
 | Access Levels | ORGANIZATION vs RESTRICTED vs UNRESTRICTED |
+| Role Grants | Governed user and role access |
 | Visibility Options | DISCOVERABLE vs HIDDEN |
 | Update Modes | MANUAL vs AUTOMATIC |
 | Common Share Patterns | Internal, named-recipient, link-based external |
@@ -24,31 +26,32 @@ Reference for creating, operating, and consuming MotherDuck shares safely.
 
 ## What Shares Are
 
-A share is a read-only reference to a MotherDuck database. When you create a share, MotherDuck records share metadata pointing at the source database. No bytes are copied. Recipients attach the share and query it as a read-only clone in their own workspace.
+A share is a read-only reference to a MotherDuck database. When you create a share, MotherDuck records share metadata pointing at the source database. No bytes are copied. Recipients attach the share and query its exposed catalog as a read-only database in their own workspace.
 
 Key properties:
 
 - **Read-only**: recipients can `SELECT`, but never `INSERT`, `UPDATE`, or `DELETE`
 - **Zero-copy**: no data duplication; the share itself incurs no additional storage cost
-- **Database-granularity**: shares are created from databases, not arbitrary subsets of tables
+- **Database-backed**: every share has one source database; an optional `INCLUDE_PATTERN` exposes only selected tables and views
 - **Owner-controlled updates**: use `UPDATE MANUAL` for explicit snapshots or `UPDATE AUTOMATIC` for periodic propagation
 - **Access-controlled**: restrict who can attach the share by organization, ACL, or share URL pattern
 
 ## SQL-First Posture
 
 - Keep share creation and maintenance as explicit SQL, even when the caller is an application or provisioning tool.
-- Make access, visibility, and update mode explicit in every `CREATE SHARE`.
+- Make access, visibility, update mode, and any include pattern explicit in every `CREATE SHARE`.
 - Treat share operations as auditable database changes, not as hidden driver logic.
 - Use SQL to verify the share state after every create, update, grant, revoke, or attach step.
 
 ## Default Workflow
 
 1. Choose the source database to share.
-2. Decide access level, visibility, and freshness requirements.
-3. Create the share with explicit options.
-4. Distribute the share URL if the share is hidden or external.
-5. Have recipients attach and query the data.
-6. For manual shares, run `UPDATE SHARE` on the owner side and `REFRESH DATABASE` on the consumer side.
+2. Decide access level, table/view scope, visibility, and freshness requirements.
+3. Preview and validate any include pattern against the live catalog.
+4. Create the share with explicit options and read its stored state back.
+5. Grant restricted access to users or roles and distribute the URL if the share is hidden or external.
+6. Have recipients attach and verify the visible catalog before querying it.
+7. For manual shares, run `UPDATE SHARE` on the owner side and `REFRESH DATABASE` on the consumer side.
 
 ## SQL Workflow Template
 
@@ -59,10 +62,11 @@ Use this sequence as the default shape:
 CREATE SHARE IF NOT EXISTS partner_share FROM analytics (
   ACCESS RESTRICTED,
   VISIBILITY HIDDEN,
-  UPDATE MANUAL
+  UPDATE MANUAL,
+  INCLUDE_PATTERN 'reporting.*, main.orders'
 );
 
-GRANT READ ON SHARE partner_share TO duck1, duck2;
+GRANT READ ON SHARE partner_share TO ROLE partner_analyst, USER duck1;
 
 LIST SHARES;
 FROM MD_INFORMATION_SCHEMA.OWNED_SHARES;
@@ -81,13 +85,56 @@ SELECT * FROM "partner_data"."main"."customers" LIMIT 10;
 
 ```sql
 CREATE SHARE IF NOT EXISTS my_data_share FROM my_database (
-  ACCESS ORGANIZATION,
+  ACCESS RESTRICTED,
   VISIBILITY DISCOVERABLE,
-  UPDATE AUTOMATIC
+  UPDATE AUTOMATIC,
+  INCLUDE_PATTERN 'analytics.*, main.dim_*'
+);
+
+GRANT READ ON SHARE my_data_share TO ROLE analyst;
+```
+
+This creates a share named `my_data_share` from `my_database`, exposes the selected tables and views, and grants the governed audience through a role. Always state access, visibility, update mode, and filtering policy explicitly.
+
+## Table-Level Security
+
+`INCLUDE_PATTERN` is a comma-separated list of `schema.table` patterns. It controls what every recipient of that share can see. It does not filter rows or mask columns.
+
+Preview a pattern against the source database before applying it when the preview function is available in the current MotherDuck version. At minimum, inspect the live schemas, tables, and views and verify that every pattern matches an intended object; validation is all-or-nothing and a pattern that matches nothing fails the statement.
+
+Create a filtered share:
+
+```sql
+CREATE SHARE finance_share FROM warehouse (
+  ACCESS RESTRICTED,
+  UPDATE AUTOMATIC,
+  INCLUDE_PATTERN 'finance.*, main.calendar'
 );
 ```
 
-This creates a share named `my_data_share` from `my_database` that anyone in your organization can discover and attach, and that updates automatically — the default posture for internal sharing. Always state access, visibility, and update mode explicitly.
+Change or remove the filter without changing the share URL:
+
+```sql
+ALTER SHARE finance_share SET INCLUDE_PATTERN 'finance.reporting_*, main.calendar';
+ALTER SHARE finance_share RESET INCLUDE_PATTERN;
+```
+
+The three stored states are distinct:
+
+| State | Effect |
+|---|---|
+| `NULL` / `RESET INCLUDE_PATTERN` | Exposes the whole source database |
+| Empty pattern list | Exposes no tables or views; the default schema still exists |
+| One or more patterns | Exposes matching tables and views |
+
+Read the stored value from `LIST SHARES` or `MD_INFORMATION_SCHEMA.OWNED_SHARES`. Changes reach held-open consumers on the next update cycle; detach and reattach when immediate verification matters.
+
+Limitations:
+
+- Filtered shares require native MotherDuck storage. DuckLake shares can be unfiltered; Iceberg catalogs cannot be shared.
+- A filtered share cannot be the source of `CREATE DATABASE ... FROM` or a wholesale `COPY DATABASE`. Copy its visible tables with `COPY FROM DATABASE` instead.
+- Patterns select tables and views only. Macros, sequences, and types follow schema visibility; objects in the default schema may remain visible.
+- Visible view or macro definitions can name hidden objects even though the hidden data remains unreadable.
 
 ## Access Levels
 
@@ -99,11 +146,26 @@ Choose the access level that matches your distribution model. Default to the mos
 | RESTRICTED | Specific users you grant access to | Named-recipient sharing and internal ACLs |
 | UNRESTRICTED | Anyone with the share URL | Public datasets |
 
-Use `ORGANIZATION` for internal sharing. It requires no per-user grants and automatically covers new team members.
+Prefer `RESTRICTED` plus role grants for internal sharing. Use `ORGANIZATION` only for deliberate legacy organization-wide access; current RBAC guidance prefers granting the share to the `explorer` role instead.
 
 Use `RESTRICTED` for named users when you need an ACL instead of broad organization access. Grant access with `GRANT READ ON SHARE ... TO ...`.
 
 Use `UNRESTRICTED` only for truly public or deliberate link-based distribution. Never use it for sensitive, proprietary, or PII-containing data.
+
+## Role Grants
+
+Grant a restricted share to the lowest role that should receive it. Roles that inherit that role receive the grant too.
+
+```sql
+CREATE ROLE IF NOT EXISTS finance;
+GRANT ROLE explorer TO ROLE finance;
+GRANT READ ON SHARE finance_share TO ROLE finance;
+
+SHOW GRANTS ON SHARE finance_share;
+SHOW USERS OF ROLE finance;
+```
+
+Grants decide who can attach a share; `INCLUDE_PATTERN` decides what every grantee of that share can see. If two audiences need different subsets, create two shares with different patterns and grant each share to the appropriate role.
 
 ## Visibility Options
 
@@ -131,16 +193,20 @@ Use `MANUAL` for point-in-time snapshots, versioned data products, and reproduci
 
 Use `AUTOMATIC` for always-current data. Treat it as periodic propagation rather than instant synchronization.
 
+The implicit default is client-version-sensitive: DuckDB 1.5.5 and later default an omitted mode to `UPDATE AUTOMATIC`, while older supported clients retain their earlier behavior. Keep the mode explicit in durable SQL so the publication contract does not change with the client version.
+
 ## Common Share Patterns
 
 ### Internal Team Share
 
 ```sql
 CREATE SHARE IF NOT EXISTS analytics_share FROM analytics_db (
-  ACCESS ORGANIZATION,
+  ACCESS RESTRICTED,
   VISIBILITY DISCOVERABLE,
   UPDATE AUTOMATIC
 );
+
+GRANT READ ON SHARE analytics_share TO ROLE explorer;
 ```
 
 ### Named-Recipient Share
@@ -287,7 +353,7 @@ SUMMARIZE "partner_data"."main"."customers";
 
 ## Use Cases
 
-- **Cross-team analytics**: share curated datasets between data engineering, analytics, and product teams. Use `ORGANIZATION` access with `AUTOMATIC` updates so everyone sees current data.
+- **Cross-team analytics**: share curated datasets between data engineering, analytics, and product teams. Use a restricted share granted to the appropriate roles with `AUTOMATIC` updates.
 - **Partner data exchange**: share results with named users via `RESTRICTED` access and `GRANT READ ON SHARE`, or use a hidden URL when distribution is link-based. Use `MANUAL` updates to control exactly what version partners see.
 - **Public datasets**: make open data available to anyone with `UNRESTRICTED` access. Treat link distribution deliberately and do not use it for sensitive datasets.
 - **Data products**: build curated, versioned datasets for consumption. Use `MANUAL` updates to create explicit versions and refresh on a defined cadence.
@@ -298,7 +364,8 @@ SUMMARIZE "partner_data"."main"."customers";
 - Shares are read-only.
 - Zero-copy means no storage duplication for the share itself.
 - Use `MANUAL` update mode for snapshots and `AUTOMATIC` for always-current delivery.
-- Use `ORGANIZATION` for internal sharing unless there is a clear reason not to.
+- Prefer restricted shares and role grants for internal sharing.
+- Use `INCLUDE_PATTERN` only for whole-table/view filtering; use separate shares when audiences need different subsets.
 - Use `RESTRICTED` for named recipients and ACL-style control.
 - Use `DISCOVERABLE` by default and `HIDDEN` when distribution should stay controlled.
 - Notify recipients after `UPDATE SHARE` on manual shares because they may need `REFRESH DATABASE`.
@@ -320,9 +387,9 @@ SELECT * FROM "partner_data"."main"."customers";
 
 `UNRESTRICTED` means anyone with the URL can access the data. Never use this for proprietary, internal, or PII-containing datasets.
 
-### Treating Shares Like Row-Level Security
+### Treating Table-Level Security Like Row-Level Security
 
-Shares operate at database level. If you need per-customer or per-user isolation, publish separate databases or move to customer-facing analytics patterns with stronger structural isolation.
+`INCLUDE_PATTERN` selects whole tables and views. If you need row-level, column-level, per-customer, or per-user isolation, publish separate databases/shares or move to customer-facing analytics patterns with stronger structural isolation.
 
 ### Forgetting to Update a Manual Share
 

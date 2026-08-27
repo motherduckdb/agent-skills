@@ -14,6 +14,8 @@ Reference for creating, editing, managing, sharing, embedding, and polishing Mot
 | 6. Editing Existing Dives | MCP and SQL-function edit/version paths |
 | 7. Dives as Code | Git repo layout, preview, CI/CD deploy |
 | 8. Embedding Dives | Embed sessions, iframe, CSP, server vs dual mode |
+| Dive Status Lifecycle | Draft, Ready, Endorsed, Archived trust signals |
+| Embedded State and Events | Initial state, state updates, navigation, exports |
 | 9-10. Theming | Theme prompt template and gallery shortlist |
 | 11. Recharts Component Reference | Chart components and props |
 | 12. Tailwind Utilities | Commonly used classes |
@@ -64,7 +66,8 @@ Always start from live schema exploration when MCP or another MotherDuck connect
 5. Build a React component with `useSQLQuery`, a default export, safe value conversion, and per-query loading/empty/error states.
 6. Preview locally when possible.
 7. Call `save_dive` or `update_dive` only after the queries and UI behavior are correct.
-8. Share data or configure embed sessions only after the saved Dive works.
+8. Read the saved version and status back. New Dives are Draft; promote to Ready only after validation and only when publication is requested.
+9. Share data or configure embed sessions only after the saved Dive works.
 
 Prefer incremental edits. A saved Dive can be updated in place, and every content update creates a version.
 
@@ -233,7 +236,11 @@ Embedding flow:
 4. Frontend renders the session in a sandboxed iframe.
 5. Refresh the session when it expires.
 
+Use `useDiveState(key, initialValue)` for interactive state that a host may preconfigure. Pass matching JSON-serializable keys through the embed session's `initial_state`; absent keys fall back to the source-declared initial value. State changes are not persisted automatically, so the host must listen for `dive-state-update` messages if it wants to save and restore them.
+
 Keep all admin tokens and service-account tokens on the backend. The browser should receive only the short-lived embed session string.
+
+Treat every iframe `postMessage` as untrusted input. Check `event.origin`, message type, and payload before updating host state, navigating, or starting a download. A `navigation-request` expresses user intent; it is never authorization to mutate application state or grant access. Handle export messages with the current embedding contract and preserve the host application's download and content-security policy.
 
 Backend session creation:
 
@@ -247,6 +254,7 @@ const response = await fetch(`https://api.motherduck.com/v1/dives/${diveId}/embe
   body: JSON.stringify({
     username: process.env.MOTHERDUCK_SERVICE_ACCOUNT_USERNAME,
     session_hint: customerId,
+    initial_state: { customerId, period: "last_30_days" },
   }),
 });
 
@@ -267,14 +275,33 @@ Frontend iframe:
 
 Add `frame-src https://embed-motherduck.com;` to Content Security Policy when CSP is strict.
 
-Use server mode first. Use dual mode only when the Dive needs browser-side DuckDB-Wasm responsiveness and the parent app can set cross-origin isolation headers:
-
-```text
-Cross-Origin-Embedder-Policy: require-corp
-Cross-Origin-Opener-Policy: same-origin
-```
+Use server mode first. Use dual mode only when the Dive benefits from browser-side DuckDB-Wasm responsiveness. Current MotherDuck Wasm clients no longer require cross-origin isolation headers; verify the current SDK and embedding docs instead of preserving old COI requirements.
 
 Embedded Dives are read-only. Escalate to `motherduck-build-cfa-app` when the product needs custom writes, backend authorization logic, non-Dive routes, or per-customer API contracts.
+
+## Dive Status Lifecycle
+
+Every Dive carries a trust signal that is separate from access control:
+
+| Status | Meaning and agent behavior |
+| --- | --- |
+| Draft | Work in progress and the default for a new Dive |
+| Ready | Reviewed by its owner and suitable for others to use |
+| Endorsed | Admin-approved source of truth; prefer it when reusing existing work |
+| Archived | Retired; hidden from default agent listings but still readable by ID or URL |
+
+Owners can set Draft, Ready, or Archived on their own Dives. Only admins can set Endorsed. Updating Dive content does not reset the status. Use `list_dives` status ordering when selecting existing work, and never have an agent self-endorse its own output.
+
+Set status with the documented MCP write path or `MD_UPDATE_DIVE_STATUS` through `query_rw`:
+
+```sql
+FROM MD_UPDATE_DIVE_STATUS(
+  id = '<dive-uuid>'::UUID,
+  status = 'ready'
+);
+```
+
+Read the Dive back after the change. Treat promotion to Ready as a publication step, not an automatic side effect of saving a draft.
 
 ## 9. Theme Prompt Template
 

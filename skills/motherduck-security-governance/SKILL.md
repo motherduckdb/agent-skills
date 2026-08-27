@@ -22,13 +22,14 @@ Use this skill when the user is evaluating whether MotherDuck can meet their sec
 - Prefer structural isolation over query-time tenant filtering for serious B2B or CFA workloads.
 - Treat region and residency as first-class architectural constraints that require current public confirmation.
 - Be explicit about whether the boundary is a share, a Dive, a database, or a full application.
+- Separate platform permissions (roles), data grants (who can attach a share), and include patterns (which tables/views that share exposes).
 - Separate documented product guarantees from architectural recommendations and assumptions in the final answer.
 
 ## Workflow
 
 1. Identify where credentials live and who administers them.
 2. Define the actual isolation boundary: account, database, schema, or query filter.
-3. Determine who can read, write, share, or administer the data.
+3. Determine which preset/custom roles users hold, who can read, write, share, or administer the data, and which grants actually provide access.
 4. Check whether residency, compliance, or contractual guarantees are part of the requirement.
 5. Use only publicly documented security anchors unless the user has current commercial documentation in hand.
 

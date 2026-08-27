@@ -68,3 +68,13 @@ When updating a skill, treat `skills/catalog.json` as the first stop:
 - keep the Skills CLI prerequisite in install docs explicit: `npm install -g @fountainai/skills`
 
 That is the docs-to-skills sync path in this repo.
+
+## Release-Note Drift Audit
+
+Before a broad product refresh, inspect public release notes since the last review and map their documentation links onto the catalog:
+
+```bash
+uv run scripts/audit_product_drift.py --since YYYY-MM-DD
+```
+
+Add `--check-sources` during a manual maintenance pass to report dead or redirected `source_docs` URLs. Network checks are intentionally not part of the default validation gate; they are evidence for a human review, not an automatic prose-sync mechanism.

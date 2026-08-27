@@ -7,6 +7,7 @@ Advanced reference for data ingestion into MotherDuck. Covers format-specific op
 | Section | Covers |
 | --- | --- |
 | Choose the client path first | Native DuckDB client vs Postgres-endpoint thin client, decision guide, PG-endpoint SQL patterns, local DuckDB database upload |
+| Remote DuckDB Database Files | Physical import from S3 or another documented cloud URL |
 | CSV Advanced Options | `read_csv` parameters, common scenarios, all-VARCHAR fallback |
 | Parquet Advanced Options | Hive partitioning, schema evolution with `union_by_name` |
 | JSON Advanced Options | Format types, nested JSON extraction |
@@ -149,6 +150,19 @@ CREATE OR REPLACE DATABASE remote_database_name FROM '/path/to/local/database.du
 ```
 
 Uploading a database does not switch the active query context. After the upload, qualify remote tables or `USE`/connect to the remote database before validating.
+
+### Import a remote DuckDB database file
+
+Create a native MotherDuck database by physically copying a remote `.duckdb`/`.db` file:
+
+```sql
+CREATE DATABASE remote_database_name
+FROM 's3://my-bucket/path/source.duckdb';
+```
+
+Configure the documented cloud-storage secret first for private objects. Unlike cloning another MotherDuck database or an unfiltered share, importing a local or remote file copies its data and can take time and storage proportional to the source. Validate table counts and key aggregates after import.
+
+A filtered share cannot be the source of `CREATE DATABASE ... FROM` because cloning would bypass its hidden-table boundary. Use `COPY FROM DATABASE <filtered_share> TO <target>` to copy only the visible tables.
 
 ---
 

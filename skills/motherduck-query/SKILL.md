@@ -15,6 +15,7 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 
 ## Default Posture
 
+- When MotherDuck MCP is available and the query answers a business question, call `get_query_guide` before writing SQL. Traverse only relevant topics and validate Guide claims against the live schema.
 - Write DuckDB SQL, not PostgreSQL SQL, even when using the PG endpoint.
 - Always use fully qualified `"database"."schema"."table"` names.
 - Preserve the intended grain of every result set; state the grain before optimizing or materializing a query.
@@ -26,10 +27,11 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 ## Workflow
 
 1. Confirm the actual tables, columns, and grain before writing SQL.
-2. Write the query in SQL first, then wrap it in Python or TypeScript only if needed.
-3. Use CTEs and DuckDB-native patterns such as `GROUP BY ALL`, `QUALIFY`, and `arg_max`.
-4. Check the plan, row count, and shape for pushdown, unnecessary sorts, or repeated raw rescans.
-5. Materialize expensive repeated queries into serving tables or light views when warranted.
+2. Load relevant Guide context when MCP is available, without treating it as a substitute for schema inspection.
+3. Write the query in SQL first, then wrap it in Python or TypeScript only if needed.
+4. Use CTEs and DuckDB-native patterns such as `GROUP BY ALL`, `QUALIFY`, and `arg_max`.
+5. Check the plan, row count, and shape for pushdown, unnecessary sorts, or repeated raw rescans.
+6. Materialize expensive repeated queries into serving tables or light views when warranted.
 
 ## Open Next
 
@@ -40,3 +42,4 @@ Use this skill when executing SQL queries for analytics, aggregations, transform
 - `motherduck-connect` for session setup
 - `motherduck-duckdb-sql` for syntax and function reference
 - `motherduck-explore` for understanding the source schema before writing queries
+- `motherduck-manage-guides` when semantic definitions or reusable query rules need to be read or maintained

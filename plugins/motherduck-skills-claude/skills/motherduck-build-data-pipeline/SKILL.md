@@ -9,7 +9,7 @@ license: MIT
 
 Use this skill when the user needs an ingestion-to-serving workflow, not just a single load step.
 
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-load-data`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, and `motherduck-ducklake`.
+This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-load-data`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, `motherduck-ducklake`, and `motherduck-manage-guides`.
 
 ## Start Here: Is a MotherDuck Server Active?
 
@@ -38,6 +38,8 @@ If no server is active, use any supplied source and target context. For planning
 - idempotent stage rebuilds or append contracts before scheduled automation
 - verify the MotherDuck-supported DuckDB client version before recommending upstream-only write, checkpoint, or lakehouse features
 - native MotherDuck storage unless DuckLake is explicitly required
+- MotherDuck CLI for Flight source and large file-shaped output when the agent has a shell; MCP for chat-only operation
+- a `flights` Guide for reusable scheduling, naming, secret, and ingestion conventions when the organization has them
 
 ## Workflow
 
@@ -48,10 +50,11 @@ If no server is active, use any supplied source and target context. For planning
 5. Deduplicate, type, and promote into staging.
 6. Materialize analytics-ready outputs.
 7. Validate counts, freshness, uniqueness, and business metrics before publishing downstream assets.
+8. Capture stable business definitions and operating caveats in referenced Guides; keep executable transformation logic in source control.
 
 Match execution to the request: answer, review, or planning work returns the requested pipeline artifacts; build or change work creates the requested in-scope files and warehouse objects and validates them. Ask before destructive actions, unrelated external writes, or a material expansion of scope.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

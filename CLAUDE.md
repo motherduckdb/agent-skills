@@ -35,6 +35,8 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 ## Product-Level Defaults
 
 - Use MCP-assisted exploration when available.
+- Use the MotherDuck CLI for file-shaped Dive/Flight work when a shell is available; use MCP for chat-only exploration and inline results.
+- Call `get_query_guide` before business-semantic queries and traverse only relevant Guide topics.
 - For use-case skills, if a remote MotherDuck MCP server or local MotherDuck server is active, start from the real database in scope.
 - If the database or workspace is unclear, ask which one should back the project before designing the solution.
 - Inspect schemas, tables, columns, joins, and time dimensions before inventing example models or rollout steps.
@@ -68,12 +70,14 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | Skill | Invoke | Description |
 |---|---|---|
 | motherduck-connect | `/motherduck-connect` | Choose and configure the right connection path. |
+| motherduck-cli | `/motherduck-cli` | Operate MotherDuck from shell, files, and structured output. |
 | motherduck-query | `/motherduck-query` | Structure and optimize DuckDB SQL for MotherDuck. |
 | motherduck-explore | `/motherduck-explore` | Discover databases, schemas, tables, columns, views, and shares. |
 | motherduck-duckdb-sql | `/motherduck-duckdb-sql` | Look up DuckDB SQL and MotherDuck-specific constraints. |
 | motherduck-rest-api | `/motherduck-rest-api` | Manage service accounts, tokens, Duckling config, active accounts, and Dive embed sessions. |
 | motherduck-load-data | `/motherduck-load-data` | Ingest files, cloud objects, and upstream data into MotherDuck. |
 | motherduck-model-data | `/motherduck-model-data` | Design analytics-ready schemas and tables. |
+| motherduck-manage-guides | `/motherduck-manage-guides` | Create, discover, version, and govern agent context. |
 | motherduck-share-data | `/motherduck-share-data` | Distribute data with shares and share Dive-backed data safely. |
 | motherduck-create-dive | `/motherduck-create-dive` | Build, theme, preview, save, and update Dives. |
 | motherduck-create-flight | `/motherduck-create-flight` | Create, schedule, run, and debug Flights — Python jobs on MotherDuck compute. |

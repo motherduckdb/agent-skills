@@ -8,7 +8,7 @@ license: MIT
 
 Use this skill when the user wants broad internal access to analytics with clear guardrails, trusted datasets, and a practical rollout path.
 
-This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-query`, `motherduck-model-data`, `motherduck-create-dive`, and `motherduck-share-data`.
+This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-query`, `motherduck-model-data`, `motherduck-manage-guides`, `motherduck-create-dive`, and `motherduck-share-data`.
 
 ## Start Here: Is a MotherDuck Server Active?
 
@@ -32,6 +32,8 @@ If no server is active, use any supplied schema and audience context. For planni
 - Dive or share boundary over raw table dumping
 - standard ownership for metric changes
 - lightweight metric definitions and owners before inviting more users
+- a short root orientation Guide plus shallow domain Guides for definitions that agents cannot infer from schema
+- restricted Shares granted to roles; use include patterns for table/view subsets and separate Shares for different audiences
 
 ## Workflow
 
@@ -39,13 +41,14 @@ If no server is active, use any supplied schema and audience context. For planni
 2. Inspect the data model that internal teams would use.
 3. Pick the first audience and first use case.
 4. Publish one trusted dataset.
-5. Document the metric owner, refresh expectation, and access boundary.
-6. Publish one Dive or one share.
-7. Expand only after the first workflow is stable.
+5. Create or update the relevant Guide with the metric owner, validated definition, join rules, and referenced objects.
+6. Publish one Ready Dive or one restricted, role-granted Share.
+7. Audit the live roles, grants, and exposed catalog.
+8. Expand only after the first workflow is stable.
 
 Match execution to the request: answer, review, or planning work returns the requested rollout artifacts; build or change work creates the requested in-scope dataset, Dive, or share and validates it. Ask before broader access grants, destructive changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 
@@ -108,4 +111,6 @@ uv run scripts/test_typescript_artifacts.py
 - `motherduck-query` -- validate KPI definitions
 - `motherduck-model-data` -- publish curated analytical views or tables
 - `motherduck-create-dive` -- build the first shareable answer surface
+- `motherduck-manage-guides` -- preserve governed metric and join context for agents
+- `motherduck-share-data` -- publish table/view subsets and role-granted access
 - `motherduck-share-data` -- publish governed data access when users need SQL, not just a Dive

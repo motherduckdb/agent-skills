@@ -51,6 +51,7 @@ SUPPORTED_HARNESSES = [
     "Gemini CLI",
 ]
 DEFAULT_ROUTING_SEQUENCE = "`motherduck-connect`, then `motherduck-explore`, then `motherduck-query`"
+SKILLS_CLI_PREREQUISITE = "npm install -g @fountainai/skills"
 
 
 class ValidationError(Exception):
@@ -134,6 +135,16 @@ def read_skill_catalog() -> dict[str, dict[str, object]]:
             raise ValidationError(
                 f"{SKILL_CATALOG}: needs_live_discovery for {skill_name!r} must be a boolean"
             )
+        for field_name, values in (
+            ("depends_on", depends_on),
+            ("references", references),
+            ("artifacts", artifacts),
+            ("source_docs", source_docs),
+        ):
+            if len(values) != len(set(values)):
+                raise ValidationError(
+                    f"{SKILL_CATALOG}: {field_name} for {skill_name!r} contains duplicate entries"
+                )
         catalog[skill_name] = {
             "description": description,
             "layer": layer,
@@ -512,6 +523,52 @@ def validate_discoverability_docs() -> None:
                 f"{doc}: missing default routing sequence {DEFAULT_ROUTING_SEQUENCE!r}"
             )
 
+    if SKILLS_CLI_PREREQUISITE not in README.read_text():
+        raise ValidationError(f"{README}: missing Skills CLI prerequisite {SKILLS_CLI_PREREQUISITE!r}")
+
+
+def validate_product_contracts(catalog: dict[str, dict[str, object]]) -> None:
+    required_layers = {
+        "motherduck-cli": "utility",
+        "motherduck-manage-guides": "workflow",
+    }
+    for skill_name, expected_layer in required_layers.items():
+        entry = catalog.get(skill_name)
+        if entry is None or entry["layer"] != expected_layer:
+            raise ValidationError(f"{SKILL_CATALOG}: {skill_name} must be a {expected_layer} skill")
+
+    required_text = {
+        "motherduck-share-data": ["INCLUDE_PATTERN", "TO ROLE"],
+        "motherduck-create-flight": ["bare `<PARAM>`", "namespaced `<secret_name>_<PARAM>`", "get_flight_run", "MD_LIST_FLIGHTS()"],
+        "motherduck-query": ["get_query_guide"],
+        "motherduck-create-dive": ["Draft", "Ready", "Endorsed", "Archived", "never self-endorse"],
+        "motherduck-cli": ["MOTHERDUCK_HOME", "motherduck new", "--output json"],
+        "motherduck-manage-guides": ["get_query_guide", "access = 'user'", "references"],
+    }
+    for skill_name, phrases in required_text.items():
+        text = (SKILLS_DIR / skill_name / "SKILL.md").read_text()
+        for phrase in phrases:
+            if phrase not in text:
+                raise ValidationError(f"{skill_name}: missing critical product contract {phrase!r}")
+
+    all_source_docs = [
+        str(url)
+        for entry in catalog.values()
+        for url in entry["source_docs"]
+    ]
+    if any("github.com/motherduckdb/motherduck-cookbook" in url for url in all_source_docs):
+        raise ValidationError("skills/catalog.json: shipped source_docs must not depend on motherduck-cookbook")
+
+    stale_fragments = {
+        "motherduck-share-data": ["database-granularity", "database level. If you need"],
+        "motherduck-create-flight": ["not the bare param name", "not bare `API_KEY`", "MD_FLIGHTS()"],
+    }
+    for skill_name, fragments in stale_fragments.items():
+        text = "\n".join(path.read_text() for path in (SKILLS_DIR / skill_name).rglob("*.md"))
+        for fragment in fragments:
+            if fragment in text:
+                raise ValidationError(f"{skill_name}: contains stale product contract {fragment!r}")
+
 
 def main() -> int:
     skills = sorted(p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md"))
@@ -596,6 +653,8 @@ def main() -> int:
             raise ValidationError(
                 f"{GEMINI_CONTEXT}: skill catalog mismatch for {layer}\nexpected: {expected}\nfound:    {found}"
             )
+
+    validate_product_contracts(catalog)
 
     claude_plugin_name = validate_claude_plugin()
     validate_claude_marketplace(claude_plugin_name)

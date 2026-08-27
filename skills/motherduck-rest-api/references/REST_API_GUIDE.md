@@ -1,6 +1,6 @@
 # MotherDuck REST API Guide
 
-Use this guide for control-plane workflows against `https://api.motherduck.com`.
+Use this guide for control-plane workflows against `https://api.motherduck.com`. Agent signup through `motherduck new` or the public signup flow is a separate product surface and is not an Admin REST API fallback.
 
 The REST API is not the SQL query path. Use it for organization administration, service-account provisioning, supported token lifecycle work, Duckling configuration, active-account inspection, and Dive embed sessions.
 

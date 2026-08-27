@@ -9,7 +9,7 @@ license: MIT
 
 Use this skill when a consultancy, implementation partner, or multi-client product team needs a repeatable MotherDuck delivery pattern across several clients.
 
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, and `motherduck-create-dive`.
+This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, `motherduck-manage-guides`, and `motherduck-create-dive`.
 
 ## Start Here: Is a MotherDuck Server Active?
 
@@ -32,6 +32,8 @@ If no server is active, use any supplied client and region context. For planning
 - shared architecture, client-specific schema
 - explicit sharing and revocation per client
 - versioned templates for provisioning, validation, handoff, and exception tracking
+- role-granted restricted Shares with per-audience include patterns where governed table-level delivery fits
+- a reusable Guide topic layout with client-specific referenced definitions and exceptions
 
 ## Workflow
 
@@ -40,12 +42,13 @@ If no server is active, use any supplied client and region context. For planning
 3. Inspect the existing regional and database layout if available.
 4. Standardize the architecture and provisioning path.
 5. Define the repeatable validation pack for every client environment.
-6. Document client-specific exceptions.
-7. Produce the handoff assets and validation checks.
+6. Create or update referenced Guides for standard conventions and client-specific exceptions.
+7. Audit roles, grants, include patterns, and region-specific availability.
+8. Produce the handoff assets and validation checks.
 
 Match execution to the request: answer, review, or planning work returns the requested delivery artifacts; build or change work creates the requested in-scope templates or client assets and validates them. Ask before provisioning additional client environments, destructive changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

@@ -26,6 +26,8 @@ Use this skill when the user needs to manage MotherDuck service accounts, suppor
 - Assume active-account, Duckling configuration, service-account creation, service-account token creation, and Dive embed-session endpoints require an organization admin bearer token unless current docs say otherwise.
 - Never expose generated access tokens in logs, browser code, client bundles, or committed files.
 - Confirm destructive deletes with the user. Deleting a user permanently deletes that user and all of their data.
+- Treat agent/account signup (`motherduck new` or the public signup flow) as separate from the organization Admin REST API. Never create an account because an admin token is unavailable.
+- For Dive embed sessions, keep `initial_state` JSON-serializable and within the documented size limits; validate iframe state, navigation, and export messages in the host application.
 
 ## Workflow
 

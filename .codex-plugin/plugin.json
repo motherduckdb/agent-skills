@@ -1,7 +1,7 @@
 {
   "name": "motherduck-skills",
-  "version": "2.5.0",
-  "description": "MotherDuck skills for agents and developers: connect, explore schemas, write DuckDB SQL, use the REST API, build Dives, and ship dashboards, pipelines, and customer-facing analytics.",
+  "version": "2.6.0",
+  "description": "MotherDuck skills for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
   "author": {
     "name": "MotherDuck",
     "url": "https://motherduck.com"
@@ -17,6 +17,9 @@
     "sql",
     "postgres",
     "rest-api",
+    "cli",
+    "guides",
+    "flights",
     "dives",
     "motherduck-ducklake"
   ],
@@ -24,7 +27,7 @@
   "interface": {
     "displayName": "MotherDuck Skills",
     "shortDescription": "Connect, explore, query, and build on MotherDuck.",
-    "longDescription": "A packaged MotherDuck skill catalog for connecting to MotherDuck, inspecting live schemas, writing DuckDB SQL, using the REST API for administration, building Dives, and shipping dashboards, pipelines, and customer-facing analytics.",
+    "longDescription": "A packaged MotherDuck skill catalog for terminal and MCP workflows: connect, inspect live schemas and Guides, write DuckDB SQL, administer MotherDuck, build Dives and Flights, and ship dashboards, pipelines, and customer-facing analytics.",
     "developerName": "MotherDuck",
     "category": "Productivity",
     "capabilities": [
@@ -33,6 +36,7 @@
     "websiteURL": "https://motherduck.com",
     "defaultPrompt": [
       "Use MotherDuck Skills to explore my databases and recommend the right query path.",
+      "Use MotherDuck Skills to capture our metric definitions in Guides and build from local files with the MotherDuck CLI.",
       "Use MotherDuck Skills to design a Dive-backed dashboard for my analytics tables."
     ],
     "brandColor": "#0777b3",

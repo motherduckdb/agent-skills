@@ -69,7 +69,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { readFile } from "node:fs/promises";
 
 const instance = await DuckDBInstance.create(
-  "md:?custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
+  "md:?custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)"
 );
 const conn = await instance.connect();
 for (const file of ["01_ingest.sql", "02_transform.sql", "03_publish.sql"]) {
@@ -225,7 +225,7 @@ Operational defaults:
 
 - buffer API or event traffic before writing analytical tables
 - prefer staged Parquet, Arrow/dataframes, or `COPY`
-- tag long-lived workloads with `custom_user_agent`; for repo use-case builds, use `agent-skills/2.5.0(harness-<harness>;llm-<llm>)`
+- tag long-lived workloads with `custom_user_agent`; for repo use-case builds, use `agent-skills/2.6.0(harness-<harness>;llm-<llm>)`
 - keep write transactions comfortably bounded instead of unbounded monoliths
 
 ---
@@ -380,8 +380,10 @@ COMMENT ON VIEW "analytics"."main"."top_customers" IS 'Top 100 customers by life
 
 ```sql
 CREATE SHARE IF NOT EXISTS analytics_share FROM analytics (
-    ACCESS ORGANIZATION, VISIBILITY DISCOVERABLE, UPDATE AUTOMATIC
+    ACCESS RESTRICTED, VISIBILITY DISCOVERABLE, UPDATE AUTOMATIC,
+    INCLUDE_PATTERN 'main.monthly_*, main.top_customers'
 );
+GRANT READ ON SHARE analytics_share TO ROLE analyst;
 ```
 
 Before sharing, make sure the serving tables are curated and documented. Shares are zero-copy and easy to distribute, so be deliberate about what database boundary you are publishing.
@@ -482,15 +484,19 @@ COMMENT ON COLUMN "analytics"."main"."monthly_revenue"."customers" IS 'SUM(uniqu
 
 -- 8. Share
 CREATE SHARE IF NOT EXISTS analytics_share FROM analytics (
-    ACCESS ORGANIZATION, VISIBILITY DISCOVERABLE, UPDATE AUTOMATIC
+    ACCESS RESTRICTED, VISIBILITY DISCOVERABLE, UPDATE AUTOMATIC,
+    INCLUDE_PATTERN 'main.monthly_revenue'
 );
+GRANT READ ON SHARE analytics_share TO ROLE analyst;
 ```
 
 ---
 
 ## Scheduling Considerations
 
-MotherDuck does not have built-in scheduling. Use external schedulers: cron, GitHub Actions, Dagster, Airflow, or Prefect.
+Use a MotherDuck Flight for a Python-native scheduled ingestion or transformation that should run on MotherDuck compute. Create it without a schedule, validate one on-demand run and its logs, then attach the UTC cron and a plan-valid `max_runtime_sec`. Keep reusable conventions in the reserved `flights` Guide topic.
+
+Use an external scheduler such as Dagster, Airflow, Prefect, GitHub Actions, or cron when the workflow coordinates several external systems, needs a richer DAG/control plane, or must run outside MotherDuck.
 
 Store SQL transformations in version-controlled `.sql` files. Execute them from a scheduled script.
 
@@ -504,7 +510,7 @@ import duckdb
 import os
 from pathlib import Path
 
-PIPELINE_USER_AGENT = "agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
+PIPELINE_USER_AGENT = "agent-skills/2.6.0(harness-<harness>;llm-<llm>)"
 
 def run_pipeline():
     conn = duckdb.connect(f"md:?custom_user_agent={PIPELINE_USER_AGENT}")
@@ -558,7 +564,7 @@ Number files to enforce execution order (`01_ingest.sql`, `02_dedupe.sql`, etc.)
 - **Version control all SQL transformations.** Store `.sql` files in git, not in ad-hoc query editors.
 - **Deduplicate before building analytics tables.** Raw sources often contain duplicates.
 - **Use fully qualified table names** in every statement: `"database"."schema"."table"`.
-- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later. For repo use-case builds, use `agent-skills/2.5.0(harness-<harness>;llm-<llm>)`.
+- **Tag long-lived pipeline runners with `custom_user_agent`.** This makes workload attribution and cost analysis possible later. For repo use-case builds, use `agent-skills/2.6.0(harness-<harness>;llm-<llm>)`.
 
 ---
 

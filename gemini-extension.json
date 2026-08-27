@@ -1,7 +1,7 @@
 {
   "name": "motherduck-skills",
-  "version": "2.5.0",
-  "description": "MotherDuck skills for Gemini CLI: connect, explore live schemas, write DuckDB SQL, use the REST API, and build Dives, dashboards, pipelines, migrations, and analytics apps.",
+  "version": "2.6.0",
+  "description": "MotherDuck skills for Gemini CLI: use the MotherDuck CLI and Guides, explore live schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
   "contextFileName": "GEMINI.md",
   "plan": {
     "directory": ".gemini/plans"

@@ -75,7 +75,7 @@ const clients: ClientConfig[] = [
 ```python
 import duckdb
 
-PARTNER_USER_AGENT = "agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
+PARTNER_USER_AGENT = "agent-skills/2.6.0(harness-<harness>;llm-<llm>)"
 
 
 def provision_client(conn: duckdb.DuckDBPyConnection, slug: str, region: str) -> dict:
@@ -138,7 +138,9 @@ def validate_all_clients(clients: list[dict]) -> list[dict]:
 - Read scaling is the public pattern for read-heavy BI and app workloads.
 - Dives are shareable live workspace artifacts, and Embedded Dives can serve app surfaces when the client needs a read-only live dashboard inside an existing product. Keep implementation mechanics in `motherduck-create-dive` and REST endpoint details in `motherduck-rest-api`.
 - Verify DuckLake sharing semantics against the live DuckLake guidance before committing to a delivery boundary.
-- Shares are zero-copy and database-granularity, so partner delivery should publish curated database boundaries rather than exposing internal staging layouts.
+- Shares are zero-copy and database-backed. Partner delivery can expose a whole curated database or a table/view subset through `INCLUDE_PATTERN`; different client audiences need separate shares or stronger structural boundaries.
+- Prefer restricted shares granted to roles, and audit the grants and stored include pattern during every client handoff.
+- Use referenced Guides for reusable definitions and client-specific exceptions that agents cannot infer from schema.
 
 ## Recommended Workflow
 

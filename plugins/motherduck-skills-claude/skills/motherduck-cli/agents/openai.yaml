@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use the MotherDuck CLI"
+  short_description: "Operate MotherDuck from files and shell"
+  default_prompt: "Use $motherduck-cli to choose and run a safe file-oriented MotherDuck CLI workflow."

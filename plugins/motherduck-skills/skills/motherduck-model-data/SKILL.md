@@ -27,7 +27,7 @@ This is a lightweight framework-agnostic convention for organizing SQL transform
 
 - Design for analytical reads, not transactional writes.
 - Prefer wide denormalized tables and pre-aggregated serving tables over highly normalized OLTP-style schemas.
-- Use fully qualified names and add comments to tables and columns.
+- Use fully qualified names and add comments to tables and columns. Preserve stable object names so Guides can reference the intended catalog objects reliably.
 - Use `NOT NULL` aggressively; do not assume primary keys or foreign keys are enforced.
 - Reuse an existing dbt, SQLMesh, or repo-local modeling convention when one is already present; create the lightweight scaffold only when there is no established project shape.
 - Separate `raw`, `staging`, and `analytics` lifecycle stages when the project is non-trivial.
@@ -70,3 +70,4 @@ If the user explicitly asks for a single table, a quick DDL statement, or an ad-
 - `motherduck-query` for executing DDL, rebuilds, and validation queries
 - `motherduck-explore` for understanding the source schema before remodeling
 - `motherduck-load-data` for ingestion paths that feed the modeled tables
+- `motherduck-manage-guides` for durable business definitions and join rules that do not belong in transformation code
