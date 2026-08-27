@@ -9,7 +9,7 @@ license: MIT
 
 Use this skill when the user is embedding analytics into a product for external users and needs a concrete serving architecture, not just a dashboard.
 
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, and `motherduck-load-data`.
+This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, `motherduck-load-data`, and `motherduck-manage-guides`.
 
 ## Start Here: Is a MotherDuck Server Active?
 
@@ -40,11 +40,13 @@ If no server is active, use any supplied schema or table context. For planning w
   - a backend can create embed sessions and keep admin tokens server-side
 - **DuckDB-Wasm** is acceptable only for small, browser-side, read-only workloads.
 - **Single shared tenant_id filtering** is the fallback, not the recommendation.
+- A filtered Share can expose a curated table/view subset to one audience, but it is not row-level tenant isolation. Different audiences need separate Shares or stronger structural boundaries.
+- For embedded Dives, validate `postMessage` origin/type/payload, use `initial_state` only for JSON-serializable UI state, and keep navigation, export, and persistence policy in the host application.
 
 ## Workflow
 
 1. Inspect the available MotherDuck server or supplied schema context.
-2. Explore the actual data model that will back the app.
+2. Read relevant Guides, explore the actual data model, and validate the governed definitions that will back the app.
 3. Choose the serving pattern:
    - 3-tier app
    - embedded Dive
@@ -58,7 +60,7 @@ If no server is active, use any supplied schema or table context. For planning w
 
 Match execution to the request: answer, review, or planning work returns the requested architecture artifacts; build or change work creates the requested in-scope files or services and validates them. Ask before destructive actions, external writes not already requested, or a material expansion of scope.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.5.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 

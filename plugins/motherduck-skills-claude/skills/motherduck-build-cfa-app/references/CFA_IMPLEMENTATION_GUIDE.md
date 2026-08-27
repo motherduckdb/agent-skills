@@ -131,7 +131,9 @@ Embedded Dives sit between a standalone Dive and a full CFA app:
 - browser receives only the short-lived session string
 - not a substitute for a full app backend when you need customer-specific routing, richer write paths, or tighter policy enforcement
 - server mode runs through the Postgres endpoint and is the default embed query mode
-- dual mode adds browser-side DuckDB-Wasm behavior and requires cross-origin isolation headers
+- dual mode adds browser-side DuckDB-Wasm behavior; current MotherDuck Wasm clients no longer require cross-origin isolation headers, but verify the current SDK and embed docs
+- `initial_state` can seed JSON-serializable `useDiveState` values; the host owns persistence of `dive-state-update` events
+- validate the origin, type, and payload of navigation, state, and export messages before the host acts on them
 
 If the requirement is "show a live MotherDuck dashboard inside our product," this can be enough. If the requirement is "serve each customer through our own application contract and backend controls," stay with the 3-tier CFA architecture.
 
@@ -203,7 +205,7 @@ Native DuckDB gives full SQL support, cross-database queries, and no driver tran
 # Python backend example (FastAPI + duckdb)
 import duckdb
 
-CFA_USER_AGENT = "agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
+CFA_USER_AGENT = "agent-skills/2.6.0(harness-<harness>;llm-<llm>)"
 
 def get_customer_connection(customer_db: str, customer_token: str):
     """Create a native DuckDB connection to a customer's MotherDuck database."""

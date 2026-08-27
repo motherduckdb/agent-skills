@@ -29,6 +29,8 @@ Use this skill when the storage decision is genuinely about open table format an
 - For data inlining, sorted tables, bucket partitioning, deletion vectors, or extension behavior, verify the current MotherDuck DuckLake docs and DuckDB/DuckLake version matrix before giving syntax guarantees.
 - Do not infer MotherDuck client/runtime support from upstream DuckDB release notes alone; check the MotherDuck lifecycle docs when the exact DuckDB version matters.
 - Keep the MotherDuck product surface separate from raw DuckLake-extension assumptions.
+- Filtered shares (`INCLUDE_PATTERN`) require native MotherDuck storage. DuckLake shares can be unfiltered, and persisted Iceberg catalogs cannot be shared.
+- Do not apply native/share `REFRESH DATABASE` assumptions to persisted Iceberg catalogs; their catalog advances independently. Verify current docs before prescribing a refresh operation.
 
 ## Workflow
 

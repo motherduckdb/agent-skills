@@ -27,7 +27,7 @@ Avoid ornamental gradients, glass effects, glowing accents, oversized hero metri
 ## Workflow
 
 1. Inspect the existing Dive, supplied design paper, screenshots, and live schema before proposing a layout.
-2. If MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and again before any save or update if the guide may have changed. Use it for current runtime and query contracts; use this skill for the responsive shell when generic styling examples conflict with the user's explicit design requirements.
+2. If MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and again before any save or update if the guide may have changed. Apply relevant conventions surfaced from the reserved `dives` Guide topic unless the user asks for a different direction. Use this skill for the responsive shell when generic styling examples conflict with the user's explicit design requirements.
 3. Define the audience, primary decision, metric hierarchy, filter dimensions, and reuse boundary.
 4. Sketch the 320 px composition first: header, filter trigger, compact one- or two-column KPI group, primary chart, supporting sections, and detail view.
 5. Expand that composition into tablet and desktop grids without changing reading order.

@@ -20,8 +20,8 @@ The catalog is a three-layer dependency graph:
 
 Current catalog:
 
-- Utility: `motherduck-connect`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`, `motherduck-rest-api`
-- Workflow: `motherduck-load-data`, `motherduck-model-data`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-create-flight`, `motherduck-design-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
+- Utility: `motherduck-connect`, `motherduck-cli`, `motherduck-query`, `motherduck-explore`, `motherduck-duckdb-sql`, `motherduck-rest-api`
+- Workflow: `motherduck-load-data`, `motherduck-model-data`, `motherduck-manage-guides`, `motherduck-share-data`, `motherduck-create-dive`, `motherduck-create-flight`, `motherduck-design-dive`, `motherduck-ducklake`, `motherduck-security-governance`, `motherduck-pricing-roi`
 - Use-case: `motherduck-build-cfa-app`, `motherduck-build-dashboard`, `motherduck-build-data-pipeline`, `motherduck-migrate-to-motherduck`, `motherduck-enable-self-serve-analytics`, `motherduck-partner-delivery`
 
 Each skill may also have:
@@ -54,6 +54,8 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Connection guidance is scenario-based, not one-size-fits-all.
 - Native `md:` workspace connections are the default posture for multi-database discovery, bootstrap flows, and temporary MotherDuck validation environments.
 - Dives are MCP-first and should use `get_dive_guide` before save/update flows.
+- Coding agents should prefer the MotherDuck CLI for file-shaped Dive/Flight work and large outputs; chat-only exploration remains MCP-first.
+- Analytical MCP work should consult `get_query_guide` and traverse relevant Guide topics before writing business-semantic SQL.
 - Use-case skills should begin from the user's live MotherDuck data model when a remote or local server is active.
 - DuckLake is supported but opt-in; native MotherDuck storage remains the default posture.
 - Artifacts should be local-first where practical, but when the repo claims MotherDuck-specific validation, the corresponding artifact or reference project should also be runnable against temporary real MotherDuck databases.

@@ -1,7 +1,7 @@
 {
   "name": "motherduck-skills",
-  "version": "2.5.0",
-  "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, using the REST API, and building dashboards, Dives, pipelines, and analytics apps.",
+  "version": "2.6.0",
+  "description": "MotherDuck skills for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
   "author": {
     "name": "MotherDuck",
     "url": "https://motherduck.com"
@@ -17,6 +17,9 @@
     "sql",
     "postgres",
     "rest-api",
+    "cli",
+    "guides",
+    "flights",
     "dives",
     "motherduck-ducklake"
   ],

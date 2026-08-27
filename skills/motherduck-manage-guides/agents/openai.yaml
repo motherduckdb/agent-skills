@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manage MotherDuck Guides"
+  short_description: "Store durable context for data agents"
+  default_prompt: "Use $motherduck-manage-guides to organize and validate warehouse-native context for this data task."

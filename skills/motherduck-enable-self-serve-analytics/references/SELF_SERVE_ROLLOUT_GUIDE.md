@@ -128,7 +128,7 @@ export default function TeamKpiView() {
 ```python
 import duckdb
 
-USE_CASE_USER_AGENT = "agent-skills/2.5.0(harness-<harness>;llm-<llm>)"
+USE_CASE_USER_AGENT = "agent-skills/2.6.0(harness-<harness>;llm-<llm>)"
 
 conn = duckdb.connect(f"md:analytics?custom_user_agent={USE_CASE_USER_AGENT}")
 conn.sql("""
@@ -147,7 +147,9 @@ conn.close()
 - MotherDuck positions Dives for the long tail of questions that do not justify a full dashboard, not as a replacement for every BI workflow.
 - Dives are shareable and live.
 - Read scaling is the official answer when dashboard or BI traffic becomes read-heavy and concurrent.
-- Shares are zero-copy, read-only database-level distribution, so publish only curated databases rather than raw internal workspaces.
+- Shares are zero-copy and read-only. Publish a curated whole database or an explicit table/view subset through `INCLUDE_PATTERN`, grant restricted access to roles, and never treat the pattern as row-level security.
+- Guides preserve metric definitions, joins, and pitfalls for agents; attach them to the governed catalog objects and default them to private until organization publication is requested and validated.
+- Dive statuses separate work in progress from trusted assets. Publish validated work as Ready and reserve Endorsed for admin-reviewed sources of truth.
 
 ## What Good Self-Serve Looks Like
 

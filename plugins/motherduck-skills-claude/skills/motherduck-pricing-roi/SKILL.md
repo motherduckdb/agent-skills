@@ -22,6 +22,7 @@ Use this skill when the user is asking whether MotherDuck is financially sensibl
 - Separate storage, compute, and operational complexity in every answer.
 - Map workload shape to cost shape before comparing vendors or plans.
 - Treat many pricing questions as risk, predictability, or procurement questions rather than purely technical ones.
+- Verify plan-sensitive entitlements such as Flight scheduling/runtime limits, custom roles, table-level security, regions, and embedded features in the current turn; do not infer them from an older release note.
 
 ## Workflow
 

@@ -4,13 +4,13 @@
     "name": "MotherDuck"
   },
   "metadata": {
-    "description": "MotherDuck skills for connecting, exploring live schemas, writing DuckDB SQL, using the REST API, and shipping Dives, dashboards, pipelines, migrations, and analytics apps."
+    "description": "MotherDuck skills for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines."
   },
   "plugins": [
     {
       "name": "motherduck-skills",
       "source": ".",
-      "description": "Connect, explore, query, and build on MotherDuck from Cursor."
+      "description": "Use the MotherDuck CLI and Guides, explore schemas, query data, and build Dives, Flights, and analytics apps from Cursor."
     }
   ]
 }

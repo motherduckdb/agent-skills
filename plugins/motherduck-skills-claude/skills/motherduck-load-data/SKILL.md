@@ -24,7 +24,7 @@ Use this skill when the job is getting data into MotherDuck correctly and effici
 
 - Start by classifying the source: object storage or HTTPS, local file or local DuckDB, in-memory rows, or an external database.
 - Prefer `CREATE TABLE AS SELECT` for first loads and `INSERT INTO ... SELECT` for appends.
-- For whole local DuckDB databases, use `CREATE OR REPLACE DATABASE remote_name FROM CURRENT_DATABASE()`, an attached local database, or a file path from a native DuckDB client after attaching `md:`.
+- For whole DuckDB databases, use `CREATE OR REPLACE DATABASE remote_name FROM CURRENT_DATABASE()`, an attached local database, a local file path from a native client, or a remote `.duckdb` file URL such as S3. Remote and local file imports physically copy data into MotherDuck; database/share clone sources are zero-copy.
 - Use Parquet for durable bulk movement whenever you control the source format.
 - Treat the Postgres endpoint as a thin-client path for server-side remote reads, not for local-file or extension-driven ingestion.
 - Bootstrap the target MotherDuck database first when the ingestion tool does not create it automatically.
@@ -37,6 +37,7 @@ Use this skill when the job is getting data into MotherDuck correctly and effici
 2. Choose the loading path:
    - object storage or HTTPS: remote read into MotherDuck
    - local file or local DuckDB: use a DuckDB client path
+   - remote DuckDB database file: use `CREATE DATABASE ... FROM '<cloud-url>'` with the required cloud secret
    - in-memory rows: Arrow or dataframe bulk load first, batched inserts only as a fallback
    - external database: use the appropriate scan or replication path from a DuckDB-capable environment
 3. Land the data into a raw or staging table with minimal transformation.
@@ -56,3 +57,4 @@ For answer, review, or planning requests, recommend the loading path without mut
 - `motherduck-query` for writing CTAS, append, and validation SQL
 - `motherduck-model-data` for promoting landed data into staging and analytics tables
 - `motherduck-ducklake` only when object-storage-backed lakehouse storage is an explicit requirement
+- `motherduck-cli` when a shell-based load should stream structured output to files

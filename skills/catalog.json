@@ -8,7 +8,8 @@
       "motherduck-model-data",
       "motherduck-query",
       "motherduck-load-data",
-      "motherduck-explore"
+      "motherduck-explore",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/CFA_IMPLEMENTATION_GUIDE.md",
@@ -23,7 +24,8 @@
       "https://motherduck.com/docs/concepts/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/"
+      "https://motherduck.com/docs/key-tasks/dives/embedding-dives/",
+      "https://motherduck.com/docs/key-tasks/guides/"
     ],
     "needs_live_discovery": true
   },
@@ -35,7 +37,8 @@
       "motherduck-explore",
       "motherduck-query",
       "motherduck-create-dive",
-      "motherduck-design-dive"
+      "motherduck-design-dive",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/DASHBOARD_IMPLEMENTATION_GUIDE.md",
@@ -46,9 +49,11 @@
       "artifacts/dashboard_story_example.ts"
     ],
     "source_docs": [
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/managing-dives-as-code/",
+      "https://motherduck.com/docs/key-tasks/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/managing-dives-as-code/",
+      "https://motherduck.com/docs/key-tasks/dives/dive-statuses/",
+      "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/dive-gallery/"
     ],
     "needs_live_discovery": true
@@ -63,7 +68,8 @@
       "motherduck-model-data",
       "motherduck-query",
       "motherduck-share-data",
-      "motherduck-ducklake"
+      "motherduck-ducklake",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/PIPELINE_IMPLEMENTATION_GUIDE.md",
@@ -77,9 +83,28 @@
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/",
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/considerations-for-loading-data/",
       "https://motherduck.com/docs/concepts/ducklake/",
+      "https://motherduck.com/docs/key-tasks/flights/",
+      "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/"
     ],
     "needs_live_discovery": true
+  },
+  "motherduck-cli": {
+    "name": "motherduck-cli",
+    "description": "Operate MotherDuck from a terminal with the MotherDuck CLI. Use when a coding agent or developer needs shell-based authentication, structured query output, or file-oriented Dive and Flight authoring; use MCP instead for chat-only exploration and inline results.",
+    "layer": "utility",
+    "depends_on": [],
+    "references": [
+      "references/CLI_PLAYBOOK.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/",
+      "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/agents/",
+      "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/authentication/",
+      "https://motherduck.com/docs/sql-reference/motherduck-cli/"
+    ],
+    "needs_live_discovery": false
   },
   "motherduck-connect": {
     "name": "motherduck-connect",
@@ -94,8 +119,9 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/postgres-endpoint/",
+      "https://motherduck.com/docs/getting-started/interfaces/connect-query-from-duckdb-cli/",
       "https://motherduck.com/docs/integrations/bi-tools/powerbi/",
-      "https://motherduck.com/docs/getting-started/interfaces/client-apis/other/postgres-endpoint-jdbc/",
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/postgres-endpoint/java/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/attach-modes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/"
@@ -115,14 +141,14 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/managing-dives-as-code/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/managing-dives-as-code/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
-      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/dives/",
-      "https://motherduck.com/docs/sql-reference/mcp/list-dives/",
-      "https://motherduck.com/docs/sql-reference/mcp/read-dive/",
+      "https://motherduck.com/docs/key-tasks/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/managing-dives-as-code/",
+      "https://motherduck.com/docs/key-tasks/dives/embedding-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/dive-statuses/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/",
+      "https://motherduck.com/docs/sql-reference/mcp/dives/list-dives/",
+      "https://motherduck.com/docs/sql-reference/mcp/dives/read-dive/",
       "https://motherduck.com/blog/april-2026-product-roundup/",
       "https://motherduck.com/blog/introducing-embedded-dives/",
       "https://motherduck.com/blog/dashboards-as-code-dives/",
@@ -148,13 +174,13 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/flights/",
       "https://motherduck.com/docs/concepts/flights/",
-      "https://motherduck.com/docs/sql-reference/mcp/get-flight-guide/",
-      "https://motherduck.com/docs/sql-reference/mcp/create-flight/",
-      "https://motherduck.com/docs/sql-reference/mcp/update-flight/",
-      "https://motherduck.com/docs/sql-reference/mcp/run-flight/",
+      "https://motherduck.com/docs/sql-reference/mcp/flights/get-flight-guide/",
+      "https://motherduck.com/docs/sql-reference/mcp/flights/create-flight/",
+      "https://motherduck.com/docs/sql-reference/mcp/flights/update-flight/",
+      "https://motherduck.com/docs/sql-reference/mcp/flights/run-flight/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/",
-      "https://github.com/motherduckdb/motherduck-cookbook/tree/main/flight-plans"
+      "https://motherduck.com/docs/cookbook/"
     ],
     "needs_live_discovery": false
   },
@@ -172,8 +198,8 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/theming-and-styling-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
       "https://motherduck.com/product/dives/",
       "https://motherduck.com/dive-gallery/"
     ],
@@ -232,7 +258,8 @@
       "motherduck-query",
       "motherduck-model-data",
       "motherduck-create-dive",
-      "motherduck-share-data"
+      "motherduck-share-data",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/SELF_SERVE_ROLLOUT_GUIDE.md"
@@ -242,9 +269,10 @@
       "artifacts/self_serve_rollout_example.ts"
     ],
     "source_docs": [
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
-      "https://motherduck.com/pricing/"
+      "https://motherduck.com/docs/key-tasks/guides/",
+      "https://motherduck.com/product/pricing/"
     ],
     "needs_live_discovery": true
   },
@@ -260,7 +288,7 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
-      "https://motherduck.com/docs/sql-reference/mcp/query-rw/"
+      "https://motherduck.com/docs/sql-reference/mcp/core/query-rw/"
     ],
     "needs_live_discovery": false
   },
@@ -287,6 +315,27 @@
     ],
     "needs_live_discovery": false
   },
+  "motherduck-manage-guides": {
+    "name": "motherduck-manage-guides",
+    "description": "Create, organize, read, update, and govern MotherDuck Guides. Use when an agent needs business definitions, join rules, data pitfalls, Dive or Flight conventions, or durable warehouse-native context attached to catalog objects.",
+    "layer": "workflow",
+    "depends_on": [
+      "motherduck-explore",
+      "motherduck-query"
+    ],
+    "references": [
+      "references/GUIDES_PLAYBOOK.md"
+    ],
+    "artifacts": [],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/guides/",
+      "https://motherduck.com/docs/key-tasks/guides/bootstrap-guides-with-an-ai-agent/",
+      "https://motherduck.com/docs/sql-reference/mcp/guides/get-query-guide/",
+      "https://motherduck.com/docs/sql-reference/mcp/guides/list-guides/",
+      "https://motherduck.com/docs/sql-reference/mcp/guides/create-guide/"
+    ],
+    "needs_live_discovery": false
+  },
   "motherduck-migrate-to-motherduck": {
     "name": "motherduck-migrate-to-motherduck",
     "description": "Plan a migration onto MotherDuck. Use when moving from Snowflake, BigQuery, Redshift, PostgreSQL, dbt-heavy stacks, or lakehouse tooling and the key decisions are target pattern, cutover slices, source-vs-target validation, rollback, and native-versus-DuckLake posture.",
@@ -297,7 +346,8 @@
       "motherduck-load-data",
       "motherduck-model-data",
       "motherduck-query",
-      "motherduck-ducklake"
+      "motherduck-ducklake",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/MIGRATION_PLAYBOOK.md",
@@ -311,6 +361,9 @@
       "https://motherduck.com/product/postgres-integration/",
       "https://motherduck.com/docs/concepts/ducklake/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/about-motherduck/cloud-regions/",
+      "https://motherduck.com/docs/key-tasks/guides/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-database/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/"
     ],
     "needs_live_discovery": true
@@ -344,7 +397,8 @@
       "motherduck-model-data",
       "motherduck-query",
       "motherduck-share-data",
-      "motherduck-create-dive"
+      "motherduck-create-dive",
+      "motherduck-manage-guides"
     ],
     "references": [
       "references/PARTNER_DELIVERY_GUIDE.md"
@@ -355,8 +409,11 @@
     ],
     "source_docs": [
       "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
+      "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/trust-and-security/"
     ],
     "needs_live_discovery": true
@@ -371,8 +428,11 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/pricing/",
+      "https://motherduck.com/product/pricing/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/about-motherduck/cloud-regions/",
+      "https://motherduck.com/docs/key-tasks/flights/",
+      "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/blog/april-2026-product-roundup/",
       "https://motherduck.com/trust-and-security/"
     ],
@@ -393,7 +453,7 @@
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
       "https://motherduck.com/docs/concepts/data-recovery/",
-      "https://motherduck.com/docs/sql-reference/mcp/query-rw/",
+      "https://motherduck.com/docs/sql-reference/mcp/core/query-rw/",
       "https://motherduck.com/docs/sql-reference/postgres-endpoint/"
     ],
     "needs_live_discovery": false
@@ -408,14 +468,13 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://api.motherduck.com",
       "https://api.motherduck.com/docs/specs",
       "https://motherduck.com/docs/sql-reference/rest-api/motherduck-rest-api/",
       "https://motherduck.com/docs/sql-reference/rest-api/users-create-token/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/about-motherduck/billing/duckling-sizes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/dives/embedding-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/embedding-dives/",
       "https://motherduck.com/blog/introducing-embedded-dives/"
     ],
     "needs_live_discovery": false
@@ -435,7 +494,12 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/table-level-security/",
+      "https://motherduck.com/docs/concepts/roles-and-access-control/",
+      "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/sso-setup/",
       "https://motherduck.com/docs/concepts/data-recovery/",
       "https://motherduck.com/trust-and-security/"
@@ -444,7 +508,7 @@
   },
   "motherduck-share-data": {
     "name": "motherduck-share-data",
-    "description": "Create and manage MotherDuck data shares for zero-copy, read-only data distribution. Use whenever someone wants to share a database with team members, another organization, or the public \u2014 covers CREATE SHARE, access/visibility/update modes, GRANT READ ON SHARE, attaching share URLs, UPDATE SHARE, and REFRESH DATABASE.",
+    "description": "Create and manage MotherDuck data shares for zero-copy, read-only distribution. Use when publishing a whole database or selected tables and views, granting access to users or roles, consuming a share, or changing its update and include-pattern policy.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -457,7 +521,9 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/table-level-security/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-share/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/alter-share/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/update-share/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/refresh-database/"
     ],

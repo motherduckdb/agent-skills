@@ -5,7 +5,7 @@
 
 MotherDuck Skills is an installable skill catalog that teaches coding agents to work with [MotherDuck](https://motherduck.com): choose the right connection path, inspect the live workspace, write DuckDB SQL instead of PostgreSQL-shaped SQL, use Dives and shares, and keep production analytics patterns safe.
 
-20 skills in three layers: **utility** (connect, explore, query, SQL syntax, REST API), **workflow** (load, model, share, Dives, Flights, DuckLake, security, pricing), and **use-case** (apps, dashboards, pipelines, migrations, rollouts). See the [full catalog](#skills-overview).
+22 skills in three layers: **utility** (connect, CLI, explore, query, SQL syntax, REST API), **workflow** (load, model, share, Guides, Dives, Flights, DuckLake, security, pricing), and **use-case** (apps, dashboards, pipelines, migrations, rollouts). See the [full catalog](#skills-overview).
 
 ## Quick Install
 
@@ -29,6 +29,14 @@ Done? Jump to [Verify the Installation](#verify-the-installation). Per-harness d
 ### Skills CLI
 
 The most portable path for Cursor, VS Code/GitHub Copilot, Codex, Claude Code, custom agents, and project-level installs:
+
+Install the Skills CLI once:
+
+```bash
+npm install -g @fountainai/skills
+```
+
+Then install MotherDuck Skills:
 
 ```bash
 npx -y skills add motherduckdb/agent-skills --skill '*' --yes --global
@@ -223,6 +231,8 @@ The agent should inspect real metadata before inventing examples.
 - `Design a customer-facing analytics architecture on MotherDuck.`
 - `Decide whether this workload needs DuckLake or native MotherDuck storage.`
 - `Use the MotherDuck REST API guidance to manage service accounts and tokens safely.`
+- `Use Guides to capture our MRR definition and reference the canonical table.`
+- `Use the MotherDuck CLI to pull, edit, preview, and publish this Dive.`
 
 ## Start Here by Task
 
@@ -231,12 +241,14 @@ For narrow technical work, start with `motherduck-connect`, then `motherduck-exp
 | If you need to... | Start with... |
 | --- | --- |
 | Connect an app or service to MotherDuck | `motherduck-connect` |
+| Operate MotherDuck from a terminal or edit Dive/Flight files | `motherduck-cli` |
 | Inspect a live workspace or schema | `motherduck-explore` |
 | Write or debug analytics SQL | `motherduck-query` |
 | Check exact DuckDB syntax | `motherduck-duckdb-sql` |
 | Use the REST API for service accounts, tokens, Duckling config, active accounts, or Dive embed sessions | `motherduck-rest-api` |
 | Load files, cloud objects, HTTPS data, dataframes, or upstream systems | `motherduck-load-data` |
 | Model schemas, tables, views, or transformation layers | `motherduck-model-data` |
+| Create or maintain warehouse-native agent context | `motherduck-manage-guides` |
 | Publish, consume, or govern shares | `motherduck-share-data` |
 | Build, theme, preview, save, update, or embed a Dive | `motherduck-create-dive` |
 | Design a responsive, reusable Dive with filters and light/dark themes | `motherduck-design-dive` |
@@ -258,12 +270,14 @@ The catalog has three layers: **utility** skills cover exact MotherDuck mechanic
 | Skill | Layer | Use it when |
 | --- | --- | --- |
 | `motherduck-connect` | Utility | you need to choose the right connection path before writing code or SQL |
+| `motherduck-cli` | Utility | a coding agent or developer should query or author Dive/Flight files from a shell |
 | `motherduck-explore` | Utility | you need to inspect real databases, schemas, tables, columns, views, or shares |
 | `motherduck-query` | Utility | you need to write, validate, or optimize DuckDB SQL against MotherDuck |
 | `motherduck-duckdb-sql` | Utility | you need DuckDB SQL syntax or MotherDuck-specific SQL constraints quickly |
 | `motherduck-rest-api` | Utility | you need the REST API for service accounts, tokens, Duckling config, active accounts, or Dive embed sessions |
 | `motherduck-load-data` | Workflow | you need to ingest files, cloud objects, HTTP data, dataframes, or upstream systems into MotherDuck |
 | `motherduck-model-data` | Workflow | you need to design analytical schemas, tables, views, or transformation layers |
+| `motherduck-manage-guides` | Workflow | you need to create, discover, version, or govern durable context for agents |
 | `motherduck-share-data` | Workflow | you need to publish, consume, or govern MotherDuck shares safely |
 | `motherduck-create-dive` | Workflow | you need to build, theme, preview, save, update, or embed a Dive |
 | `motherduck-create-flight` | Workflow | you need a scheduled or on-demand Python job (Flight) on MotherDuck for ingestion, transformation, or automation |

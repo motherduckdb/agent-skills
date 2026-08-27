@@ -1,6 +1,6 @@
 # Runtime Selection
 
-Reference for choosing **which runtime executes the connection** to MotherDuck: MCP server, Python (with `uv` or `pip`), Node.js, or the DuckDB CLI. This is a separate decision from `CONNECTION_GUIDE.md`, which picks the *connection method* (PG endpoint vs native DuckDB API vs pg_duckdb vs WASM).
+Reference for choosing **which runtime executes the connection** to MotherDuck: MCP server, MotherDuck CLI, Python (with `uv` or `pip`), Node.js, or the DuckDB CLI. This is separate from `CONNECTION_GUIDE.md`, which picks the connection method.
 
 ## Decision Tree
 

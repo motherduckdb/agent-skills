@@ -25,6 +25,9 @@ Use this skill when you need exact DuckDB syntax, function behavior, or a quick 
 - Verify current MotherDuck support before relying on recently released upstream DuckDB features such as `VARIANT`, native `GEOMETRY`, `MERGE INTO`, or `date_trunc` return-type changes.
 - Check whether the statement depends on local files, extension install/load, temporary-table behavior, or other client-only features before claiming it will work in MotherDuck.
 - Treat snapshot, restore, and `UNDROP DATABASE` statements as operational SQL with plan-specific retention behavior, not ordinary analytical syntax.
+- Treat `INCLUDE_PATTERN` as whole-table/view filtering on a Share, not row-level or column-level security. Use `ALTER SHARE` only for include-pattern changes.
+- Distinguish physical import (`CREATE DATABASE ... FROM '<file-url>'`) from zero-copy clone sources, and reject filtered shares as clone sources.
+- Use role/grant SQL for governed access and audit it with `SHOW ...` statements; do not preserve `ACCESS ORGANIZATION` as the preferred RBAC pattern.
 - Treat MotherDuck SQL as an additional surface on top of DuckDB SQL, not a replacement for it.
 
 ## Workflow

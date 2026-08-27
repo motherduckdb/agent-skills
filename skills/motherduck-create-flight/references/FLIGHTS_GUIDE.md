@@ -10,7 +10,7 @@ Condensed from the MotherDuck Flights docs (concepts, key tasks, MCP tool pages,
 | Anatomy of a Flight | Fields: name, source, requirements, token, config, secrets, schedule |
 | Runtime Environment | CPU/RAM/disk, run sequence, and lifecycle/isolation caveats to verify live |
 | Authentication | MOTHERDUCK_TOKEN injection, access token labels, service accounts |
-| Config vs Secrets | Env-var injection rules, the `<secret_name>_<PARAM>` gotcha |
+| Config vs Secrets | Bare and namespaced env-var injection rules |
 | Scheduling | UTC cron syntax, clearing schedules, schedule status |
 | Versioning and Update Semantics | What bumps a version, PATCH carry-forward |
 | Runs, Logs, and Cancellation | Run lifecycle, polling, log retrieval |
@@ -38,12 +38,15 @@ Use a flight when a job should run unattended on MotherDuck, retry on a schedule
 | `config` | `{string: string}` map of **non-secret** values surfaced as env vars under their original key. Full-replace on update. |
 | `flight_secret_names` / `md_secret_names` | Names of `TYPE flights` secrets whose params are injected as env vars (encrypted at rest). Full-replace on update. |
 | `schedule_cron` | Optional standard 5-field cron expression, **UTC**. Omit for on-demand only. |
+| `max_runtime_sec` | Optional run cap. Validate it against the current plan limit before create/update. |
 
 ## Runtime Environment
 
 Each run executes this sequence: allocate a Python runtime → inject `MOTHERDUCK_TOKEN`, config keys, and secret params as env vars → `pip install` the requirements → execute `main()` capturing stdout+stderr → record status and logs.
 
 The container is constrained. Call `get_flight_guide` for the current CPU, memory, scratch-disk, timeout, and concurrency limits before sizing a workload. Prefer bounded concurrency, disk-buffered loading, and cleanup of `/tmp/` between batches.
+
+Flights are available across MotherDuck plans, but scheduling, concurrency, per-run maximums, compute allowances, and regional availability vary. Confirm the current region/plan matrix before committing to a deployment. Organization admins can discover all Flights read-only, while create, update, run, and delete permissions remain governed separately.
 
 - It is a Linux process: `subprocess` works, `apt-get install` of Debian packages works (git, ffmpeg, Playwright). dlt and similar tools that write under `HOME` should set `os.environ.setdefault("HOME", "/tmp")`.
 - DuckDB extensions can be installed inside the flight's *local* DuckDB process (`INSTALL postgres`, `INSTALL bigquery FROM community`) — the no-runtime-extension rule applies to MotherDuck's server-side engine, not to the flight container.
@@ -69,7 +72,7 @@ CREATE SECRET api_secret IN motherduck (
 );
 ```
 
-  Reference it with `flight_secret_names = ["api_secret"]`. Each param is injected as **`<secret_name>_<PARAM>`** — here `api_secret_API_KEY` and `api_secret_API_HOST`, *not* bare `API_KEY`. DuckDB lowercases unquoted secret names; keep param keys UPPERCASE. On naming conflicts, the last secret in the list wins. This prefixing is the most common flight-authoring bug; a robust pattern is to check the bare name first (local runs) and then scan `os.environ` for any key ending in `_<PARAM>` (deployed runs).
+  Reference it with `flight_secret_names = ["api_secret"]`. Each param is injected under a namespaced key (`api_secret_API_KEY`, `api_secret_API_HOST`) and, when safe, a bare convenience alias (`API_KEY`, `API_HOST`). Prefer the namespaced form in deployed code because it is stable and unambiguous. Names preserve case exactly. When bare keys collide, later secrets win the raw alias; config overrides a colliding secret variable. Reserved `MOTHERDUCK_TOKEN` and `MOTHERDUCK_FLIGHTS_RUN` parameters receive only their namespaced form.
 - `CREATE SECRET` must run on a read-write connection (`query_rw`, the UI, or a direct connection); the read-only MCP `query` tool rejects it. S3 access for private buckets is separate: an account-level `TYPE S3` secret read by the engine, not env-injected.
 
 ## Scheduling
@@ -85,9 +88,11 @@ CREATE SECRET api_secret IN motherduck (
 
 Step syntax requires a base: `*/N` or `M-N/S`; a bare `/N` is invalid. Omit `schedule_cron` to create an on-demand-only flight; on `update_flight`, pass `""` to clear the schedule, omit to leave it unchanged. A schedule can be `active` or `disabled`; disabling does not delete it. Schedule changes are metadata-only (no new version).
 
+`max_runtime_sec` stops a run that exceeds its configured cap. Read the allowed cap from `get_flight_guide` or current plan documentation. Validate it before any source/config deployment so a rejected cap cannot leave content state ambiguous.
+
 ## Versioning and Update Semantics
 
-- Content fields — `source_code`, `requirements_txt`, `config`, `flight_secret_names`, `access_token_name` — are immutable per version. Any change to them creates a new 1-indexed FlightVersion.
+- Content fields — `source_code`, `requirements_txt`, `config`, `flight_secret_names`, `access_token_name`, `max_runtime_sec` — are immutable per version. Any change to them creates a new 1-indexed FlightVersion.
 - `name` and `schedule_cron` changes do not create a version.
 - `update_flight` is a PATCH: omitted fields are unchanged, and when you touch any content field the others are carried forward — send only what changes. But `config` and `flight_secret_names` are full replacements when sent, never merges.
 - A run locks to the version current when it started; a mid-run update only affects the next run.
@@ -95,7 +100,7 @@ Step syntax requires a base: `*/N` or `M-N/S`; a bare `/N` is invalid. Omit `sch
 
 ## Runs, Logs, and Cancellation
 
-Run lifecycle: `PENDING` → `RUNNING` → terminal `SUCCEEDED` | `FAILED` | `CANCELLED` (SQL surface prefixes these with `RUN_STATUS_`). `run_flight` returns immediately with the new run (sequential per-flight `run_number`); poll `list_flight_runs` (newest first) for completion. `exit_code` is 0 on success, NULL while in progress. Multiple concurrent runs of one flight are allowed.
+Run lifecycle: `PENDING` → `RUNNING` → terminal `SUCCEEDED` | `FAILED` | `CANCELLED` (SQL surface prefixes these with `RUN_STATUS_`). `run_flight` returns immediately with the new run (sequential per-flight `run_number`); poll `get_flight_run` for that exact run when available, otherwise use `list_flight_runs` (newest first). `exit_code` is 0 on success and NULL while in progress. Multiple concurrent runs of one flight are allowed.
 
 - `run_flight(id, config?)` — the optional `config` is a per-run override merged over the stored config (provided keys win, only keys already defined on the flight can be set); the flight itself is unchanged. Use it for backfill dates or one-off parameter changes. Non-secret values only.
 - `get_flight_logs(id, run_number, max_bytes?)` — combined stdout/stderr plus the full run record (status, exit_code, timing) in one call; truncation keeps the tail (`max_bytes` minimum 1024). Logs are available while `RUNNING` and after any terminal status.
@@ -103,25 +108,28 @@ Run lifecycle: `PENDING` → `RUNNING` → terminal `SUCCEEDED` | `FAILED` | `CA
 
 ## MCP Tool Reference
 
-Call `get_flight_guide` (no arguments) first — it returns the current authoring guide.
+Call `get_flight_guide` (no arguments) first — it returns the current authoring guide plus relevant conventions from the reserved `flights` Guide topic. When a shell and filesystem are available, `motherduck flight guide` plus pull/edit/push is more context-efficient for file-shaped work.
 
 | Tool | Required | Optional | Notes |
 | --- | --- | --- | --- |
-| `create_flight` | `name`, `source_code` | `requirements_txt`, `config`, `md_secret_names`, `md_token_name`, `schedule_cron` | Returns flight `id` + `current_version` (1). |
-| `update_flight` | `id` | any field above, plus `name` | PATCH; content fields bump the version; `schedule_cron: ""` clears. |
+| `create_flight` | `name`, `source_code` | `requirements_txt`, `config`, `md_secret_names`, `md_token_name`, `schedule_cron`, `max_runtime_sec` | Returns flight `id` + `current_version` (1). |
+| `update_flight` | `id` | any field above, plus `name` | PATCH; content fields bump the version; `schedule_cron: ""` clears; validate runtime cap first. |
 | `edit_flight_source` | `id`, `edits[]` | — | Each edit: `{old_string, new_string, replace_all?}`; `old_string` must match exactly once unless `replace_all`. Applied sequentially; creates a new version. No prior `get_flight` needed. MCP-only. |
 | `get_flight` | `id` | `version` | Metadata + full version snapshot (source, requirements, config, secrets) in one call. |
 | `list_flights` | — | `keywords`, `limit` (default 100, max 500) | Case-insensitive name filter; all words must match. Summary only. |
 | `list_flight_versions` | `id` | `limit` | Newest first, full content per version. |
 | `run_flight` | `id` | `config` | Async; returns run with `run_number`, status `PENDING`/`RUNNING`. |
+| `get_flight_run` | `id`, `run_number` | — | Reads one exact run without re-listing the run history. |
 | `list_flight_runs` | `id` | `limit` | Newest first; each run reports the effective config it ran with. |
 | `get_flight_logs` | `id`, `run_number` | `max_bytes` | Logs + run record; tail on truncation. (Docs page: `get-flight-run-logs`.) |
 | `cancel_flight_run` | `id`, `run_number` | — | Error on terminal/nonexistent runs. |
 | `delete_flight` | `id` | — | Permanently deletes flight, versions, schedule, run history, logs; cancels active runs. Irreversible — confirm with the user first. |
 
+Flight and run listings are server-paged and ordered newest first. Use bounded `limit`/`offset` values instead of assuming an unparameterized list reads the entire organization. Fetch one exact run with `get_flight_run` when that tool is available.
+
 ## MCP vs SQL Naming
 
-The same operations exist as server-side SQL functions (`FROM MD_CREATE_FLIGHT(...)`, `MD_UPDATE_FLIGHT`, `MD_RUN_FLIGHT`, `MD_FLIGHTS()`, `MD_GET_FLIGHT`, `MD_GET_FLIGHT_VERSION`, `MD_GET_FLIGHT_LOGS`, `MD_DELETE_FLIGHT`, ...). They are not available on local-only DuckDB connections. Name differences:
+The same operations exist as server-side SQL functions (`FROM MD_CREATE_FLIGHT(...)`, `MD_UPDATE_FLIGHT`, `MD_RUN_FLIGHT`, `MD_LIST_FLIGHTS()`, `MD_GET_FLIGHT`, `MD_GET_FLIGHT_VERSION`, `MD_GET_FLIGHT_LOGS`, `MD_DELETE_FLIGHT`, ...). They are not available on local-only DuckDB connections. Name differences:
 
 | MCP | SQL |
 | --- | --- |
@@ -132,7 +140,9 @@ The same operations exist as server-side SQL functions (`FROM MD_CREATE_FLIGHT(.
 | status `SUCCEEDED` | status `RUN_STATUS_SUCCEEDED` |
 | `edit_flight_source` | no equivalent — `MD_GET_FLIGHT` → edit client-side → `MD_UPDATE_FLIGHT` |
 
-Resolve a flight by name in SQL with `SELECT flight_id FROM MD_FLIGHTS() WHERE flight_name = ?`.
+Resolve a flight by name in SQL with `SELECT flight_id FROM MD_LIST_FLIGHTS() WHERE flight_name = ?`.
+
+`MD_GET_FLIGHT_LOGS` is tabular: it returns one row per log line rather than one `logs` blob column. Inspect the current function schema and preserve its ordering columns; do not select a nonexistent `logs` field. The MCP and CLI log commands adapt that table into their user-facing output.
 
 ## Loading Data from a Flight
 
@@ -160,9 +170,11 @@ Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-tr
 1. One successful on-demand run with logs reviewed before any schedule is attached.
 2. Service-account token via `access_token_name`, scoped to only the target databases.
 3. All sensitive values in `TYPE flights` secrets; nothing sensitive in `config` or source.
-4. `requirements_txt` fully pinned (supply-chain note from the docs: flights do not scan your code or dependencies — avoid untrusted packages).
-5. Idempotent writes and `IF NOT EXISTS` bootstrap so reruns and first runs both succeed.
-6. Non-zero exit on failure (raise, or `sys.exit(1)`) so the run reports `FAILED` instead of silently succeeding.
+4. Bare and namespaced secret aliases used deliberately; collisions are absent or intentional.
+5. `requirements_txt` fully pinned (supply-chain note from the docs: flights do not scan your code or dependencies — avoid untrusted packages).
+6. Idempotent writes and `IF NOT EXISTS` bootstrap so reruns and first runs both succeed.
+7. `max_runtime_sec` fits the current plan and workload.
+8. Non-zero exit on failure (raise, or `sys.exit(1)`) so the run reports `FAILED` instead of silently succeeding.
 
 ## Troubleshooting
 
@@ -171,7 +183,7 @@ Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-tr
 | Run `FAILED`, non-zero `exit_code` | Python exception in `main()` — read `get_flight_logs` for the traceback. |
 | `ImportError` / `ModuleNotFoundError` | Package missing from `requirements_txt` or version mismatch; fix and `update_flight`. |
 | Fails at `duckdb.connect("md:")` with a version error | Unpinned or unsupported `duckdb`; resolve and pin a version from `https://motherduck.com/docs/duckdb-versions.json`. The included examples retain their tested pin for reproducibility. |
-| `KeyError` on a secret env var | Reading the bare param name instead of `<secret_name>_<PARAM>`, or the secret name was not passed in `flight_secret_names`. |
+| `KeyError` on a secret env var | The secret was not included in `flight_secret_names`, the parameter name differs from the expected uppercase key, or the code chose the wrong namespaced alias. |
 | `MOTHERDUCK_TOKEN` missing | Wrong `access_token_name` label. |
 | Schedule didn't fire | Schedule `disabled`, or the cron is UTC and you expected local time. |
 | New version not picked up | The run started before the update; runs lock to the version current at start. |
