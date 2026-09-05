@@ -1,6 +1,6 @@
 ---
 name: motherduck-model-data
-description: Design and build database schemas and data models in MotherDuck. Produces a file-based SQL project scaffold with a model manifest. Use for any schema design or data modeling task — creating tables, choosing data types, star schemas, wide denormalized tables, raw/staging/analytics layers, dbt-style transformation projects, or restructuring data for analytics workloads.
+description: Design or implement MotherDuck analytical schemas and transformation models, including grain, types, and materialization.
 license: MIT
 ---
 
@@ -8,20 +8,11 @@ license: MIT
 
 ## Core Behavior
 
-For multi-model or transformation-layer work, default to a file-based project scaffold rather than warehouse-only SQL execution.
-
-The project scaffold includes:
-
-- **SQL files** organized by lifecycle stage (`raw/`, `staging/`, `analytics/`)
-- **A manifest** (`model_manifest.yml`) defining the DAG: model names, dependencies, materialization strategy, and target database
-
-This is a lightweight framework-agnostic convention for organizing SQL transformations that can be reviewed, versioned, and rerun.
+For multi-model work, keep transformations in reviewable SQL files using the project's existing dbt, SQLMesh, or local conventions. If none exist, use stage directories and a `model_manifest.yml` recording dependencies, materialization, and target database. A single-table request needs only the requested SQL or change.
 
 ## Prerequisites
 
-- MotherDuck connection established via `motherduck-connect`
-- Existing source shape understood via `motherduck-explore`
-- DuckDB SQL syntax available via `motherduck-duckdb-sql`
+Use the known source schema and connection. Discover missing types, grain, and join keys before implementing; planning can use supplied schema without a live connection.
 
 ## Default Posture
 
@@ -36,35 +27,20 @@ This is a lightweight framework-agnostic convention for organizing SQL transform
 
 1. Inspect the current source tables and actual column types before designing new models.
 2. Choose the target lifecycle stage and grain for each modeled table. Map dependencies between models.
-3. Create the project directory structure with SQL files and manifest.
+3. Place SQL in the existing project, or use the scaffold reference for a new multi-model project.
 4. Author each model as a standalone SQL file. Use explicit types, nullability, comments, and fully qualified names. Decide between a table, CTAS rebuild, or view based on freshness and cost.
-5. Fill in the manifest with model metadata: name, path, stage, materialization, database, and `depends_on` references.
-6. When the request includes implementation, run the models and verify that the resulting tables match the expected grain and row counts. If MCP is the runner, use `query_rw` because DDL and CTAS are writes; the user's implementation request authorizes in-scope execution. For answer, review, or planning requests, keep the deliverable to SQL files plus the manifest and do not mutate the warehouse.
+5. Record dependencies and materializations in the project's framework or lightweight manifest, not both.
+6. For implementation, run the in-scope models and verify grain and row counts; MCP DDL and CTAS require `query_rw`. For an answer, review, or plan, return the requested explanation or SQL without creating a project or mutating the warehouse unless requested.
 
-## Expected Project Structure
+## References
 
-```
-<project-name>/
-  models/
-    raw/
-      raw_<entity>.sql           -- DDL for raw landing tables
-    staging/
-      stg_<entity>.sql           -- Deduplicated, typed, filtered
-    analytics/
-      dim_<entity>.sql           -- Dimension tables
-      fct_<entity>.sql           -- Fact / metric tables
-  model_manifest.yml             -- DAG: names, deps, materialization
-```
-
-## When to Skip the Scaffold
-
-If the user explicitly asks for a single table, a quick DDL statement, or an ad-hoc exploration query, produce the SQL directly. The scaffold is the default for **modeling work** — multi-table, multi-stage transformations with dependencies.
-
-## Open Next
+Read only the reference sections needed for the current task.
 
 - Read `references/MODELING_PLAYBOOK.md` for schema patterns, data-type guidance, CTAS/view decisions, complex types, constraints, project scaffold conventions, and common modeling mistakes.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-duckdb-sql` for type syntax and function details
 - `motherduck-query` for executing DDL, rebuilds, and validation queries

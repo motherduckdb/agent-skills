@@ -8,7 +8,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 
 ## Default Routing
 
-- For most narrow technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`.
+- Start with the skill that matches the task. Use connection setup or discovery only when that context is missing.
 - For larger product work, start with the matching use-case skill and let it orchestrate the lower layers.
 - If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the live workspace before inventing SQL, models, or rollout plans.
 
@@ -38,7 +38,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - Use the MotherDuck CLI for file-shaped Dive/Flight work when a shell is available; use MCP for chat-only exploration and inline results.
 - Call `get_query_guide` before business-semantic queries and traverse only relevant Guide topics.
 - For use-case skills, if a remote MotherDuck MCP server or local MotherDuck server is active, start from the real database in scope.
-- If the database or workspace is unclear, ask which one should back the project before designing the solution.
+- Resolve the database or workspace from the request and active context; ask only if a remaining ambiguity materially changes the result.
 - Inspect schemas, tables, columns, joins, and time dimensions before inventing example models or rollout steps.
 - Call `get_dive_guide` before `save_dive` or `update_dive`.
 - Call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`.
@@ -53,8 +53,8 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 ## Skill Authoring Posture
 
 - Write skill content for current frontier models: state MotherDuck-specific behavior, constraints, defaults, and gotchas; do not explain general concepts the model already knows.
-- Frontmatter descriptions are third person, state what the skill does and when to use it, and include concrete trigger terms; `skills/catalog.json` descriptions must match SKILL.md frontmatter exactly.
-- `SKILL.md` is a router; references link one level deep, and every `references/` file over 100 lines starts with a `## Contents` table of contents.
+- Keep descriptions short and distinct from neighboring skills; `skills/catalog.json` descriptions must match SKILL.md frontmatter exactly.
+- Keep simple skills self-contained and route substantial modes to references. Read only relevant sections; every reference over 100 lines needs a `## Contents` table, linked one level deep from `SKILL.md`.
 - Make artifact intent explicit: "Run X" for executables, "Read X as reference" for guidance.
 - Give one concrete default plus an escape hatch instead of option menus; reserve exact lockstep commands for fragile operations (auth, version pinning, `get_dive_guide` ordering).
 

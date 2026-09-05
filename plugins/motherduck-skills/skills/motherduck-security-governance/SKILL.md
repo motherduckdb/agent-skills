@@ -1,12 +1,10 @@
 ---
 name: motherduck-security-governance
-description: Explain MotherDuck security, governance, and access-control patterns. Use for any question about SOC 2, GDPR, compliance, data residency, regions, SSO, service accounts, token handling, tenant isolation, sharing boundaries, snapshots and recovery, or governance posture — including when a security_compliance_owner, technical_owner, or application_builder is evaluating MotherDuck.
+description: Assess MotherDuck security, permissions, isolation, residency, and compliance requirements against documented controls.
 license: MIT
 ---
 
 # Security and Governance
-
-Use this skill when the user is evaluating whether MotherDuck can meet their security, governance, and deployment requirements. This is a workflow skill focused on control boundaries and safe patterns.
 
 ## Source Of Truth
 
@@ -33,11 +31,15 @@ Use this skill when the user is evaluating whether MotherDuck can meet their sec
 4. Check whether residency, compliance, or contractual guarantees are part of the requirement.
 5. Use only publicly documented security anchors unless the user has current commercial documentation in hand.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/SECURITY_GOVERNANCE_PLAYBOOK.md` for public security anchors, service-account posture, residency framing, sharing boundaries, and what not to overstate
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for secure token handling and endpoint selection
 - `motherduck-explore` when governance depends on what data is actually present and how it is partitioned

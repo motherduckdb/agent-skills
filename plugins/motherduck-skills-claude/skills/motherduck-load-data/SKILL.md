@@ -1,13 +1,11 @@
 ---
 name: motherduck-load-data
-description: Load and ingest data into MotherDuck from local files, object storage (S3, GCS, Azure, R2), HTTPS, dataframes, or external databases. Use for any import or bulk-load task — CSV, Parquet, JSON, Delta, Iceberg, local DuckDB database upload — and for choosing between CTAS, INSERT...SELECT, COPY, cloud-storage secrets, and Postgres-endpoint versus native DuckDB-client paths.
+description: Load files, object storage, dataframes, or external databases into MotherDuck using an appropriate bulk ingestion path.
 argument-hint: [source-and-target]
 license: MIT
 ---
 
 # Load Data into MotherDuck
-
-Use this skill when the job is getting data into MotherDuck correctly and efficiently, not just writing one ad hoc import query.
 
 ## Source Of Truth
 
@@ -42,15 +40,19 @@ Use this skill when the job is getting data into MotherDuck correctly and effici
    - external database: use the appropriate scan or replication path from a DuckDB-capable environment
 3. Land the data into a raw or staging table with minimal transformation.
 4. Validate row counts, types, and a few business aggregates immediately after the load.
-5. Promote into modeled tables only after the landing step is correct.
+5. Promote into modeled tables only when the request includes transformation; a load request is complete after its destination data is validated.
 
 For answer, review, or planning requests, recommend the loading path without mutating data. For load or implementation requests, perform the requested in-scope write and validation; ask before destructive replacement or a broader external write.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/INGESTION_PATTERNS.md` for format-specific options, cloud-storage secrets, Postgres-endpoint loading tradeoffs, Python dataframe paths, and advanced ingestion patterns.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for choosing between the Postgres endpoint and a DuckDB client path
 - `motherduck-explore` for inspecting destination databases and validating landed tables

@@ -1,31 +1,16 @@
 ---
 name: motherduck-build-cfa-app
-description: Design a MotherDuck-backed customer-facing analytics app. Use for embedded analytics, multi-tenant SaaS reporting, or product analytics for external users -- whenever the decision depends on per-customer isolation, backend routing, service-account boundaries, read scaling, or Hypertenancy-style patterns.
+description: Build MotherDuck analytics into customer-facing applications with tenant isolation, backend routing, and serving APIs.
 license: MIT
 ---
 
 # Build a Customer-Facing Analytics App
 
-Use this skill when the user is embedding analytics into a product for external users and needs a concrete serving architecture, not just a dashboard.
-
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, `motherduck-load-data`, and `motherduck-manage-guides`.
-
 ## Start Here: Is a MotherDuck Server Active?
 
-- If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the design or execution.
-- Then inspect the live data model:
-  - databases and schemas
-  - tables and views
-  - columns and types
-  - join keys
-  - time dimensions
-  - core serving metrics
-- Use that discovery to shape the serving pattern, tenant boundaries, and example code.
+Use an active remote MotherDuck MCP server or local MotherDuck server to inspect the in-scope database, schema, grain, keys, and relevant metrics. Reuse known context and narrow discovery to the requested work; do not scan the whole workspace by default. Let the actual data model shape the result.
 
-Do not jump straight to an architecture diagram if live data discovery is available.
-
-If no server is active, use any supplied schema or table context. For planning work, proceed with explicit assumptions when safe; ask for missing schema details only when they block a reliable result.
+Resolve the target from the request or active context. Ask only if ambiguity materially affects the result. Without a server, use supplied schema and explicit assumptions for planning; do not imply live validation.
 
 ## Default Serving Choices
 
@@ -63,7 +48,7 @@ When this skill produces a native DuckDB (`md:`) connection, watermark it with `
 
 ## Output
 
-The output of this skill should be:
+For a full engagement, cover the following as relevant to the request:
 
 - a recommended serving architecture
 - the isolation model
@@ -71,51 +56,25 @@ The output of this skill should be:
 - the first implementation slice
 - the validation and rollout plan
 
-If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
-This is mainly for automated tests, regression checks, or downstream tooling that needs a stable machine-readable shape. Normal human-facing use of the skill can stay in prose unless JSON is explicitly requested.
-
-Use this exact top-level shape when JSON is requested:
-
-```json
-{
-  "summary": {},
-  "assumptions": [],
-  "implementation_plan": [],
-  "validation_plan": [],
-  "risks": []
-}
-```
+For explicit structured JSON requests, read [the output contract](references/EXECUTION_REFERENCE.md#structured-output). Otherwise use the format that fits the requested deliverable.
 
 ## References
 
-- `references/CFA_IMPLEMENTATION_GUIDE.md` -- preserved detailed implementation content that used to live in this skill
+Read only the sections relevant to the task; these are guidance, not a mandatory itinerary.
+
+- `references/CFA_IMPLEMENTATION_GUIDE.md` -- backend implementation, service accounts, routing, and read-scaling examples
 - `references/CFA_ARCHITECTURE.md` -- architecture comparison, isolation model, and connection-path detail
 
-## Runnable Artifact
+## Examples
 
-- `artifacts/customer_routing_example.py` -- MotherDuck-backed Python example showing per-customer routing with separate database namespaces
-- `artifacts/customer_routing_example.ts` -- TypeScript companion artifact with the same routing contract and output shape
+Read [the execution reference](references/EXECUTION_REFERENCE.md) only to run the bundled examples or reproduce their validation.
 
-Run it with:
-
-```bash
-uv run --with duckdb python skills/motherduck-build-cfa-app/artifacts/customer_routing_example.py
-```
-
-Run the same artifact against temporary MotherDuck databases:
-
-```bash
-MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
-uv run --with duckdb python skills/motherduck-build-cfa-app/artifacts/customer_routing_example.py
-```
-
-Validate the TypeScript companion artifact:
-
-```bash
-uv run scripts/test_typescript_artifacts.py
-```
+- [customer_routing_example.py](artifacts/customer_routing_example.py)
+- [customer_routing_example.ts](artifacts/customer_routing_example.ts)
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` -- choose the correct PG endpoint or native DuckDB path
 - `motherduck-explore` -- inspect the live database and schema before choosing an architecture

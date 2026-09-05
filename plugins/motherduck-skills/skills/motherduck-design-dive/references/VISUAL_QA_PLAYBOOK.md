@@ -1,6 +1,6 @@
 # Dive Visual QA Playbook
 
-Use this loop after the SQL is correct and before saving or updating a Dive. The output is an evidence bundle that another agent or designer can inspect without recreating the run.
+Use the full loop for a new Dive, broad redesign, or requested review handoff. For a scoped edit, inspect affected viewports and states, fixing observed regressions without recreating the whole evidence bundle. The full handoff includes the information hierarchy, filter behavior, breakpoint rules, theme tokens, reusable component boundaries, and the evidence below.
 
 ## 1. Prepare the Preview
 
@@ -53,7 +53,7 @@ Write findings in severity order. Name the viewport, component, evidence, and pr
 
 Fix the highest-impact structural problem first. Common examples are excessive mobile height, unreadable axes, hidden filters, rigid card widths, low-contrast chart lines, or customer-specific labels in the shared component layer.
 
-After each meaningful change:
+After a correction, repeat the affected checks and inspect adjacent viewports or themes when the change could affect them. For comparable evidence:
 
 1. repeat the same viewport and interaction checks
 2. capture `*-v2.png` or `*-final.png`

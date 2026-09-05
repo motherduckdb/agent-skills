@@ -1,12 +1,10 @@
 ---
 name: motherduck-create-dive
-description: Create, edit, manage, share, or embed MotherDuck Dives — live React + SQL dashboards, charts, and data apps saved in the workspace. Use for any dashboard, chart, KPI display, or data visualization over MotherDuck data, and for Dive authoring mechanics such as get_dive_guide, useSQLQuery, local preview, version history, Dives-as-code, required resources, team sharing, or embedded Dive sessions.
+description: Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime.
 license: MIT
 ---
 
 # Create and Manage MotherDuck Dives
-
-Use this skill when the user needs a persistent, shareable, editable Dive rather than a one-off chart. Dives are live React + SQL data apps inside MotherDuck; they can be built conversationally, edited from existing workspace content, managed as code, shared with teammates, or embedded in another application.
 
 ## Source Of Truth
 
@@ -26,7 +24,7 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 - New Dives start as Draft. Promote a validated Dive to Ready only when the requested delivery includes publication. Only an admin can mark a Dive Endorsed; never self-endorse an agent-created Dive.
 - When reusing existing work, prefer Endorsed and then Ready Dives. Archived Dives are retired and excluded from default agent listings unless explicitly requested.
 - When local preview uses `REQUIRED_DATABASES`, keep the export on one line and mirror the real share dependencies in metadata or save/update inputs. Avoid aliases that collide with existing database names.
-- Start from a named theme direction such as `Corporate Dashboard`, `Tufte Minimal`, or `FT Salmon` instead of vague visual prompts.
+- Preserve an existing Dive’s visual system for scoped edits. For a new Dive, choose a concrete theme direction that fits its audience.
 - Prefer one query per visual section or interaction surface rather than one giant cross-purpose query.
 - Preview locally before saving when the environment supports it.
 - For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions.
@@ -35,7 +33,7 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 
 ## Workflow
 
-1. Classify the delivery path: workspace Dive, edit existing Dive, Dives-as-code, share with teammates, or embed in an app.
+1. Choose the requested delivery path: workspace Dive, existing edit, Dives-as-code, sharing, or embedding. Follow only that path; a chart request does not itself authorize sharing or embedding.
 2. Explore the live schema and validate the core SQL first.
 3. Call `get_dive_guide` if MCP is available, then design the story, sections, interactions, and theme.
 4. Build or edit the Dive component, using local preview/hot reload when possible.
@@ -45,11 +43,15 @@ Use this skill when the user needs a persistent, shareable, editable Dive rather
 
 For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-explore` for discovering the real tables, views, and dimensions before visualizing them
 - `motherduck-query` for validating the SQL each Dive section will run

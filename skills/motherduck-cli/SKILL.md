@@ -1,12 +1,10 @@
 ---
 name: motherduck-cli
-description: Operate MotherDuck from a terminal with the MotherDuck CLI. Use when a coding agent or developer needs shell-based authentication, structured query output, or file-oriented Dive and Flight authoring; use MCP instead for chat-only exploration and inline results.
+description: Use the MotherDuck CLI for terminal queries, authentication, and file-based Dive or Flight workflows.
 license: MIT
 ---
 
 # Use the MotherDuck CLI
-
-Use this skill when the environment has a shell and filesystem and the work benefits from files, scripts, or compact JSON output. The CLI is the efficient path for coding agents that edit Dive or Flight source locally. MotherDuck MCP remains the better path for chat clients without a shell and for inline catalog exploration.
 
 ## Source Of Truth
 
@@ -37,11 +35,15 @@ Use this skill when the environment has a shell and filesystem and the work bene
 
 For answer, review, or planning requests, recommend commands without logging in, creating an account, or changing remote resources. For explicit build/change requests, complete the in-scope CLI workflow and validate its result; ask before destructive deletes or materially broader external changes.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/CLI_PLAYBOOK.md` for installation, authentication, JSON contracts, query patterns, agent isolation, and complete Dive/Flight file workflows.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for choosing the underlying application connection path
 - `motherduck-explore` and `motherduck-query` for catalog discovery and SQL behavior

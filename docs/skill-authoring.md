@@ -4,14 +4,14 @@ This repo is a public MotherDuck skill catalog. Keep skills opinionated and usef
 
 ## What Goes in `SKILL.md`
 
-`SKILL.md` should act like a router:
+Keep a simple skill self-contained. For a skill with substantial modes, make `SKILL.md` a short router containing:
 
 - when to use the skill
 - the first decisions to make
 - the default workflow
 - the expected output
 - which `references/` files to open next
-- which `artifacts/` to run next
+- which `artifacts/` can help when an executable example is needed
 
 For use-case skills, always say what to do when a remote or local MotherDuck server is active:
 
@@ -32,7 +32,7 @@ Put detailed guidance in `references/`:
 - migration or rollout checklists
 - deep product guidance that would bloat the main skill
 
-When shrinking a skill, move content into `references/`; do not delete it.
+When shrinking a skill, preserve useful operational detail in `references/`. Remove redundant wording and generic instructions rather than moving that noise elsewhere. Link each reference with the task or mode that needs it; do not require reading every reference.
 
 Do not point shipped `SKILL.md`, `references/`, or `artifacts/` content at `motherduck-cookbook`.
 That repo is an authoring-only comparison source for maintainers. If it teaches us something useful, copy the learning into this repo's guidance or artifacts before shipping.
@@ -97,13 +97,18 @@ Repo maintenance layout:
 
 ## Writing Style
 
-- prefer direct trigger phrases in descriptions; write descriptions in third person and say both what the skill does and when to use it
+- keep descriptions short and discriminating: capability plus the trigger that distinguishes it from neighboring skills; avoid keyword inventories and broad "any task" triggers
 - keep the main skill concise; assume a capable model and only state MotherDuck-specific behavior, constraints, defaults, and gotchas
 - state each instruction once; keep examples only when they encode a MotherDuck requirement, a tool contract, or a measured failure mode
 - distinguish answer/review/planning requests from build/change requests where the skill can mutate files, data, or external resources
 - let build/change requests authorize safe in-scope implementation and validation; require confirmation only for destructive actions, unrelated external writes, or material scope expansion
 - inspect active servers, workspace context, and supplied artifacts before asking questions; ask only when a missing choice materially changes the result and cannot be discovered safely
 - give multi-step workflows a concrete completion or validation condition so the agent does not stop after a partial result
+- use workflows as decision guidance; reserve fixed ordering for real dependencies such as reading the Dive runtime guide before authoring or validating a Flight before enabling its requested schedule
+- preserve existing user authorization; do not add a second approval gate for an already requested operation
+- keep structured-output contracts and example test commands in conditional references; ordinary replies should fit the request
+- scale validation to affected behavior; examples and full visual evidence matrices are not prerequisites for unrelated edits
+- keep shared skills model-neutral so the same MotherDuck contracts work across capable coding agents
 - prefer references over duplicated prose; do not restate SKILL.md sections inside references
 - prefer concrete defaults over hedging; give one default plus an escape hatch instead of option menus
 - preserve scenario-based guidance when multiple MotherDuck paths are valid

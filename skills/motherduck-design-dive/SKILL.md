@@ -1,6 +1,6 @@
 ---
 name: motherduck-design-dive
-description: Design or redesign a MotherDuck Dive as a responsive, reusable analytics interface. Use when a Dive must be mobile-friendly from the start, support light and dark modes, reserve space for filters, use restrained Power BI-style information design, embed small charts inside metric components, or work across customers without one-off layout changes.
+description: Design or improve a MotherDuck Dive’s layout, responsive behavior, themes, filters, and visual accessibility.
 license: MIT
 ---
 
@@ -8,9 +8,9 @@ license: MIT
 
 Use this skill for the visual system and interaction design of a Dive. Pair it with `motherduck-create-dive` for current React and `useSQLQuery` mechanics, and with `motherduck-build-dashboard` when the task also includes defining the analytical story and SQL.
 
-## Design Contract
+## Design Defaults
 
-Every designed or redesigned Dive must:
+For a new Dive or a full redesign, use these defaults unless the user's design requirements differ. For a scoped edit, preserve the existing visual system and check affected states.
 
 - start at a 320 px viewport and enhance upward
 - use fluid containers and responsive grids instead of fixed desktop widths
@@ -33,31 +33,26 @@ Avoid ornamental gradients, glass effects, glowing accents, oversized hero metri
 5. Expand that composition into tablet and desktop grids without changing reading order.
 6. Implement semantic design tokens, theme switching, reusable cards, responsive chart wrappers, and filter state.
 7. Validate query correctness separately, then preview the complete Dive with loading, empty, error, long-label, and dense-data states.
-8. Run the screenshot, inspection, iteration, and evidence workflow in `references/VISUAL_QA_PLAYBOOK.md`.
-9. Verify the viewport and theme matrix in `references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md` before saving or updating the Dive.
+8. Inspect the rendered result at affected viewports and themes. Use the full visual QA reference for a new design, broad redesign, or requested evidence handoff; a label or SQL edit does not require a new design report.
 
 For answer, review, or planning requests, return the requested design artifact without changing a Dive. For build or redesign requests, implement and preview the in-scope Dive; save or update it only when the request includes that operation.
 
 ## Deliverable
 
-Provide:
-
-- the information hierarchy and component map
-- filter behavior on mobile, tablet, and desktop
-- breakpoint and reflow rules
-- light/dark token roles and chart palette
-- reusable component boundaries and customer-specific inputs
-- accessibility and responsive QA results
-- a versioned evidence bundle with desktop, mobile, theme, and filter screenshots plus a short iteration report
+Return the implemented change or requested design, the checks performed, and any concrete limitation. For a full design handoff, include the hierarchy, filter behavior, responsive rules, theme tokens, component boundaries, and evidence described in the visual QA reference.
 
 Do not call a design mobile-friendly based only on responsive CSS. Report the viewports and states actually checked.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md` for the layout grid, component anatomy, theme tokens, filter model, anti-patterns, and QA checklist.
 - Read `references/VISUAL_QA_PLAYBOOK.md` for the repeatable screenshot, visual inspection, iteration, and reviewer handoff loop.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-create-dive` for the current component contract, preview, save/update, and required resources
 - `motherduck-build-dashboard` for the analytical story, section queries, and end-to-end dashboard workflow
