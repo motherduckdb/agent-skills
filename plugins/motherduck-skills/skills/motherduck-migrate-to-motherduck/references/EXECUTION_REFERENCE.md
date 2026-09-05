@@ -42,4 +42,3 @@ From a checkout of this repository, validate the TypeScript companion artifacts:
 ```bash
 uv run scripts/test_typescript_artifacts.py
 ```
-

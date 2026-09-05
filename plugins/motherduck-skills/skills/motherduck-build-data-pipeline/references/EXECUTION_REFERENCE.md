@@ -61,4 +61,3 @@ uv run python pipeline/cleanup.py
 - Use Python 3.11 or 3.12 to reproduce this reference project; its tested `dbt-duckdb` path did not run reliably on Python 3.14.
 - If you want exact schema names like `raw`, `staging`, and `analytics` in dbt, override `generate_schema_name`.
 - When a long-lived Python process loads data and a separate `dbt` subprocess builds models, run post-build validation in a fresh process or refresh database state before reading new relations.
-
