@@ -1,13 +1,11 @@
 ---
 name: motherduck-ducklake
-description: Decide when DuckLake is the right MotherDuck storage pattern versus native MotherDuck storage (the default). Use when evaluating lakehouse or open table format storage, Iceberg-style requirements, fully managed DuckLake, BYOB buckets, own-compute DuckLake access, data inlining, time travel, object-storage layout, or file-aware compaction and maintenance.
+description: Evaluate or operate DuckLake on MotherDuck when open table formats, bucket ownership, or file maintenance matter.
 argument-hint: [storage-scenario]
 license: MIT
 ---
 
 # Use DuckLake on MotherDuck
-
-Use this skill when the storage decision is genuinely about open table format and object-store behavior, not just about where to put another analytical table.
 
 ## Source Of Truth
 
@@ -40,11 +38,15 @@ Use this skill when the storage decision is genuinely about open table format an
 4. Define the ingestion and maintenance posture up front, including data inlining, file compaction, and cleanup expectations.
 5. Validate who will query the data and from which compute surface before finalizing the architecture.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/DUCKLAKE_PLAYBOOK.md` for the mode decision matrix, MotherDuck-specific SQL patterns, BYOB constraints, data-inlining behavior, maintenance functions, and common DuckLake mistakes
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for choosing native DuckDB versus Postgres-endpoint access paths
 - `motherduck-load-data` when the real issue is ingestion rather than storage format

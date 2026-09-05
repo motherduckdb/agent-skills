@@ -1,28 +1,16 @@
 ---
 name: motherduck-partner-delivery
-description: Deliver repeatable MotherDuck architectures across multiple clients. Use when a consultancy, agency, or multi-client product team needs to standardize isolation, provisioning, regional deployment, sharing boundaries, and client-specific exceptions across client engagements.
+description: Standardize MotherDuck delivery across client engagements with reusable provisioning, isolation, and handoff patterns.
 license: MIT
 ---
 
 # Partner Delivery
 
-Use this skill when a consultancy, implementation partner, or multi-client product team needs a repeatable MotherDuck delivery pattern across several clients.
-
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-explore`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, `motherduck-manage-guides`, and `motherduck-create-dive`.
-
 ## Start Here: Is a MotherDuck Server Active?
 
-- If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- Discover the client databases or workspaces from the active context. Ask only when multiple plausible targets remain and the choice would materially change the delivery model.
-- Explore the live setup when available:
-  - current client database boundaries
-  - regional layout
-  - existing service-account or share boundaries
-  - reusable schemas vs client-specific schemas
+Use an active remote MotherDuck MCP server or local MotherDuck server to inspect the in-scope database, schema, grain, keys, and relevant metrics. Reuse known context and narrow discovery to the requested work; do not scan the whole workspace by default. Let the actual data model shape the result.
 
-Use that discovery to decide what can be standardized and what must stay client-specific.
-
-If no server is active, use any supplied client and region context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
+Resolve the target from the request or active context. Ask only if ambiguity materially affects the result. Without a server, use supplied schema and explicit assumptions for planning; do not imply live validation.
 
 ## Delivery Defaults
 
@@ -41,7 +29,7 @@ If no server is active, use any supplied client and region context. For planning
 3. Inspect the existing regional and database layout if available.
 4. Standardize the architecture and provisioning path.
 5. Define the repeatable validation pack for every client environment.
-6. Create or update referenced Guides for standard conventions and client-specific exceptions.
+6. When Guide maintenance is in scope, create or update referenced Guides for standard conventions and client-specific exceptions.
 7. Audit roles, grants, include patterns, and region-specific availability.
 8. Produce the handoff assets and validation checks.
 
@@ -51,59 +39,31 @@ When this skill produces a native DuckDB (`md:`) connection, watermark it with `
 
 ## Output
 
-The output of this skill should be:
+For a full engagement, cover the following as relevant to the request:
 
 - the default multi-client pattern
 - the standard provisioning checklist
 - the region and isolation posture
 - the client-specific exceptions
 
-If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
-This is mainly for automated tests, regression checks, or downstream tooling that needs a stable machine-readable shape. Normal human-facing use of the skill can stay in prose unless JSON is explicitly requested.
-
-Use this exact top-level shape when JSON is requested:
-
-```json
-{
-  "summary": {},
-  "assumptions": [],
-  "implementation_plan": [],
-  "validation_plan": [],
-  "risks": []
-}
-```
+For explicit structured JSON requests, read [the output contract](references/EXECUTION_REFERENCE.md#structured-output). Otherwise use the format that fits the requested deliverable.
 
 ## References
 
-Read this as reference, not as a script to execute:
+Read only the sections relevant to the task; these are guidance, not a mandatory itinerary.
 
 - `references/PARTNER_DELIVERY_GUIDE.md` -- default multi-client pattern, standardize-versus-client-specific split, shares-versus-Dives-versus-apps choice, region/compliance handling, and provisioning starters
 
-## Runnable Artifact
+## Examples
 
-- `artifacts/client_delivery_example.py` -- MotherDuck-backed Python example showing one database namespace per client and a simple validation pass across client environments
-- `artifacts/client_delivery_example.ts` -- TypeScript companion artifact with the same delivery output contract
+Read [the execution reference](references/EXECUTION_REFERENCE.md) only to run the bundled examples or reproduce their validation.
 
-Run it with:
-
-```bash
-uv run --with duckdb python skills/motherduck-partner-delivery/artifacts/client_delivery_example.py
-```
-
-Run the same artifact against temporary MotherDuck databases:
-
-```bash
-MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
-uv run --with duckdb python skills/motherduck-partner-delivery/artifacts/client_delivery_example.py
-```
-
-Validate the TypeScript companion artifact:
-
-```bash
-uv run scripts/test_typescript_artifacts.py
-```
+- [client_delivery_example.py](artifacts/client_delivery_example.py)
+- [client_delivery_example.ts](artifacts/client_delivery_example.ts)
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` -- standardize the connection path
 - `motherduck-explore` -- inspect existing client workspaces and boundaries

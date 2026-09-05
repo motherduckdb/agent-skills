@@ -1,13 +1,11 @@
 ---
 name: motherduck-share-data
-description: Create and manage MotherDuck data shares for zero-copy, read-only distribution. Use when publishing a whole database or selected tables and views, granting access to users or roles, consuming a share, or changing its update and include-pattern policy.
+description: Create, consume, or manage MotherDuck data shares, including audience grants, table filters, and refresh policy.
 argument-hint: [database-and-audience]
 license: MIT
 ---
 
 # Share Data with MotherDuck
-
-Use this skill when you need to distribute a MotherDuck database without copying data. Shares are read-only, zero-copy database clones and should be treated as explicit provisioning operations.
 
 ## Source Of Truth
 
@@ -21,9 +19,7 @@ Use this skill when you need to distribute a MotherDuck database without copying
 
 ## Prerequisites
 
-- MotherDuck connection established via `motherduck-connect`
-- Source database identified via `motherduck-explore`
-- Share SQL validated via `motherduck-query`
+A working connection, the source database, and the intended audience. Reuse these from context; related skills are available for missing setup or SQL details.
 
 ## Default Posture
 
@@ -47,11 +43,15 @@ Use this skill when you need to distribute a MotherDuck database without copying
 
 For answer, review, or planning requests, return the sharing design and SQL without provisioning. For create, update, grant, or revoke requests, perform the requested in-scope operation and validate the resulting access; ask before public exposure, destructive revocation, or unrelated grants.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, role grants, include-pattern rules, access/update decisions, consumer workflow, and common failure modes.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for MotherDuck authentication and connection setup
 - `motherduck-explore` for discovering databases, tables, columns, and existing shares

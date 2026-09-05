@@ -213,21 +213,17 @@ Every dashboard tells ONE story. Pick a single narrative focus before writing an
 - Operational efficiency and reliability
 - Customer behavior and retention
 
-**Define the sections:**
+**Example starting composition:** Adapt this to the decision and available data; the counts below are defaults, not limits.
 
 1. **KPIs (3-5 numbers).** These are the most important metrics at a glance. Pick the numbers the user would check first every morning. Examples: Total Revenue, Order Count, Average Order Value, Customer Count.
 
-2. **Primary chart (1 required).** This shows the main trend -- usually a time-series. Examples: Monthly Revenue (LineChart), Daily Active Users (AreaChart), Weekly Request Volume (AreaChart).
+2. **Primary chart.** Show the central comparison or trend; use a time-series only when change over time is the question. Examples: Monthly Revenue (LineChart), Daily Active Users (AreaChart), Weekly Request Volume (AreaChart).
 
 3. **Secondary chart (0-1 optional).** This shows a breakdown or comparison. Examples: Revenue by Category (BarChart), Error Rate by Endpoint (BarChart), Feature Usage (BarChart).
 
 4. **Detail table (0-1 optional).** Use a table when the user needs exact values or when there are more than 8 categories. Examples: Top 10 Products by Revenue, Slowest Endpoints, Top Pages by Views.
 
-**Constraints:**
-- Maximum 5 KPIs.
-- Maximum 2 charts.
-- Maximum 1 table.
-- If you find yourself adding more, split into multiple dashboards instead.
+Keep sections that help the audience decide or investigate. Split unrelated narratives into separate dashboards; do not split a coherent requested analysis merely to satisfy a chart quota.
 
 ---
 
@@ -310,7 +306,7 @@ Follow these layout conventions for a consistent, professional dashboard.
 const COLORS = ["#0777b3", "#bd4e35", "#2d7a00", "#e18727", "#638CAD", "#adadad"];
 ```
 
-Use colors consistently across all charts. The primary series always uses `#0777b3`.
+This palette is an example. Use consistent semantic colors from the selected theme across charts, preserving the existing visual system during scoped edits.
 
 ---
 
@@ -395,9 +391,9 @@ Common iteration fixes:
 
 5. **One dashboard, one narrative.** Do not mix unrelated stories (e.g., sales performance and server health) in one dashboard. Build separate dashboards instead.
 
-6. **Consistent colors across all charts.** Use the same `COLORS` array for all charts. The primary series is always `#0777b3`.
+6. **Consistent colors across all charts.** Use shared theme tokens and stable series colors in both light and dark modes.
 
-7. **Pre-aggregate everything in SQL.** The React component formats and renders. It never computes aggregations, filters data, or transforms values.
+7. **Compute business metrics in SQL.** React handles presentation, formatting, and UI state; keep expensive shaping and metric definitions in SQL.
 
 ---
 

@@ -327,6 +327,18 @@ CREATE TABLE "my_db"."main"."users" (
 
 ## Project Scaffold Conventions
 
+For a new multi-model project without an existing framework, use this layout. Adapt names to the project; a single-table change does not need a scaffold.
+
+```text
+<project-name>/
+  models/
+    raw/raw_<entity>.sql
+    staging/stg_<entity>.sql
+    analytics/dim_<entity>.sql
+    analytics/fct_<entity>.sql
+  model_manifest.yml
+```
+
 Each SQL file contains exactly one model and follows a naming convention by stage:
 - Raw: `raw_<entity>.sql`
 - Staging: `stg_<entity>.sql`

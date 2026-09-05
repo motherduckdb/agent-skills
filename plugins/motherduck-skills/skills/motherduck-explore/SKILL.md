@@ -1,12 +1,10 @@
 ---
 name: motherduck-explore
-description: Discover and explore databases, tables, columns, and data shares in MotherDuck. Use when you need to understand what data is available, preview table contents, or search the data catalog.
+description: Discover MotherDuck databases, tables, columns, shares, and sample data to understand an available dataset.
 license: MIT
 ---
 
 # Explore MotherDuck Data
-
-Use this skill when you need to discover what databases, tables, and columns exist in a MotherDuck account; preview and sample data; understand schemas and data types; find shared databases; or search the data catalog.
 
 ## Prerequisites
 
@@ -14,7 +12,7 @@ Use this skill when you need to discover what databases, tables, and columns exi
 
 ## Default Posture
 
-- Explore top-down: databases, then tables/views, then columns, then statistics, then sample rows.
+- Start at the known catalog object; broaden to databases or shares only when the target is unknown.
 - Use fully qualified table names once more than one database is attached.
 - Check shared databases before concluding that data is unavailable.
 - Use the MotherDuck MCP tools (`list_databases`, `list_tables`, `list_columns`, `search_catalog`) when available because they return structured results faster than ad hoc SQL.
@@ -27,14 +25,18 @@ Use this skill when you need to discover what databases, tables, and columns exi
 1. List databases in scope.
 2. Load relevant Guide context, then list tables and views in the target database.
 3. Inspect columns, types, nullability, and comments before writing queries.
-4. Run `SUMMARIZE` on important tables to understand ranges, cardinality, and null rates.
+4. Use targeted profiling or `SUMMARIZE` when ranges, cardinality, or null rates affect the answer; avoid broad scans for a catalog lookup.
 5. Preview rows, capture grain and join assumptions, and only then move into analytical SQL or modeling work.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/EXPLORATION_PLAYBOOK.md` for the full SQL workflow, share discovery patterns, MCP tool guidance, and common exploration mistakes
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` for session setup and authentication
 - `motherduck-query` for analytical SQL after the schema is understood

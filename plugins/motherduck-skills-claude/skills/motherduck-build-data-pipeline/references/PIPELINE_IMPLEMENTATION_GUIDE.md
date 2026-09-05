@@ -334,7 +334,7 @@ COMMENT ON VIEW "analytics"."main"."recent_orders" IS 'Orders from the last 30 d
 
 ## Step 5: Validate Data Quality
 
-Run validation checks between every pipeline stage. Never skip validation.
+Validate the data contracts affected by the change before publishing downstream outputs. For a new pipeline, check each stage boundary; a scoped transformation edit should rerun its affected models and dependent checks.
 
 ```sql
 -- Row count sanity check across stages
@@ -557,7 +557,7 @@ Number files to enforce execution order (`01_ingest.sql`, `02_dedupe.sql`, etc.)
 
 - **Separate lifecycle stages explicitly.** Production default: `raw`, `staging`, and `analytics` as separate databases. Minimal dbt projects may use one database with `raw`, `staging`, and `analytics` schemas.
 - **Land data in `raw` before curation.** Preserve source-like tables so downstream rebuilds stay simple.
-- **Validate data between every pipeline stage.** Row counts, NULL checks, uniqueness, range validation.
+- **Validate affected stage contracts.** Use row counts, nullability, uniqueness, and range checks where they protect the data contract.
 - **Preserve raw data.** Never transform during ingestion. Rebuild downstream tables from staging.
 - **Materialize only what needs fast repeated access.** Use views for lightweight, always-current logic.
 - **Use `CREATE OR REPLACE` for idempotent rebuilds.** Every pipeline step should be safe to re-run.

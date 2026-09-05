@@ -50,7 +50,6 @@ SUPPORTED_HARNESSES = [
     "Codex",
     "Gemini CLI",
 ]
-DEFAULT_ROUTING_SEQUENCE = "`motherduck-connect`, then `motherduck-explore`, then `motherduck-query`"
 SKILLS_CLI_PREREQUISITE = "npm install -g @fountainai/skills"
 
 
@@ -515,13 +514,6 @@ def validate_discoverability_docs() -> None:
         for harness in SUPPORTED_HARNESSES:
             if harness not in text:
                 raise ValidationError(f"{doc}: missing supported harness {harness!r}")
-
-    for doc in (README, HARNESS_GUIDE):
-        text = doc.read_text()
-        if DEFAULT_ROUTING_SEQUENCE not in text:
-            raise ValidationError(
-                f"{doc}: missing default routing sequence {DEFAULT_ROUTING_SEQUENCE!r}"
-            )
 
     if SKILLS_CLI_PREREQUISITE not in README.read_text():
         raise ValidationError(f"{README}: missing Skills CLI prerequisite {SKILLS_CLI_PREREQUISITE!r}")

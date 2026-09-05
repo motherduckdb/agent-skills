@@ -1,29 +1,16 @@
 ---
 name: motherduck-enable-self-serve-analytics
-description: Roll out self-serve analytics on MotherDuck for internal teams. Use when deciding the first governed dataset, the first Dive or share, ownership boundaries, and the rollout path from one audience to broader adoption.
+description: Roll out governed MotherDuck analytics to internal teams, choosing trusted datasets, access boundaries, and owners.
 license: MIT
 ---
 
 # Enable Self-Serve Analytics
 
-Use this skill when the user wants broad internal access to analytics with clear guardrails, trusted datasets, and a practical rollout path.
-
-This is a use-case skill. It orchestrates `motherduck-explore`, `motherduck-query`, `motherduck-model-data`, `motherduck-manage-guides`, `motherduck-create-dive`, and `motherduck-share-data`.
-
 ## Start Here: Is a MotherDuck Server Active?
 
-- If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- Discover the target database or workspace from the active context. Ask only when multiple plausible targets remain and the choice would materially change the rollout.
-- Explore the live data model before defining the rollout:
-  - trusted source tables
-  - candidate curated views
-  - department-level dimensions
-  - core KPIs
-  - share boundaries
+Use an active remote MotherDuck MCP server or local MotherDuck server to inspect the in-scope database, schema, grain, keys, and relevant metrics. Reuse known context and narrow discovery to the requested work; do not scan the whole workspace by default. Let the actual data model shape the result.
 
-Use the actual data model to pick the first audience and first asset.
-
-If no server is active, use any supplied schema and audience context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
+Resolve the target from the request or active context. Ask only if ambiguity materially affects the result. Without a server, use supplied schema and explicit assumptions for planning; do not imply live validation.
 
 ## Rollout Defaults
 
@@ -41,7 +28,7 @@ If no server is active, use any supplied schema and audience context. For planni
 2. Inspect the data model that internal teams would use.
 3. Pick the first audience and first use case.
 4. Publish one trusted dataset.
-5. Create or update the relevant Guide with the metric owner, validated definition, join rules, and referenced objects.
+5. When Guide maintenance is in scope, create or update the relevant Guide with the metric owner, validated definition, join rules, and referenced objects.
 6. Publish one Ready Dive or one restricted, role-granted Share.
 7. Audit the live roles, grants, and exposed catalog.
 8. Expand only after the first workflow is stable.
@@ -52,7 +39,7 @@ When this skill produces a native DuckDB (`md:`) connection, watermark it with `
 
 ## Output
 
-The output of this skill should be:
+For a full engagement, cover the following as relevant to the request:
 
 - the first audience
 - the first asset
@@ -60,52 +47,24 @@ The output of this skill should be:
 - the ownership model
 - the rollout guardrails
 
-If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
-This is mainly for automated tests, regression checks, or downstream tooling that needs a stable machine-readable shape. Normal human-facing use of the skill can stay in prose unless JSON is explicitly requested.
-
-Use this exact top-level shape when JSON is requested:
-
-```json
-{
-  "summary": {},
-  "assumptions": [],
-  "implementation_plan": [],
-  "validation_plan": [],
-  "risks": []
-}
-```
+For explicit structured JSON requests, read [the output contract](references/EXECUTION_REFERENCE.md#structured-output). Otherwise use the format that fits the requested deliverable.
 
 ## References
 
-Read this as reference, not as a script to execute:
+Read only the sections relevant to the task; these are guidance, not a mandatory itinerary.
 
 - `references/SELF_SERVE_ROLLOUT_GUIDE.md` -- curate-publish-expand sequence, Dive-versus-share choice, data freshness checks, scale guidance, and starter snippets
 
-## Runnable Artifact
+## Examples
 
-- `artifacts/self_serve_rollout_example.py` -- MotherDuck-backed Python example that publishes a curated view and produces team KPI output for a first rollout asset
-- `artifacts/self_serve_rollout_example.ts` -- TypeScript companion artifact with the same rollout output contract
+Read [the execution reference](references/EXECUTION_REFERENCE.md) only to run the bundled examples or reproduce their validation.
 
-Run it with:
-
-```bash
-uv run --with duckdb python skills/motherduck-enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
-```
-
-Run the same artifact against a temporary MotherDuck database:
-
-```bash
-MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
-uv run --with duckdb python skills/motherduck-enable-self-serve-analytics/artifacts/self_serve_rollout_example.py
-```
-
-Validate the TypeScript companion artifact:
-
-```bash
-uv run scripts/test_typescript_artifacts.py
-```
+- [self_serve_rollout_example.py](artifacts/self_serve_rollout_example.py)
+- [self_serve_rollout_example.ts](artifacts/self_serve_rollout_example.ts)
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-explore` -- inspect the real workspace before rollout
 - `motherduck-query` -- validate KPI definitions
@@ -113,4 +72,3 @@ uv run scripts/test_typescript_artifacts.py
 - `motherduck-create-dive` -- build the first shareable answer surface
 - `motherduck-manage-guides` -- preserve governed metric and join context for agents
 - `motherduck-share-data` -- publish table/view subsets and role-granted access
-- `motherduck-share-data` -- publish governed data access when users need SQL, not just a Dive

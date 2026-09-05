@@ -6,10 +6,10 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 
 ## Default Routing
 
-- For most technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`.
-- Add a workflow or use-case skill only after the connection path, live schema, and SQL shape are grounded.
+- Start with the skill that matches the task; use connection setup or discovery only when that context is missing.
+- For end-to-end work, start with the matching use-case skill and load lower-level guidance as needed.
 - If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the real workspace, schemas, tables, joins, and time dimensions before inventing SQL, models, or rollout plans.
-- If the database or workspace is unclear, ask which one is in scope before designing the solution.
+- Resolve the database or workspace from the request and active context; ask only if a remaining ambiguity materially changes the result.
 
 ## Skill Catalog
 

@@ -1,12 +1,10 @@
 ---
 name: motherduck-duckdb-sql
-description: DuckDB SQL reference for MotherDuck. Use when you need exact DuckDB syntax or function behavior, friendly SQL features like QUALIFY, GROUP BY ALL, or list/struct types, MotherDuck-specific SQL such as shares, secrets, snapshots, or UNDROP, or to fix SQL errors and PostgreSQL-style SQL that fails on MotherDuck.
+description: Look up or repair DuckDB SQL syntax and verify MotherDuck-specific command and feature support.
 license: MIT
 ---
 
 # DuckDB SQL Reference for MotherDuck
-
-Use this skill when you need exact DuckDB syntax, function behavior, or a quick sanity check that a statement will actually work on MotherDuck.
 
 ## Source Of Truth
 
@@ -36,11 +34,15 @@ Use this skill when you need exact DuckDB syntax, function behavior, or a quick 
 3. Verify any MotherDuck-only command or server-mode limitation against the current docs.
 4. If the user needs exact syntax or function details, open `references/SYNTAX_REFERENCE.md`.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/SYNTAX_REFERENCE.md` for DuckDB data types, friendly SQL features, functions, complex types, and common MotherDuck-specific gotchas.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-query` for writing and validating analytical SQL against live MotherDuck data
 - `motherduck-connect` when syntax support depends on PG endpoint versus native DuckDB behavior

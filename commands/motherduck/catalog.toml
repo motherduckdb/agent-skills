@@ -6,7 +6,7 @@ Summarize the installed MotherDuck skill catalog for the user.
 Required behavior:
 - Group the skills into utility, workflow, and use-case layers.
 - Give one short, practical sentence for when each layer matters.
-- Call out the default starting sequence: `motherduck-connect` -> `motherduck-explore` -> `motherduck-query`.
+- Recommend starting with the capability that matches the request; setup and exploration are needed only when their context is missing.
 - Mention `motherduck-cli` for shell/file workflows and `motherduck-manage-guides` for durable business and authoring context.
 - Mention that `/motherduck:route <task>` can map a concrete task onto the right skill sequence.
 - Keep the answer concise and operational.

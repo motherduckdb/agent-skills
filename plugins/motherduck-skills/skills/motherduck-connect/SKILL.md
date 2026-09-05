@@ -1,12 +1,10 @@
 ---
 name: motherduck-connect
-description: Connect to MotherDuck from any application. Use when setting up database connectivity via the Postgres endpoint (recommended), pg_duckdb, native DuckDB API, or JDBC. Covers connection strings, authentication, SSL, and environment variable configuration.
+description: Set up or troubleshoot MotherDuck connections, authentication, client runtimes, and read scaling.
 license: MIT
 ---
 
 # Connect to MotherDuck
-
-Use this skill when establishing database connectivity from any application, script, or service to MotherDuck. Start here before running queries or loading data.
 
 ## Source Of Truth
 
@@ -18,7 +16,7 @@ Use this skill when establishing database connectivity from any application, scr
 
 - Start with the PG endpoint (MotherDuck's Postgres-compatible endpoint) for backend applications, BI tools, and serverless runtimes that want PostgreSQL wire compatibility.
 - For BI tools, treat the PG endpoint as the compatibility path for Power BI and Tableau Cloud when current docs list them as supported.
-- Use the native DuckDB API only when you need local files, hybrid local/cloud execution, or direct DuckDB control.
+- Use the native DuckDB API when you need local files, hybrid local/cloud execution, or direct DuckDB control.
 - Use `md:` workspace connections for multi-database exploration, bootstrap flows, and temporary validation environments.
 - Reuse an existing connection, connector, or environment-managed token when the user's context already provides one; do not ask for secrets that can be discovered from the active workspace.
 - Start with one connection. Add pooling or read scaling only when real concurrent-read pressure exists.
@@ -30,38 +28,28 @@ Pick the connection method (above) and the runtime separately. The runtime is wh
 
 For answer, review, or planning requests, inspect the available runtimes and recommend a path without installing anything. Install or configure a runtime only when the user asks to connect, build, or change the application.
 
-Classify the workload first:
+Reuse the project’s language, dependencies, and working connection. Prefer MCP for chat-only exploration and the MotherDuck CLI for file-shaped Dive/Flight work or large output. For application code, use its existing runtime; choose a new runtime only when none is established.
 
-- **Ad-hoc / exploration**: one-shot, interactive, may be discarded. No artifact ships.
-- **Recurring / pipeline**: scheduled, version-controlled, runs unattended. Code is checked into a repo.
-
-Then resolve in this order, stopping at the first match:
-
-1. **MotherDuck MCP available + workload is ad-hoc or chat-oriented** → use MCP (`query`, `list_databases`, `list_tables`, `list_columns`, `search_catalog`). No client to install. Stop here.
-2. **MotherDuck CLI available + work is file-oriented, scripted, or produces large output** → use `motherduck query` or its Dive/Flight file workflows. Keep automated CLI state in a task-specific `MOTHERDUCK_HOME`.
-3. **`uv` is installed** (`command -v uv`) → run scripts via `uv run --with "duckdb==<version>" script.py`. Preferred for reproducible application or pipeline code.
-4. **`python3` + `pip` available** → `pip install "duckdb==<version>"` inside a project-managed venv.
-5. **`node` + `npm` available** → `npm install @duckdb/node-api@<version>`.
-6. **None of the above** → install the DuckDB CLI with the current platform-specific MotherDuck instructions. Do not use the POSIX installer command on Windows.
-
-If the host project already declares a language (a `pyproject.toml`, `package.json`, or similar lockfile is present), follow that language even if the priority order would suggest otherwise. Do not introduce a second runtime alongside an existing one.
-
-Before any install step, fetch `https://motherduck.com/docs/duckdb-versions.json` and pick the highest MotherDuck-supported DuckDB version. Pin that version explicitly in the install command. Latest upstream DuckDB is **not** automatically supported on MotherDuck.
+Before installing a DuckDB client, check `https://motherduck.com/docs/duckdb-versions.json` and pin a MotherDuck-supported version. Keep an existing compatible pin unless the task requires an upgrade. See the runtime reference for installation examples.
 
 ## Workflow
 
-1. Choose one connection method and do not mix methods in the same application.
+1. Choose the connection path for the workload; keep ingestion and serving paths distinct when their needs differ.
 2. Put the MotherDuck token in environment-managed secrets, not in source code.
 3. Establish the connection with explicit SSL settings where required.
 4. Verify the connection with `SELECT 1 AS connected` and then list reachable tables.
 5. If the workload is read-heavy and concurrent, evaluate read scaling and `session_hint`.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/CONNECTION_GUIDE.md` for connection-method selection, PG endpoint and native DuckDB examples, token handling, read scaling, attach modes, and common failure modes
 - Read `references/RUNTIME_SELECTION.md` for the MCP-vs-Python-vs-Node-vs-CLI decision tree, detection commands, install snippets, and the DuckDB version-pinning workflow
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-explore` for discovering databases, tables, columns, and shares after the connection is established
 - `motherduck-query` for executing DuckDB SQL against the connected databases

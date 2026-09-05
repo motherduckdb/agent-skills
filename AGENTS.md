@@ -73,6 +73,8 @@ Important supporting surfaces:
 
 - Keep changes targeted. This repo is mostly documentation and manifests; broad rewrites create drift.
 - Write for current frontier models: keep MotherDuck-specific signal, cut explanations of general concepts the model already knows.
+- Keep descriptions short and distinct; load only task-relevant references and related skills. Reuse established connection and schema context.
+- Treat workflow defaults as guidance unless order protects a concrete contract. Match validation to affected behavior and preserve the user's existing scope and authorization.
 - Keep `skills/catalog.json` descriptions byte-identical to SKILL.md frontmatter descriptions; `scripts/validate_skills.py` enforces this.
 - Give every `references/` file over 100 lines a `## Contents` table of contents, and keep references linked one level deep from `SKILL.md`.
 - When updating one catalog surface, check the others in the same pass.

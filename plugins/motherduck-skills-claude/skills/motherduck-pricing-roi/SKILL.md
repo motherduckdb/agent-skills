@@ -1,13 +1,11 @@
 ---
 name: motherduck-pricing-roi
-description: Explain MotherDuck pricing and ROI tradeoffs. Use for any pricing, cost, billing, plan-comparison, instance-sizing, chargeback, or budget question — when an economic_buyer, technical_owner, or analytics_lead asks about spend, budget guardrails, workload cost drivers, plan fit, vendor cost comparisons, or whether MotherDuck is worth adopting.
+description: Assess MotherDuck costs, plan fit, and ROI using current pricing and the workload’s compute and storage needs.
 argument-hint: [workload-or-pricing-question]
 license: MIT
 ---
 
 # Pricing and ROI
-
-Use this skill when the user is asking whether MotherDuck is financially sensible for their workload, team, or project. This is a workflow skill focused on cost framing, not implementation detail.
 
 ## Source Of Truth
 
@@ -19,7 +17,7 @@ Use this skill when the user is asking whether MotherDuck is financially sensibl
 
 - Do not hardcode pricing numbers unless you have verified them in the current turn.
 - When quoting numbers, include the verification date and the public source you checked.
-- Separate storage, compute, and operational complexity in every answer.
+- For estimates and comparisons, separate storage, compute, and operational overhead. A narrow price lookup needs only the relevant verified rate and conditions.
 - Map workload shape to cost shape before comparing vendors or plans.
 - Treat many pricing questions as risk, predictability, or procurement questions rather than purely technical ones.
 - Verify plan-sensitive entitlements such as Flight scheduling/runtime limits, custom roles, table-level security, regions, and embedded features in the current turn; do not infer them from an older release note.
@@ -32,11 +30,15 @@ Use this skill when the user is asking whether MotherDuck is financially sensibl
 4. Frame ROI in terms of systems replaced, complexity removed, and faster delivery.
 5. Call out what still needs live pricing-page or sales confirmation.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/PRICING_ROI_PLAYBOOK.md` for workload-to-cost mapping, publicly safe talking points, ROI framing, and what not to promise
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` when the pricing discussion depends on connection-path choices
 - `motherduck-security-governance` when compliance, residency, or commercial controls affect ROI

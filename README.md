@@ -236,7 +236,7 @@ The agent should inspect real metadata before inventing examples.
 
 ## Start Here by Task
 
-For narrow technical work, start with `motherduck-connect`, then `motherduck-explore`, then `motherduck-query`. For end-to-end product work, start with the matching use-case skill and let it orchestrate the lower layers.
+For narrow work, start with the matching skill; add connection setup or discovery only when context is missing. For end-to-end product work, start with the matching use-case skill and load lower-level guidance as needed. Read supporting references only for the modes involved in the task.
 
 | If you need to... | Start with... |
 | --- | --- |

@@ -1,12 +1,10 @@
 ---
 name: motherduck-create-flight
-description: Create, schedule, run, and debug MotherDuck Flights — Python jobs that run on MotherDuck compute. Use whenever someone wants to create a flight, schedule a Python script or recurring job on MotherDuck, set up scheduled ingestion from Postgres, dlt sources, S3, BigQuery, Snowflake, or APIs, refresh aggregates or transformations on a cron, or operate flights with get_flight_guide, create_flight, run_flight, flight logs, secrets, schedules, and versions.
+description: Create, run, schedule, or debug MotherDuck Flights, Python jobs executed on MotherDuck compute.
 license: MIT
 ---
 
 # Create and Manage MotherDuck Flights
-
-Use this skill when the user needs Python to run *on MotherDuck* — on a schedule or on demand — instead of in their own infrastructure. A Flight is a single-file Python program that MotherDuck executes in a managed runtime with a MotherDuck token injected, pip dependencies installed from a `requirements.txt`, and stdout/stderr captured as run logs. The primary use cases are scheduled ingestion (pull from Postgres, S3, APIs, other warehouses, or any dlt source into MotherDuck tables) and scheduled transformation (refresh aggregates, run dbt, recompute reporting tables).
 
 ## Source Of Truth
 
@@ -33,19 +31,23 @@ Use this skill when the user needs Python to run *on MotherDuck* — on a schedu
 
 1. Classify the job: ingestion, transformation/refresh, export or alerting, or admin automation. If the job is interactive analysis or a one-off query, use `motherduck-query` instead — no Flight needed.
 2. Call `get_flight_guide` (MCP) and confirm which database the flight writes to with `motherduck-explore`.
-3. Start from the closest template in `references/FLIGHT_EXAMPLES.md` (dlt source, Postgres mirror, or S3 partition refresh) rather than writing from scratch; adapt via config knobs, not code surgery.
+3. Reuse a matching template in `references/FLIGHT_EXAMPLES.md` when it fits; otherwise write a focused script that preserves the runtime, secrets, and idempotency contracts.
 4. Create any required `TYPE flights` secret first, then `create_flight` with `name`, `source_code`, pinned `requirements_txt`, `config`, and secret names — no `schedule_cron` yet.
 5. `run_flight`, poll `get_flight_run` when available (or `list_flight_runs` as a fallback) until terminal, and read `get_flight_logs`. Iterate with `edit_flight_source` (surgical) or `update_flight` (full field replacement); each content change creates a new version.
-6. Once a run succeeds, set the schedule with `update_flight(schedule_cron = ...)` and tell the user the cron is UTC. Clear it later with `schedule_cron = ""`.
+6. If scheduling was requested, set it only after a successful run with `update_flight(schedule_cron = ...)` and state that cron is UTC. Clear it with `schedule_cron = ""` only when requested; preserve an existing schedule during unrelated edits.
 
 For answer, review, or planning requests, do not create or schedule a Flight. For create or update requests, complete the requested in-scope deployment and on-demand validation; attaching a recurring schedule is authorized only when the request includes scheduling.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/FLIGHTS_GUIDE.md` for the full concept and operations reference: anatomy, runtime environment, config vs secrets, scheduling, versioning, run lifecycle, the complete MCP tool reference, MCP-vs-SQL naming, loading strategies by data volume, and troubleshooting.
 - Read `references/FLIGHT_EXAMPLES.md` for three complete, best-practice flight templates (dlt ingestion, Postgres ingestion, scheduled S3 partition refresh) with their `requirements.txt`, secret setup, and deploy calls.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-load-data` for choosing the ingestion SQL the flight will run (CTAS, `INSERT ... SELECT`, cloud-storage secrets)
 - `motherduck-query` for validating the DuckDB SQL inside the flight before deploying it

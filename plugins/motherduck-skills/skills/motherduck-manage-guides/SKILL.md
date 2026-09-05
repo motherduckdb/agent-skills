@@ -1,12 +1,10 @@
 ---
 name: motherduck-manage-guides
-description: Create, organize, read, update, and govern MotherDuck Guides. Use when an agent needs business definitions, join rules, data pitfalls, Dive or Flight conventions, or durable warehouse-native context attached to catalog objects.
+description: Read or maintain MotherDuck Guides for business definitions, join rules, and reusable warehouse conventions.
 license: MIT
 ---
 
 # Manage MotherDuck Guides
-
-Use this skill when context that is not visible from the schema should guide agents consistently: metric definitions, join rules, columns to avoid, business vocabulary, or Dive and Flight conventions. Guides are versioned Markdown documents stored in MotherDuck and surfaced through the MCP server.
 
 ## Source Of Truth
 
@@ -32,13 +30,17 @@ Use this skill when context that is not visible from the schema should guide age
 5. For a create or update request, apply the change through MCP or the documented SQL function and read it back.
 6. Verify metadata, access, references, current version, and change comment. For query work, follow the Guide and still validate the resulting SQL against the live schema.
 
-For answer, review, or planning requests, inspect and draft without creating or modifying Guides. For explicit create/update requests, perform the in-scope mutation and verify it; ask before organization-wide publication, deletion, or unrelated context changes.
+For answer, review, or planning requests, inspect and draft without creating or modifying Guides. For explicit create/update requests, perform the in-scope mutation and verify it; ask before deletion or expanding visibility beyond the authorized audience. An explicit organization-publication request already authorizes that audience, subject to admin permission.
 
-## Open Next
+## References
+
+Read only the reference sections needed for the current task.
 
 - Read `references/GUIDES_PLAYBOOK.md` for topic design, access governance, references, MCP/SQL operations, versioning, and quality checks.
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-explore` for validating referenced catalog objects
 - `motherduck-query` for testing SQL and applying Guide-aware analysis

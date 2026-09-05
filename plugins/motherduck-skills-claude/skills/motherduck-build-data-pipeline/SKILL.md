@@ -1,33 +1,17 @@
 ---
 name: motherduck-build-data-pipeline
-description: Design an end-to-end MotherDuck data pipeline. Use for ETL/ELT workflows -- choosing raw, staging, and analytics boundaries, bulk ingestion paths, transformation sequencing, dlt/dbt integration, publication targets, or whether DuckLake is actually required.
+description: Build ingestion-to-serving pipelines on MotherDuck, including stage boundaries, transformations, and publication.
 argument-hint: [pipeline-goal]
 license: MIT
 ---
 
 # Build a Data Pipeline with MotherDuck
 
-Use this skill when the user needs an ingestion-to-serving workflow, not just a single load step.
-
-This is a use-case skill. It orchestrates `motherduck-connect`, `motherduck-load-data`, `motherduck-model-data`, `motherduck-query`, `motherduck-share-data`, `motherduck-ducklake`, and `motherduck-manage-guides`.
-
 ## Start Here: Is a MotherDuck Server Active?
 
-- If a **remote MotherDuck MCP server** or **local MotherDuck server** is active, use it.
-- If the user names the destination database, use it without adding a confirmation step.
-- Explore the live environment:
-  - current databases and schemas
-  - raw, staging, and analytics boundaries if they already exist
-  - source tables, target tables, and table grain
-  - key columns, date fields, and join keys
+Use an active remote MotherDuck MCP server or local MotherDuck server to inspect the in-scope database, schema, grain, keys, and relevant metrics. Reuse known context and narrow discovery to the requested work; do not scan the whole workspace by default. Let the actual data model shape the result.
 
-Use that discovery to decide whether the pipeline is:
-
-- landing into an empty workspace
-- extending an existing warehouse layout
-- publishing into an existing analytics model
-
-If no server is active, use any supplied source and target context. For planning work, proceed with explicit assumptions when safe; ask for missing details only when they block a reliable result.
+Resolve the target from the request or active context. Ask only if ambiguity materially affects the result. Without a server, use supplied schema and explicit assumptions for planning; do not imply live validation.
 
 ## Pipeline Defaults
 
@@ -50,7 +34,7 @@ If no server is active, use any supplied source and target context. For planning
 5. Deduplicate, type, and promote into staging.
 6. Materialize analytics-ready outputs.
 7. Validate counts, freshness, uniqueness, and business metrics before publishing downstream assets.
-8. Capture stable business definitions and operating caveats in referenced Guides; keep executable transformation logic in source control.
+8. When durable context is part of delivery, capture stable business definitions and operating caveats in referenced Guides; keep executable transformation logic in source control.
 
 Match execution to the request: answer, review, or planning work returns the requested pipeline artifacts; build or change work creates the requested in-scope files and warehouse objects and validates them. Ask before destructive actions, unrelated external writes, or a material expansion of scope.
 
@@ -58,7 +42,7 @@ When this skill produces a native DuckDB (`md:`) connection, watermark it with `
 
 ## Output
 
-The output of this skill should be:
+For a full engagement, cover the following as relevant to the request:
 
 - the stage layout
 - the ingestion method
@@ -66,71 +50,26 @@ The output of this skill should be:
 - the serving tables or views
 - the validation checks
 
-If the caller explicitly asks for structured JSON, return raw JSON only with no Markdown fences or prose before/after it.
-This is mainly for automated tests, regression checks, or downstream tooling that needs a stable machine-readable shape. Normal human-facing use of the skill can stay in prose unless JSON is explicitly requested.
-
-Use this exact top-level shape when JSON is requested:
-
-```json
-{
-  "summary": {},
-  "assumptions": [],
-  "implementation_plan": [],
-  "validation_plan": [],
-  "risks": []
-}
-```
+For explicit structured JSON requests, read [the output contract](references/EXECUTION_REFERENCE.md#structured-output). Otherwise use the format that fits the requested deliverable.
 
 ## References
 
+Read only the sections relevant to the task; these are guidance, not a mandatory itinerary.
+
 - `references/dlt-dbt-motherduck-project/` -- fully runnable MotherDuck reference project using `dlt`, `dbt-duckdb`, and validation queries
-- `references/PIPELINE_IMPLEMENTATION_GUIDE.md` -- preserved detailed pipeline guidance that used to live in this skill
+- `references/PIPELINE_IMPLEMENTATION_GUIDE.md` -- stage design, transformation sequencing, and ingestion-to-serving examples
 - `../motherduck-load-data/references/INGESTION_PATTERNS.md` -- lower-level ingestion patterns
 
-## Runnable Artifact
+## Examples
 
-- `artifacts/pipeline_stage_example.py` -- MotherDuck-backed Python example that stages a Parquet extract, lands it into raw, deduplicates it, and publishes analytics output across raw/staging/analytics databases
-- `artifacts/pipeline_stage_example.ts` -- TypeScript companion artifact with the same stage layout and output contract
-- `references/dlt-dbt-motherduck-project/` -- end-to-end MotherDuck example that bootstraps the target database, lands raw data with `dlt`, builds staging and analytics models with `dbt`, and validates the final mart
+Read [the execution reference](references/EXECUTION_REFERENCE.md) only to run the bundled examples or reproduce their validation.
 
-Run it with:
-
-```bash
-uv run --with duckdb python skills/motherduck-build-data-pipeline/artifacts/pipeline_stage_example.py
-```
-
-Run the same stage pattern against temporary MotherDuck databases:
-
-```bash
-MOTHERDUCK_ARTIFACT_USE_MOTHERDUCK=1 \
-uv run --with duckdb python skills/motherduck-build-data-pipeline/artifacts/pipeline_stage_example.py
-```
-
-Validate the TypeScript companion artifact:
-
-```bash
-uv run scripts/test_typescript_artifacts.py
-```
-
-For the full MotherDuck project:
-
-```bash
-cd skills/motherduck-build-data-pipeline/references/dlt-dbt-motherduck-project
-export MOTHERDUCK_TOKEN=...
-export MOTHERDUCK_PIPELINE_DB=md_skills_pipeline_demo
-uv sync --python 3.12
-uv run python pipeline/run_all.py
-uv run python pipeline/cleanup.py
-```
-
-## Verified Notes
-
-- Bootstrap the target MotherDuck database before running `dlt`. The `motherduck` destination does not create the database for you.
-- Use Python 3.11 or 3.12 to reproduce this reference project; its tested `dbt-duckdb` path did not run reliably on Python 3.14.
-- If you want exact schema names like `raw`, `staging`, and `analytics` in dbt, override `generate_schema_name`.
-- When a long-lived Python process loads data and a separate `dbt` subprocess builds models, run post-build validation in a fresh process or refresh database state before reading new relations.
+- [pipeline_stage_example.py](artifacts/pipeline_stage_example.py)
+- [pipeline_stage_example.ts](artifacts/pipeline_stage_example.ts)
 
 ## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-connect` -- choose the right connection path
 - `motherduck-load-data` -- ingestion mechanics

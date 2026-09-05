@@ -2,6 +2,8 @@
 
 Use this reference after `motherduck-design-dive` has established the audience, decision, metrics, and filter dimensions.
 
+This is the default system for a new Dive or full redesign. Preserve explicit user requirements and existing conventions for scoped edits; run the QA cases affected by the change rather than rebuilding the full system.
+
 ## Contents
 
 | Section | Covers |
