@@ -13,17 +13,13 @@ The packaged installs below are harness-specific convenience paths for runtimes 
 | `Claude Code` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
 | `Codex` | `codex plugin marketplace add motherduckdb/agent-skills`, then install **MotherDuck Skills** from `/plugins` |
 | `Cursor` | `npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global`; this repo also includes `.cursor-plugin/plugin.json` for Cursor plugin ingestion |
-| `Gemini CLI` | `gemini extensions install https://github.com/motherduckdb/agent-skills --consent` |
+| `Gemini CLI` | `gemini extensions install https://github.com/motherduckdb/agent-skills` |
 
 ## Skills CLI Install
 
-For harnesses that support the shared skills installer:
+Use the [Skills CLI](https://github.com/vercel-labs/skills) with Git and Node.js 22.20+; `npx` runs it without a global installation. This requirement comes from the [current package metadata](https://github.com/vercel-labs/skills/blob/main/package.json).
 
-If you do not already have the Skills CLI available, install it first:
-
-```bash
-npm install -g @fountainai/skills
-```
+Install into the current project:
 
 ```bash
 npx -y skills add motherduckdb/agent-skills --skill '*' --yes
@@ -62,7 +58,23 @@ npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --g
 
 ## Manual Per-Skill Install
 
-Copy the full skill directory, not only `SKILL.md`.
+From a repository checkout, copy the full skill directory, not only `SKILL.md`, to a skill path supported by your agent. For agents that discover `~/.agents/skills`:
+
+```bash
+mkdir -p ~/.agents/skills
+cp -R skills/motherduck-connect ~/.agents/skills/motherduck-connect
+```
+
+See [HARNESSES.md](../HARNESSES.md) for agent-specific discovery paths.
+
+## Updates
+
+- Claude Code / GitHub Copilot CLI: `/plugin update motherduck-skills@motherduck-skills`
+- Codex: manage the installed plugin from `/plugins`.
+- Gemini CLI: `gemini extensions update motherduck-skills`, then restart the session.
+- Skills CLI: `npx -y skills update -g` for global skills, or `npx -y skills update -p` for project skills. These update the installed skills in that scope.
+
+For Gemini automation, `--consent` skips the installation confirmation; it is optional for interactive installs.
 
 ## Verification
 

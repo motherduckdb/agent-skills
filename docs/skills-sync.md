@@ -65,7 +65,7 @@ When updating a skill, treat `skills/catalog.json` as the first stop:
 - rerun the MotherDuck-backed artifact suite when the change affects real MotherDuck behavior
 - rerun `uv run scripts/sync_claude_plugin.py` when the shared catalog changed
 - rerun `uv run scripts/check_claude_plugin_sync.py` before you consider the Claude package done
-- keep the Skills CLI prerequisite in install docs explicit: `npm install -g @fountainai/skills`
+- keep Skills CLI examples on `npx -y skills` and verify runtime prerequisites against the current package
 
 That is the docs-to-skills sync path in this repo.
 

@@ -14,7 +14,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 
 ## Install Notes
 
-- For shared Skills CLI installs, assume the prerequisite is `npm install -g @fountainai/skills` unless the environment already has the CLI.
+- For shared Skills CLI installs, use `npx -y skills`; verify the current package's Node.js requirement instead of requiring a global install.
 - The dedicated Claude plugin package lives at `plugins/motherduck-skills-claude`.
 
 ## Non-Negotiable Rules

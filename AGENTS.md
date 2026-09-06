@@ -59,7 +59,7 @@ Important supporting surfaces:
 
 - Lead with the Postgres endpoint for thin-client and PostgreSQL-driver interoperability.
 - Keep native DuckDB APIs in the guidance when local files, hybrid execution, or direct DuckDB control matter.
-- For Skills CLI installs, keep the prerequisite explicit: `npm install -g @fountainai/skills`.
+- For Skills CLI installs, use `npx -y skills` and verify Node.js requirements against the current `skills` package; no global install is required.
 - Prefer MCP-assisted exploration when MotherDuck MCP is available.
 - For use-case skills, if a remote or local MotherDuck server is active, start from the user's real database/schema instead of inventing one.
 - Prefer a native `md:` workspace connection for multi-database exploration, bootstrap flows, and temporary validation environments.
