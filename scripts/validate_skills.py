@@ -50,7 +50,6 @@ SUPPORTED_HARNESSES = [
     "Codex",
     "Gemini CLI",
 ]
-SKILLS_CLI_PREREQUISITE = "npm install -g @fountainai/skills"
 
 
 class ValidationError(Exception):
@@ -514,9 +513,6 @@ def validate_discoverability_docs() -> None:
         for harness in SUPPORTED_HARNESSES:
             if harness not in text:
                 raise ValidationError(f"{doc}: missing supported harness {harness!r}")
-
-    if SKILLS_CLI_PREREQUISITE not in README.read_text():
-        raise ValidationError(f"{README}: missing Skills CLI prerequisite {SKILLS_CLI_PREREQUISITE!r}")
 
 
 def validate_product_contracts(catalog: dict[str, dict[str, object]]) -> None:

@@ -78,11 +78,7 @@ For current agent-facing MotherDuck workflows:
 - prefer the MotherDuck CLI for file-shaped Dive/Flight work when a shell is available
 - call `get_query_guide` before business-semantic MCP queries and traverse only relevant Guide topics
 
-When the public install story references the shared Skills CLI path, keep the prerequisite explicit:
-
-```bash
-npm install -g @fountainai/skills
-```
+For the shared Skills CLI path, use `npx -y skills` without a global install. Verify Node.js requirements against the current package metadata when updating install instructions.
 
 When the change affects supported harnesses, also keep these packaged skill trees aligned with `skills/`:
 
