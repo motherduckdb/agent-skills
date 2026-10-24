@@ -10,7 +10,7 @@ license: MIT
 ## Source Of Truth
 
 - Prefer current MotherDuck Dive docs first.
-- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before generating Dive code and always before `save_dive` or `update_dive`. The guide defines the current component API and runtime libraries.
+- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive` or `update_dive`. The guide defines the current component API and runtime libraries.
 - `get_dive_guide` also surfaces relevant conventions from the reserved `dives` Guide topic. Apply those conventions when they do not conflict with the user's explicit requirements.
 - Use the blessed Dives example repo as the reference implementation for local preview, Dives-as-code layout, metadata, CI previews, and deploy scripts.
 - Use Dives SQL functions when the user wants a scriptable SQL-native create/read/update/delete workflow instead of MCP tools.

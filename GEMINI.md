@@ -62,4 +62,4 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 ## Discovery Helpers
 
 - `/motherduck:catalog` explains the catalog and where to start.
-- `/motherduck:route <task>` maps a concrete task onto the right skill or skill sequence.
+- `/motherduck:route <task>` picks the starting skill for a concrete task.

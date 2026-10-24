@@ -9,7 +9,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 ## Default Routing
 
 - Start with the skill that matches the task. Use connection setup or discovery only when that context is missing.
-- For larger product work, start with the matching use-case skill and let it orchestrate the lower layers.
+- For larger product work, start with the matching use-case skill and load lower-level skills only when it needs them.
 - If a remote MotherDuck MCP server or local MotherDuck server is active, inspect the live workspace before inventing SQL, models, or rollout plans.
 
 ## Install Notes
