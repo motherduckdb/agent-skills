@@ -6,8 +6,8 @@ The REST API is not the SQL query path. Use it for organization administration, 
 
 ## MotherDuck MCP
 
-When the MotherDuck MCP server is connected and user-admin tools are enabled, prefer MCP
-admin tools over curl. The server exchanges the caller's credential for a regional SLT and
+When the MotherDuck MCP server is connected and lists user-admin tools, prefer MCP
+admin tools over curl. Check the tool list first; many MCP setups do not expose them. The server exchanges the caller's credential for a regional SLT and
 calls `api.<region>.motherduck.com`, not the global routing host. Call `get_user_admin_guide`
 for the in-session copy of this guide.
 

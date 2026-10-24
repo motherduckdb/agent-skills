@@ -147,7 +147,7 @@ conn.close()
 - MotherDuck positions Dives for the long tail of questions that do not justify a full dashboard, not as a replacement for every BI workflow.
 - Dives are shareable and live.
 - Read scaling is the official answer when dashboard or BI traffic becomes read-heavy and concurrent.
-- Shares are zero-copy and read-only. Publish a curated whole database or an explicit table/view subset through `INCLUDE_PATTERN`, grant restricted access to roles, and never treat the pattern as row-level security.
+- Shares are zero-copy and read-only. Publish a curated whole database or an explicit table/view subset through `INCLUDE_PATTERN`, grant restricted access to roles, and never treat the pattern as row-level security. For per-team rows, hidden columns, or masked values, add secure views to the share keyed on `current_email()` or `is_role_in_session()`.
 - Guides preserve metric definitions, joins, and pitfalls for agents; attach them to the governed catalog objects and default them to private until organization publication is requested and validated.
 - Dive statuses separate work in progress from trusted assets. Publish validated work as Ready and reserve Endorsed for admin-reviewed sources of truth.
 

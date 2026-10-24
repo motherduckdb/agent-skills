@@ -61,7 +61,7 @@ LIMIT 10;
 - Prefer backend-held credentials over browser-exposed credentials.
 - Prefer structural isolation over query-time tenant filtering for serious B2B or CFA workloads.
 - Prefer region-specific guidance when residency matters.
-- Use shares as read-only publication boundaries. Use `INCLUDE_PATTERN` for whole-table/view filtering, never as row-level or column-level security.
+- Use shares as read-only publication boundaries. Use `INCLUDE_PATTERN` for whole-table/view filtering and secure views for row-level security, column-level security, and masking.
 
 ## Publicly Documented Security Anchors
 
@@ -71,7 +71,7 @@ These are safe public anchors to use:
 - MotherDuck publicly states that it is GDPR verified and that signed DPAs can be requested via `security@motherduck.com`.
 - Public pricing and trust pages state that compliance reports are available through the commercial process, and that some commercial or security features vary by plan.
 - MotherDuck publicly documents service accounts as organization-owned non-human identities for applications and automation.
-- MotherDuck publicly documents shares as read-only and zero-copy, with optional table/view filtering through `INCLUDE_PATTERN`; this is not row-level or column-level entitlement enforcement.
+- MotherDuck publicly documents shares as read-only and zero-copy, with optional table/view filtering through `INCLUDE_PATTERN` and, on Business and Enterprise, secure views that enforce row filters, hidden columns, and masking per consumer.
 - MotherDuck publicly documents preset and custom roles, role inheritance, user assignments, and role-based Share grants. Custom roles are plan-gated, so verify current entitlements before promising availability.
 - MotherDuck publicly documents SSO support with identity providers such as Okta, Microsoft Entra ID, and SAML/OIDC options. Verify current plan requirements and limitations before promising a rollout path.
 - MotherDuck publicly documents data recovery through automatic snapshots, named snapshots, point-in-time restore, and `UNDROP DATABASE`, with retention and availability varying by plan.

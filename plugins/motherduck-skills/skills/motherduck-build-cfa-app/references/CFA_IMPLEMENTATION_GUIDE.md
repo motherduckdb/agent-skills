@@ -312,7 +312,7 @@ Enable read scaling for each customer's service account when concurrent read wor
 - **Default pool size:** read scaling starts with a default pool size of 4 replicas and can be increased up to 16 as a soft limit.
 - **Use Read Scaling tokens** to distribute load across replicas automatically.
 - **Read Scaling tokens are read-only.** Write operations require a Read/Write token.
-- **Use `session_hint` on native DuckDB connections** so repeated requests from the same end user land on the same replica when possible.
+- **Use `session_name` on native DuckDB connections** (`session_hint` is its deprecated older name) so repeated requests from the same end user land on the same replica when possible.
 
 | Token Type | Use Case | Concurrency | Write Access |
 |---|---|---|---|
@@ -360,7 +360,7 @@ Read scaling distributes read queries across multiple replicas of a customer's D
 - **Default pool size is 4 replicas** and can be increased up to 16 as a soft limit.
 - **Eventually consistent.** Replicas sync from the primary within a few minutes. This delay is acceptable for analytics workloads.
 - **Automatic load distribution.** When using a Read Scaling token, MotherDuck routes queries across available replicas automatically.
-- **Session affinity matters.** When using native DuckDB connections, pass a stable `session_hint` so the same user stays on the same replica when possible.
+- **Session affinity matters.** When using native DuckDB connections, pass a stable `session_name` so the same user stays on the same replica when possible.
 - **No query rewrite is required.** The main change is token type and connection configuration, not a new SQL dialect.
 
 ### When to Use CREATE SNAPSHOT and REFRESH DATABASE
@@ -424,7 +424,7 @@ Read/Write tokens route to the primary instance. Read Scaling tokens distribute 
 
 ### Assuming strong consistency with read replicas
 
-Read replicas are eventually consistent. If your application writes data and immediately queries for it via a Read Scaling token, the write may not be visible yet. Use `CREATE SNAPSHOT` + `REFRESH DATABASE` when strict consistency is required after a write. When using native DuckDB connections, pair this with a stable `session_hint`.
+Read replicas are eventually consistent. If your application writes data and immediately queries for it via a Read Scaling token, the write may not be visible yet. Use `CREATE SNAPSHOT` + `REFRESH DATABASE` when strict consistency is required after a write. When using native DuckDB connections, pair this with a stable `session_name`.
 
 ### Skipping query validation
 
