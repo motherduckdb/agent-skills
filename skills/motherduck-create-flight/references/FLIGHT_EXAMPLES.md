@@ -622,7 +622,7 @@ create_flight(
   name = "postgres-nightly-mirror",
   source_code = <flight source above>,
   requirements_txt = "duckdb==1.5.2\ntenacity==9.0.0\n",
-  md_secret_names = ["pg"],
+  flight_secret_names = ["pg"],
   config = { "TARGET_DATABASE": "postgres_ingest", "EXCLUDED_SCHEMAS": "audit,scratch" },
 )
 ```

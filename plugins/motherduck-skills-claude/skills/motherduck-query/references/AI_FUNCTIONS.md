@@ -54,6 +54,7 @@ FROM "support"."main"."tickets";
 - Images: pass PNG or JPEG bytes as a `BLOB` (a bare BLOB is treated as JPEG) or a `{name, content, format}` struct or list of structs; load files or URLs with `read_blob`. Each side must be 280 to 1,568 px and upright (EXIF rotation is ignored); out-of-limit images return `NULL`. `box` always returns coordinates, so pair it with a `noul` presence check.
 - Batching: text rows go 32 per request by default and shrink automatically under the token limit. Setting `batch_size` (1 to 64) turns that adjustment off, and an oversized batch returns `NULL` for every row in it. `batch_size := 1` gives strict per-row isolation at higher cost. Images are never batched.
 - There is no model parameter. Confidence is not correctness: evaluate on labelled examples before automating a decision.
+- When a CTE wraps `prompt_jev()` (or `prompt()`), declare it `AS MATERIALIZED` so the calls run once instead of once per reference.
 
 ## `prompt`
 

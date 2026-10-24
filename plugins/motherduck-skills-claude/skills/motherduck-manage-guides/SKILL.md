@@ -16,7 +16,8 @@ license: MIT
 ## Default Posture
 
 - Keep one short root orientation Guide only when its guidance applies broadly. Put domain-specific knowledge under shallow, descriptive topics.
-- Default new Guides to `access = 'user'`. Organization visibility requires an explicit request and the required admin permission.
+- Default new Guides to `access = 'user'`. Organization visibility requires an explicit request and the required admin permission; change it with `set_guide_access` (MCP) or `--access` on `motherduck guide push`.
+- Document tables that Flights create under the `data-sources` topic (not `flights`, which holds authoring conventions): source, purpose, grain, key columns, transformations, refresh behavior, and caveats, with references to the table, its producing Flight, and any consuming Dive. Use `organization` access when the table's database has an owned share, `user` otherwise.
 - Write one coherent subject per Guide, with a discriminating title and description. Lead with rules, tested SQL, and named pitfalls.
 - Attach references to the databases, shares, schemas, tables, columns, Dives, Flights, or Guides the content governs so agents discover it at the right time.
 - Validate referenced objects and executable SQL against the live workspace before presenting a Guide as trustworthy.
