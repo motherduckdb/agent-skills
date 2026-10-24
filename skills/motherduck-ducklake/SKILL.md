@@ -26,14 +26,15 @@ license: MIT
 - For data inlining, sorted tables, bucket partitioning, deletion vectors, or extension behavior, verify the current MotherDuck DuckLake docs and DuckDB/DuckLake version matrix before giving syntax guarantees.
 - Do not infer MotherDuck client/runtime support from upstream DuckDB release notes alone; check the MotherDuck lifecycle docs when the exact DuckDB version matters.
 - Keep the MotherDuck product surface separate from raw DuckLake-extension assumptions.
-- Filtered shares (`INCLUDE_PATTERN`) require native MotherDuck storage. DuckLake shares can be unfiltered, and persisted Iceberg catalogs cannot be shared.
+- Fine-grained sharing (`INCLUDE_PATTERN` and secure views for rows, columns, and masking) works on fully managed DuckLake only, not on BYOB databases with their own `DATA_PATH`. Such shares must be `UPDATE AUTOMATIC`, and consumers lose time travel and DuckLake metadata functions. If per-audience access control matters, that is a reason to choose fully managed over BYOB. Persisted Iceberg catalogs cannot be shared.
+- A BYOB bucket can sit in a different region or cloud from the organization: set `REGION` on the S3 secret, `ENDPOINT` for other S3-compatible stores, or `ACCOUNT_ID` (plus a jurisdiction endpoint when residency matters) for R2. Expect higher latency and possible provider transfer charges. Compute, the metadata catalog, statistics, and inlined rows stay in the organization's region.
 - Do not apply native/share `REFRESH DATABASE` assumptions to persisted Iceberg catalogs; their catalog advances independently. Verify current docs before prescribing a refresh operation.
 
 ## Workflow
 
 1. Confirm why native MotherDuck storage is insufficient.
 2. Pick the operating mode: fully managed, BYOB with MotherDuck compute, or BYOB with own compute.
-3. Verify regional and bucket constraints before proposing BYOB.
+3. Verify bucket reachability, region, transfer cost, and residency before proposing BYOB, and check whether the design needs fine-grained sharing (fully managed only).
 4. Define the ingestion and maintenance posture up front, including data inlining, file compaction, and cleanup expectations.
 5. Validate who will query the data and from which compute surface before finalizing the architecture.
 

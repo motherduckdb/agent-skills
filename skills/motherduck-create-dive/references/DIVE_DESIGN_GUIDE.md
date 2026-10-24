@@ -15,6 +15,8 @@ Reference for creating, editing, managing, sharing, embedding, and polishing Mot
 | 7. Dives as Code | Git repo layout, preview, CI/CD deploy |
 | 8. Embedding Dives | Embed sessions, iframe, CSP, server vs dual mode |
 | Dive Status Lifecycle | Draft, Ready, Endorsed, Archived trust signals |
+| Write-Back with Flights | `useRunFlight`, `useFlightRun`, grants, freshness after a run |
+| Agent Chat on Dives | What the in-Dive assistant sees and can change |
 | Embedded State and Events | Initial state, state updates, navigation, exports |
 | 9-10. Theming | Theme prompt template and gallery shortlist |
 | 11. Recharts Component Reference | Chart components and props |
@@ -302,6 +304,59 @@ FROM MD_UPDATE_DIVE_STATUS(
 ```
 
 Read the Dive back after the change. Treat promotion to Ready as a publication step, not an automatic side effect of saving a draft.
+
+## Write-Back with Flights
+
+A Dive never writes through its own SQL. A control in the Dive starts a run of a Flight, the Flight performs the write with its owner's token and secrets, and the Dive follows the run and reloads its data.
+
+1. Build and validate the Flight first (see `motherduck-create-flight`). Declare every key the Dive will send in the Flight's stored `config`; a run can override only existing keys, and the Flight reads them as environment variables.
+2. Validate every value inside the Flight as untrusted input and bind it as a SQL parameter.
+3. Grant viewers access: `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`.
+4. Wire the control:
+
+```jsx
+import { useRunFlight, useFlightRun } from "@motherduck/react-sql-query";
+
+// Hardcode the ID. MD_LIST_FLIGHTS() only lists the viewer's own Flights.
+const APPROVE_ORDER_FLIGHT = "00000000-0000-4000-8000-000000000000";
+
+function ApproveOrder({ orderId, onApproved }) {
+  const start = useRunFlight(APPROVE_ORDER_FLIGHT);
+  const run = useFlightRun(APPROVE_ORDER_FLIGHT, start.data?.runNumber, {
+    onFinished: (finished) => {
+      if (finished.status === "SUCCEEDED") onApproved(); // rerun the affected queries
+    },
+  });
+  const busy = start.isPending || run.isChecking;
+
+  return (
+    <div>
+      <button disabled={busy} onClick={() => start.run({ ORDER_ID: String(orderId) })}>
+        {busy ? "Approving..." : "Approve"}
+      </button>
+      {start.error && <p role="alert">{start.error.message}</p>}
+    </div>
+  );
+}
+```
+
+- Call `run` only from an event handler; every call starts a new run. A resolved `run` means the run started, not that it finished. `runAsync` returns a promise for the same result.
+- Config values must be strings. Convert numbers, dates, and booleans before calling `run`.
+- Test from SQL before wiring the UI: `MD_RUN_FLIGHT` returns the `run_number`, and `MD_GET_FLIGHT_RUN` reports its terminal status.
+- Freshness: when the Dive reads through a Share, the change can take about a minute to appear. For immediate results the Flight can finish with `CREATE SNAPSHOT OF "<database>"` and the Dive can run `REFRESH DATABASE "<alias>"` before rerunning queries; both cost performance, so use them only when the workflow needs it.
+- Runs work in the MotherDuck app, the MCP Dive viewer, and `motherduck dive watch`. Embedded Dives show "This Dive can't run Flights." Viewers with no roles or on a read-scaling token are refused.
+- Common failures: no `RUN` grant (not-found or ownership error), an error the Dive does not render (click appears to do nothing), and stale data because the Dive did not rerun its queries.
+
+## Agent Chat on Dives
+
+The **AI Chat** button in a Dive opens MotherDuck's in-app agent. It sees the Dive's queries, their data, and the viewer's current filters and selections, and it acts with the viewer's own permissions. It can create Dives, add charts, change filters or queries, edit the title and description, share the underlying data with the organization (Dive owner only), and delete Dives. Each edit is saved as a new version; deletions are permanent. It cannot change tables or databases.
+
+Design implications for authored Dives:
+
+- Name and describe sections and queries in plain business terms so the agent can explain them.
+- Keep filter state in explicit Dive state so the agent sees what the viewer is looking at.
+- Treat agent edits like any other edit: read the current version before overwriting, and use version history to recover.
+- Organization Admins can turn Agent Chat off on the AI Features settings page.
 
 ## 9. Theme Prompt Template
 
@@ -739,6 +794,7 @@ const { data } = useSQLQuery(`SELECT month, SUM(revenue) AS revenue, COUNT(*) AS
 - Exposing MotherDuck tokens in browser code.
 - Updating content when only metadata should change.
 - Deleting or overwriting a Dive without checking version history.
+- Writing from Dive SQL instead of starting a Flight, or starting a Flight on render instead of from a click.
 
 ---
 

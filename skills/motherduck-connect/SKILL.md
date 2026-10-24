@@ -20,7 +20,8 @@ license: MIT
 - Use `md:` workspace connections for multi-database exploration, bootstrap flows, and temporary validation environments.
 - Reuse an existing connection, connector, or environment-managed token when the user's context already provides one; do not ask for secrets that can be discovered from the active workspace.
 - Start with one connection. Add pooling or read scaling only when real concurrent-read pressure exists.
-- Use native DuckDB `custom_user_agent` where supported; for PG endpoint clients, prefer the client's `application_name` setting when available.
+- For services that should fail over instead of blocking while a Duckling starts, bound native `md:` connects with `connection_timeout` (`md:my_db?connection_timeout=30s`, `MOTHERDUCK_CONNECTION_TIMEOUT`, or `SET motherduck_connection_timeout = '30s'` before the first `ATTACH 'md:'`). It applies to DuckDB clients with the MotherDuck extension, not the PG endpoint or Wasm. Without it, only network retries are bounded.
+- Use native DuckDB `custom_user_agent` where supported; for PG endpoint clients, prefer the client's `application_name` setting when available. The tag shows per query in the Duckling Overview, which makes it the quickest way to see which workload is using a Duckling.
 
 ## Runtime Selection
 

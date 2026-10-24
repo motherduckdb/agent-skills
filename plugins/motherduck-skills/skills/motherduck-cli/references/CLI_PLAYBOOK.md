@@ -163,6 +163,8 @@ motherduck flight push nightly_load --output json
 motherduck flight run nightly_load --output json
 ```
 
+Cancel a pending or running run with `motherduck flight cancel` (owner or organization Admin); see `motherduck flight cancel --help` for its arguments.
+
 Poll only the relevant run through the current exact-run command when available; otherwise list one newest run. On failure, read the bounded log tail:
 
 ```bash
@@ -172,6 +174,24 @@ motherduck flight logs nightly_load --run "$RUN_NUMBER" | tail -100
 ```
 
 Attach a schedule only after a successful on-demand run and only when scheduling was requested. Use the CLI secret commands for secret metadata, but never place secret values in shell history or logs.
+
+## Guide Workflow
+
+Guides live as a folder with `guide.md` and `guide.metadata.json` (title, topic, description, access, references, and, after the first push, id and version):
+
+```bash
+motherduck guide list --topic core/metrics --output json
+motherduck guide init revenue-guide --title "Revenue definitions" --topic core/metrics
+motherduck guide push revenue-guide --version-description "Clarify ARR" --external-id "$(git rev-parse HEAD)"
+motherduck guide pull <guide-id-or-url> --dir revenue-guide
+motherduck guide list-versions <guide-id-or-url> --limit 5
+```
+
+- Nothing exists remotely until `push`. `push` without an id in metadata creates the Guide; with one it updates it. Metadata- or access-only changes do not add a version; `--force` adds one anyway.
+- Access defaults to `user`. `organization` needs permission and an explicit request.
+- Topics are lowercase and slash-separated. The reserved `dives` and `flights` topics feed `motherduck dive guide` and `motherduck flight guide`.
+- References are a JSON array linking the Guide to databases, tables, columns, views, macros, Guides, Dives, or Flights; use the full `md:_share/...` URL for shares.
+- `delete` is a soft delete that keeps version history; confirm before running it.
 
 ## Automation Safety
 

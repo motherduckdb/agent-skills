@@ -20,7 +20,9 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - validate before cutover
 - port SQL dialect and data types deliberately before performance tuning
 - phased cutover over big-bang replacement
-- remote DuckDB database-file import when the source is already packaged in cloud storage
+- remote DuckDB database-file import (`CREATE DATABASE ... FROM 's3://...'`) when the source is already packaged in cloud storage
+- target environment (databases, roles, shares, service accounts) defined in Terraform when it must be recreated across dev, staging, and production
+- secure views on Shares when the legacy warehouse enforced row access policies, column masking, or secure views; map each policy and test it as the affected consumer
 - capture validated business definitions, join rules, and cutover caveats in Guides after the target model stabilizes
 
 ## Workflow

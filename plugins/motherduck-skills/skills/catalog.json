@@ -105,7 +105,8 @@
       "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/",
       "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/agents/",
       "https://motherduck.com/docs/getting-started/interfaces/motherduck-cli/authentication/",
-      "https://motherduck.com/docs/sql-reference/motherduck-cli/"
+      "https://motherduck.com/docs/sql-reference/motherduck-cli/",
+      "https://motherduck.com/docs/sql-reference/motherduck-cli/guide/"
     ],
     "needs_live_discovery": false
   },
@@ -127,7 +128,8 @@
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/postgres-endpoint/java/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/attach-modes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
-      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/"
+      "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/",
+      "https://motherduck.com/docs/sql-reference/connection-string-parameters/"
     ],
     "needs_live_discovery": false
   },
@@ -156,7 +158,11 @@
       "https://motherduck.com/blog/introducing-embedded-dives/",
       "https://motherduck.com/blog/dashboards-as-code-dives/",
       "https://github.com/motherduckdb/blessed-dives-example",
-      "https://motherduck.com/dive-gallery/"
+      "https://motherduck.com/dive-gallery/",
+      "https://motherduck.com/docs/key-tasks/dives/run-flights-from-dives/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-run-flight/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-flight-run/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/"
     ],
     "needs_live_discovery": false
   },
@@ -183,7 +189,10 @@
       "https://motherduck.com/docs/sql-reference/mcp/flights/run-flight/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/",
-      "https://motherduck.com/docs/cookbook/"
+      "https://motherduck.com/docs/cookbook/",
+      "https://motherduck.com/docs/about-motherduck/billing/flight-sizes/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/grant-run-on-flight/",
+      "https://motherduck.com/docs/key-tasks/flights/observability/explain-flight-runs/"
     ],
     "needs_live_discovery": false
   },
@@ -336,7 +345,8 @@
       "https://motherduck.com/docs/key-tasks/guides/bootstrap-guides-with-an-ai-agent/",
       "https://motherduck.com/docs/sql-reference/mcp/guides/get-query-guide/",
       "https://motherduck.com/docs/sql-reference/mcp/guides/list-guides/",
-      "https://motherduck.com/docs/sql-reference/mcp/guides/create-guide/"
+      "https://motherduck.com/docs/sql-reference/mcp/guides/create-guide/",
+      "https://motherduck.com/docs/sql-reference/motherduck-cli/guide/"
     ],
     "needs_live_discovery": false
   },
@@ -420,7 +430,8 @@
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
       "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/docs/key-tasks/guides/",
-      "https://motherduck.com/trust-and-security/"
+      "https://motherduck.com/trust-and-security/",
+      "https://motherduck.com/docs/integrations/dev-tools/terraform/"
     ],
     "needs_live_discovery": true
   },
@@ -440,7 +451,9 @@
       "https://motherduck.com/docs/key-tasks/flights/",
       "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/blog/april-2026-product-roundup/",
-      "https://motherduck.com/trust-and-security/"
+      "https://motherduck.com/trust-and-security/",
+      "https://motherduck.com/docs/about-motherduck/billing/flight-sizes/",
+      "https://motherduck.com/docs/about-motherduck/billing/managing-billing/"
     ],
     "needs_live_discovery": false
   },
@@ -450,7 +463,8 @@
     "layer": "utility",
     "depends_on": [],
     "references": [
-      "references/QUERY_PLAYBOOK.md"
+      "references/QUERY_PLAYBOOK.md",
+      "references/AI_FUNCTIONS.md"
     ],
     "artifacts": [],
     "source_docs": [
@@ -460,7 +474,10 @@
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
       "https://motherduck.com/docs/concepts/data-recovery/",
       "https://motherduck.com/docs/sql-reference/mcp/core/query-rw/",
-      "https://motherduck.com/docs/sql-reference/postgres-endpoint/"
+      "https://motherduck.com/docs/sql-reference/postgres-endpoint/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt-jev/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/embedding/"
     ],
     "needs_live_discovery": false
   },
@@ -481,7 +498,9 @@
       "https://motherduck.com/docs/about-motherduck/billing/duckling-sizes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/dives/embedding-dives/",
-      "https://motherduck.com/blog/introducing-embedded-dives/"
+      "https://motherduck.com/blog/introducing-embedded-dives/",
+      "https://motherduck.com/docs/key-tasks/service-accounts-guide/manage-service-accounts-and-tokens/",
+      "https://motherduck.com/docs/integrations/dev-tools/terraform/"
     ],
     "needs_live_discovery": false
   },
@@ -508,7 +527,12 @@
       "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/sso-setup/",
       "https://motherduck.com/docs/concepts/data-recovery/",
-      "https://motherduck.com/trust-and-security/"
+      "https://motherduck.com/trust-and-security/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/secure-views/",
+      "https://motherduck.com/docs/integrations/data-science-ai/typesafe/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/grant-run-on-flight/",
+      "https://motherduck.com/docs/integrations/dev-tools/terraform/"
     ],
     "needs_live_discovery": false
   },
@@ -531,7 +555,8 @@
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-share/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/alter-share/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/update-share/",
-      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/refresh-database/"
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/refresh-database/",
+      "https://motherduck.com/docs/key-tasks/sharing-data/secure-views/"
     ],
     "needs_live_discovery": false
   }

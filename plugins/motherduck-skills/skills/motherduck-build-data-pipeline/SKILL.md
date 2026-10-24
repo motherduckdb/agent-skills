@@ -23,6 +23,8 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - native MotherDuck storage unless DuckLake is explicitly required
 - MotherDuck CLI for Flight source and large file-shaped output when the agent has a shell; MCP for chat-only operation
 - a `flights` Guide for reusable scheduling, naming, secret, and ingestion conventions when the organization has them
+- Flights sized to their Python work (`F4` when the job mostly sends SQL) and instrumented for the Flight Explainer so each run shows step status and the failing step
+- AI enrichment (classification with `prompt_jev()`, extraction with `prompt()`) as an incremental transform step that writes results to a table, never recomputed at read time
 
 ## Workflow
 

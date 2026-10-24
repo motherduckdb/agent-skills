@@ -26,6 +26,9 @@ license: MIT
 - Set and validate `max_runtime_sec` when the workload needs an explicit cap; read the current plan limit from `get_flight_guide` instead of hardcoding it.
 - For production, use a service-account token via `access_token_name` and keep its database permissions as narrow as the workload allows.
 - Treat a Flight as orchestration and light processing, not a place to crunch large tables in Python memory. Push heavy compute into SQL and verify runtime capacity with `get_flight_guide` before sizing disk- or memory-intensive work.
+- Pick the smallest Flight size that fits the Python work: `F4` for API calls and SQL-driven jobs, `F16` (the default on paid plans) for dbt or dlt, `F32` (Business and Enterprise) for in-process ML or large dbt projects. SQL sent over `md:` runs on a Duckling, not the Flight, so size for Python memory only. Set it with `instance_type` on `MD_CREATE_FLIGHT`/`MD_UPDATE_FLIGHT`; check `get_flight_guide` for the MCP field.
+- To let teammates, a role, or a Dive start a Flight, the owner runs `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`. Every run uses the owner's token and secrets, so validate each config value a caller can pass as untrusted input.
+- For multi-step Flights, add Flight Explainer instrumentation (a `# @flight` Mermaid step chart plus `@flight-run <step> <status>` log lines) so each run shows step progress, row counts, and where it failed.
 
 ## Workflow
 
@@ -35,6 +38,7 @@ license: MIT
 4. Create any required `TYPE flights` secret first, then `create_flight` with `name`, `source_code`, pinned `requirements_txt`, `config`, and secret names — no `schedule_cron` yet.
 5. `run_flight`, poll `get_flight_run` when available (or `list_flight_runs` as a fallback) until terminal, and read `get_flight_logs`. Iterate with `edit_flight_source` (surgical) or `update_flight` (full field replacement); each content change creates a new version.
 6. If scheduling was requested, set it only after a successful run with `update_flight(schedule_cron = ...)` and state that cron is UTC. Clear it with `schedule_cron = ""` only when requested; preserve an existing schedule during unrelated edits.
+7. If other users or a Dive must trigger the Flight, grant `RUN` after the validated run and confirm with `SHOW GRANTS ON FLIGHT '<flight_id>'`.
 
 For answer, review, or planning requests, do not create or schedule a Flight. For create or update requests, complete the requested in-scope deployment and on-demand validation; attaching a recurring schedule is authorized only when the request includes scheduling.
 
@@ -42,7 +46,7 @@ For answer, review, or planning requests, do not create or schedule a Flight. Fo
 
 Read only the reference sections needed for the current task.
 
-- Read `references/FLIGHTS_GUIDE.md` for the full concept and operations reference: anatomy, runtime environment, config vs secrets, scheduling, versioning, run lifecycle, the complete MCP tool reference, MCP-vs-SQL naming, loading strategies by data volume, and troubleshooting.
+- Read `references/FLIGHTS_GUIDE.md` for the full concept and operations reference: anatomy, runtime environment and sizes, config vs secrets, scheduling, versioning, run lifecycle, run grants, Flight Explainer instrumentation, the complete MCP tool reference, MCP-vs-SQL naming, loading strategies by data volume, and troubleshooting.
 - Read `references/FLIGHT_EXAMPLES.md` for three complete, best-practice flight templates (dlt ingestion, Postgres ingestion, scheduled S3 partition refresh) with their `requirements.txt`, secret setup, and deploy calls.
 
 ## Related Skills
@@ -53,5 +57,6 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-query` for validating the DuckDB SQL inside the flight before deploying it
 - `motherduck-explore` for confirming target databases, schemas, and tables exist
 - `motherduck-build-data-pipeline` when the work is a full raw/staging/analytics pipeline design and the flight is just its scheduler
+- `motherduck-create-dive` when a Dive button or form should start the Flight (write-back)
 - `motherduck-cli` when the agent has a shell and should keep Flight source in local files
 - `motherduck-manage-guides` for reusable personal or organization Flight conventions

@@ -20,7 +20,9 @@ license: MIT
 - For estimates and comparisons, separate storage, compute, and operational overhead. A narrow price lookup needs only the relevant verified rate and conditions.
 - Map workload shape to cost shape before comparing vendors or plans.
 - Treat many pricing questions as risk, predictability, or procurement questions rather than purely technical ones.
-- Verify plan-sensitive entitlements such as Flight scheduling/runtime limits, custom roles, table-level security, regions, and embedded features in the current turn; do not infer them from an older release note.
+- Verify plan-sensitive entitlements such as Flight sizes and scheduling/runtime limits, custom roles, table-level security, secure views, regions, and embedded features in the current turn; do not infer them from an older release note.
+- Price Flights and AI functions as their own lines. Flights bill per run-hour by size (`F4`, `F16`, `F32`), and the SQL a Flight sends is Duckling compute. AI functions bill in AI Units under the AI session cap: `prompt_jev()` meters input tokens only and is usually the cheapest way to classify at scale; `prompt()` cost depends on the model and `reasoning_effort` (default `'none'`).
+- For procurement through AWS, MotherDuck is available on AWS Marketplace by Private Offer for consolidated AWS billing.
 
 ## Workflow
 
