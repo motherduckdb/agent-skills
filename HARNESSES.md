@@ -23,7 +23,7 @@ Use this file to answer two questions quickly:
 
 For narrow work, start with the matching skill. Add connection setup or discovery only when context is missing.
 
-For end-to-end product work, start with the matching use-case skill and let it orchestrate the lower layers.
+For end-to-end product work, start with the matching use-case skill and load lower-level skills only when it needs them.
 
 ## Maintainer Notes
 

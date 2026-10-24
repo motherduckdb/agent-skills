@@ -25,7 +25,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 3. Pick the dashboard story.
 4. Write one query per section.
 5. For a new dashboard or layout change, use the responsive and theme guidance in `motherduck-design-dive`; preserve the existing design for a scoped SQL or text edit.
-6. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before `save_dive` or `update_dive`.
+6. Compose the dashboard in a Dive. When MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive` or `update_dive`.
 7. When the request includes creating or updating the Dive, save only after responsive, theme, query-state, and data validation; do not add a second approval gate for the requested in-scope write.
 8. Read the saved Dive back. Leave work-in-progress as Draft; promote it to Ready only after the requested delivery is validated. Reuse Endorsed Dives before rebuilding an existing trusted answer.
 

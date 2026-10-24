@@ -14,7 +14,7 @@ license: MIT
 ## Default Posture
 
 - Start at the known catalog object; broaden to databases or shares only when the target is unknown.
-- Use fully qualified table names once more than one database is attached.
+- Prefer fully qualified `"database"."schema"."table"` names; they are required once more than one database or share is attached.
 - Check shared databases before concluding that data is unavailable.
 - Use the MotherDuck MCP tools (`list_databases`, `list_tables`, `list_columns`, `search_catalog`) when available because they return structured results faster than ad hoc SQL.
 - Before business-semantic exploration through MCP, call `get_query_guide`, then read only relevant root Guides and topic branches. Follow `relatedGuides` returned by catalog tools when they govern the objects in scope.

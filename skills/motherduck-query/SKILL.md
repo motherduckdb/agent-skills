@@ -15,7 +15,7 @@ license: MIT
 
 - When MotherDuck MCP is available and the query answers a business question, call `get_query_guide` before writing SQL. Traverse only relevant topics and validate Guide claims against the live schema.
 - Write DuckDB SQL, not PostgreSQL SQL, even when using the PG endpoint.
-- Always use fully qualified `"database"."schema"."table"` names.
+- Prefer fully qualified `"database"."schema"."table"` names; they are required once more than one database or share is attached.
 - Preserve result grain and check join cardinality before optimizing or materializing a query.
 - Filter early, aggregate early, and prefer serving tables or summaries for repeated reads.
 - Keep SQL obvious, multi-line, and explicit about grain, filters, and output shape.

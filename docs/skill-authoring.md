@@ -112,6 +112,17 @@ Repo maintenance layout:
 - make artifact intent explicit: "Run X" for executables, "Read X as reference" for guidance
 - avoid time-sensitive phrasing (version pins, plan names, "currently in preview") in durable guidance; when a claim can drift, tell the reader to verify it against current MotherDuck docs
 
+## One Agent Loop, Many Skills
+
+These skills run inside one agent loop on many models (Claude, GPT, Gemini). The agent sees every description up front, loads skill bodies when it needs them, and plans its own steps. Write for that:
+
+- One rule, one wording. When a rule appears in several skills (table qualification, `get_dive_guide` ordering, write authorization), use the same sentence everywhere. Two skills loaded together must never disagree; literal-following models will obey whichever one they read last.
+- Do not prescribe skill sequences or act as a router. Name the starting skill and the related skills; the agent decides when to load them.
+- Numbered workflows describe dependencies and a done condition, not a pipeline to replay. Fixed order only where a real contract requires it.
+- Hard preconditions belong in tools when we control the tool. A skill sentence is a fallback for harnesses or MCP versions that do not enforce it.
+- Before adding a skill, check whether it chains with an existing one (always loaded together, same objects, one hands output to the other). If so, add a reference to the existing skill instead.
+- Every new or merged skill ships with eval tasks that check the right skill loads and the result passes a rubric, run more than once and on more than one model family.
+
 ## Required Checks
 
 When changing skills, references, artifacts, or catalog surfaces:

@@ -16,7 +16,7 @@ license: MIT
 ## Default Posture
 
 - Write DuckDB SQL, not PostgreSQL SQL, even when the client connects through the Postgres endpoint.
-- Use fully qualified `"database"."schema"."table"` names once more than one database or share is in scope.
+- Prefer fully qualified `"database"."schema"."table"` names; they are required once more than one database or share is attached.
 - Prefer DuckDB-native constructs when they simplify the query: `GROUP BY ALL`, `QUALIFY`, `UNION BY NAME`, `arg_max`, `EXCLUDE`, and `REPLACE`.
 - When porting SQL from another engine, translate functions, date arithmetic, identifier quoting, and type casts explicitly instead of assuming compatibility.
 - Verify current MotherDuck support before relying on recently released upstream DuckDB features such as `VARIANT`, native `GEOMETRY`, `MERGE INTO`, or `date_trunc` return-type changes.
