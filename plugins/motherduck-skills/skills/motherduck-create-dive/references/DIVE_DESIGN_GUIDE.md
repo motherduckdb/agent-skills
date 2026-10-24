@@ -16,6 +16,7 @@ Reference for creating, editing, managing, sharing, embedding, and polishing Mot
 | 8. Embedding Dives | Embed sessions, iframe, CSP, server vs dual mode |
 | Dive Status Lifecycle | Draft, Ready, Endorsed, Archived trust signals |
 | Write-Back with Flights | `useRunFlight`, `useFlightRun`, grants, freshness after a run |
+| Exporting Query Results | `exportAs`, `useExport`, formats |
 | Agent Chat on Dives | What the in-Dive assistant sees and can change |
 | Embedded State and Events | Initial state, state updates, navigation, exports |
 | 9-10. Theming | Theme prompt template and gallery shortlist |
@@ -146,7 +147,7 @@ Example metadata:
 }
 ```
 
-For workspace-only Dives, MCP can often suggest or create org-scoped shares for private databases referenced by the Dive. Ask explicitly when teammates need access.
+A `database` dependency on a personal database works only for its owner; sharing the Dive does not grant access to that database. Before declaring one, check `MD_INFORMATION_SCHEMA.OWNED_SHARES` and prefer an existing, unambiguous share (ask if several exist). Create a share only when the user asks to share the Dive's data, then swap the `database` entry for a `share` entry and keep the alias so SQL does not change. Over MCP, `share_dive_data(diveId)` does this for org-wide access in one call: it creates org-scoped shares for the owned databases the Dive uses and updates the Dive. Use `motherduck-share-data` when the audience should be narrower than the organization.
 
 ## 6. Editing Existing Dives
 
@@ -164,7 +165,7 @@ MCP path:
 1. `list_dives` to find the Dive and current version.
 2. `read_dive` for the latest content, or `read_dive(version = N)` for a historical version.
 3. Edit and preview the component.
-4. `update_dive` only after the user approves the changed behavior.
+4. Apply focused changes with `edit_dive_content` (a list of exact `old_string`/`new_string` replacements; no prior read needed) or a full rewrite with `update_dive`, after the user approves the changed behavior.
 
 SQL path:
 
@@ -320,32 +321,59 @@ import { useRunFlight, useFlightRun } from "@motherduck/react-sql-query";
 // Hardcode the ID. MD_LIST_FLIGHTS() only lists the viewer's own Flights.
 const APPROVE_ORDER_FLIGHT = "00000000-0000-4000-8000-000000000000";
 
-function ApproveOrder({ orderId, onApproved }) {
+// `orders` is the useSQLQuery result that reads the table the Flight writes.
+function ApproveOrder({ orderId, orders }) {
   const start = useRunFlight(APPROVE_ORDER_FLIGHT);
   const run = useFlightRun(APPROVE_ORDER_FLIGHT, start.data?.runNumber, {
     onFinished: (finished) => {
-      if (finished.status === "SUCCEEDED") onApproved(); // rerun the affected queries
+      if (finished.status === "SUCCEEDED") orders.refetch();
     },
   });
   const busy = start.isPending || run.isChecking;
 
   return (
     <div>
-      <button disabled={busy} onClick={() => start.run({ ORDER_ID: String(orderId) })}>
+      <button disabled={busy} onClick={() => start.run({ ORDER_ID: String(orderId), DECISION: "approved" })}>
         {busy ? "Approving..." : "Approve"}
       </button>
-      {start.error && <p role="alert">{start.error.message}</p>}
+      {run.isFinished && run.status !== "SUCCEEDED" && <p role="alert">The approval did not finish.</p>}
+      {start.error && <p role="alert">Could not start: {start.error.message}</p>}
+      {run.error && <p role="alert">Could not check the run: {run.error.message}</p>}
     </div>
   );
 }
 ```
 
 - Call `run` only from an event handler; every call starts a new run. A resolved `run` means the run started, not that it finished. `runAsync` returns a promise for the same result.
+- `useFlightRun` polls for you: `status` moves from `undefined` to `PENDING`, `RUNNING`, then `SUCCEEDED`, `FAILED`, or `CANCELLED`; `isFinished` and `exitCode` are set at the end, and `onFinished` fires once per run. After an hour `isChecking` turns false; call `check()` to look again. Do not write your own polling.
+- Viewers without a grant get an error from `run`; show it in plain words and keep the rest of the Dive working. A table of past runs (`MD_LIST_FLIGHT_RUNS`) works only for the owner and Admins.
 - Config values must be strings. Convert numbers, dates, and booleans before calling `run`.
 - Test from SQL before wiring the UI: `MD_RUN_FLIGHT` returns the `run_number`, and `MD_GET_FLIGHT_RUN` reports its terminal status.
-- Freshness: when the Dive reads through a Share, the change can take about a minute to appear. For immediate results the Flight can finish with `CREATE SNAPSHOT OF "<database>"` and the Dive can run `REFRESH DATABASE "<alias>"` before rerunning queries; both cost performance, so use them only when the workflow needs it.
+- Freshness: a Dive that reads the database directly sees the write after `refetch()`. When it reads through a Share, the change appears within about a minute. Only when viewers need it immediately: the Flight ends with one `CREATE SNAPSHOT OF "<database>"` (it blocks other writes while it runs), and the Dive, once the run succeeds, runs `REFRESH DATABASE "<alias>"` in a `useSQLQuery` gated with `enabled: run.status === "SUCCEEDED"`, then refetches after that refresh succeeds rather than in `onFinished`.
+- Flight side: define every key the Dive sends in the Flight's config (default `''`), validate values against allowed inputs, make a repeated click harmless (set a status rather than append a row), attach only the databases it needs, and set a short `max_runtime_sec`.
+- Sharing a Dive that runs Flights: viewers need to see the Dive, read every `REQUIRED_DATABASES` share, and hold a `run` grant on each Flight. Recommend those grants and apply them only after the user confirms; prefer a role over `ORGANIZATION`.
 - Runs work in the MotherDuck app, the MCP Dive viewer, and `motherduck dive watch`. Embedded Dives show "This Dive can't run Flights." Viewers with no roles or on a read-scaling token are refused.
 - Common failures: no `RUN` grant (not-found or ownership error), an error the Dive does not render (click appears to do nothing), and stale data because the Dive did not rerun its queries.
+
+## Exporting Query Results
+
+Add export controls only when the use case calls for them; the runtime generates the file. Call `exportAs` on a visible query's result to export the same SQL, or use `useExport` for export-only SQL:
+
+```jsx
+import { useExport } from "@motherduck/react-sql-query";
+
+const { exportQuery } = useExport();
+
+async function downloadOrders() {
+  try {
+    await exportQuery({ sql: `SELECT * FROM "analytics"."main"."orders"`, format: "parquet", filename: "orders" });
+  } catch (e) {
+    setExportError(e.message);
+  }
+}
+```
+
+Formats are `csv`, `json`, `parquet`, and `xlsx`, with format-specific options such as compression and sheet names. Start exports only from a click, never during render, in `useEffect`, or on a timer, and show errors inline. Do not build Blob URLs, hidden anchors, `window.open()` downloads, or `COPY TO` statements.
 
 ## Agent Chat on Dives
 

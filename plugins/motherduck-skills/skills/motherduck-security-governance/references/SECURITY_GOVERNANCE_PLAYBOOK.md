@@ -154,7 +154,7 @@ SHOW GRANTS ON FLIGHT '<flight_id>';
 SELECT * FROM MD_LIST_FLIGHT_GRANTEES('<flight_id>'::UUID);
 ```
 
-A run always uses the Flight owner's token, secrets, and database permissions, so a `RUN` grant to `ORGANIZATION` lets every member and service account trigger writes the owner can make. Only the owner can add grants; Admins can list and revoke them and can cancel any run.
+A run always uses the Flight owner's token, secrets, and database permissions, so a `RUN` grant to `ORGANIZATION` lets every member and service account trigger writes the owner can make. Only the owner can add grants; Admins can list and revoke them and can cancel any run. Agents should recommend grants and apply them only after explicit confirmation; sharing a Dive does not imply one. Removing someone's access to a Dive leaves their `run` grant in place, so include Flight grants in access reviews and offboarding.
 
 Governance as code: the official Terraform provider (`motherduckdb/motherduck`, Terraform 1.5+ or OpenTofu) manages databases, schemas, shares and share grants, roles and role grants, secrets, and, with `MOTHERDUCK_ADMIN_TOKEN`, service accounts, tokens, and Duckling configuration. A clean plan only covers resources in state; compare observed grants (`SHOW GRANTS ...`) with policy to catch grants made outside Terraform. State can hold sensitive values, so keep it in an encrypted, access-controlled remote backend.
 

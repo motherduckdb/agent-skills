@@ -28,8 +28,9 @@ license: MIT
 - Preserve an existing Dive’s visual system for scoped edits. For a new Dive, choose a concrete theme direction that fits its audience.
 - Prefer one query per visual section or interaction surface rather than one giant cross-purpose query.
 - Preview locally before saving when the environment supports it.
-- For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions.
-- Dive SQL is read-only. For actions such as approving a record, submitting a form, or refreshing a pipeline, have a button start a Flight the Dive owner controls with `useRunFlight` and track it with `useFlightRun` (from `@motherduck/react-sql-query`). Hardcode the Flight ID, pass only string config values, disable the control while a run is pending, render the hook's `error`, and rerun the affected queries when the run succeeds. Viewers need `GRANT RUN ON FLIGHT`; embedded Dives cannot run Flights.
+- For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions. Use `edit_dive_content` (exact text replacements) for focused edits and `update_dive` for a full rewrite.
+- Add export controls only when the use case calls for them: `exportAs` on a query result or the `useExport` hook (CSV, JSON, Parquet, XLSX), started from a click. Do not build Blob URLs, hidden anchors, or `COPY TO` exports.
+- Dive SQL is read-only. For actions such as approving a record, submitting a form, or refreshing a pipeline, have a button start a Flight the Dive owner controls with `useRunFlight` and track it with `useFlightRun` (from `@motherduck/react-sql-query`). Hardcode the Flight ID, pass only string config values, disable the control while a run is pending, render the hook's `error`, and rerun the affected queries when the run succeeds. Viewers need a `run` grant: recommend the grantees and grant only after the user confirms. Embedded Dives cannot run Flights.
 - Viewers can open **AI Chat** in the Dive header. It sees the Dive's queries, data, and current filters, and can edit the Dive with each change kept in version history. Clear section titles, query names, and the Dive description make its answers better.
 - Treat embedded Dives as the first-choice path when a product needs a live read-only Dive surface with a backend-created embed session. Move to `motherduck-build-cfa-app` when the app needs custom API contracts, writes, non-Dive routing, tenant policy enforcement, or richer authorization.
 - For shared repos or CI/CD, use a service-account token so Dive ownership is not tied to one human user.
@@ -42,7 +43,7 @@ license: MIT
 4. Build or edit the Dive component, using local preview/hot reload when possible.
 5. Call `save_dive`, `update_dive`, or deploy only after queries, loading states, required resources, and visual behavior are correct.
 6. Read the resulting URL, version, and status back. If the requested delivery includes publication, promote a validated Draft to Ready through the write-capable path.
-7. If teammates or application users need access, configure the underlying shares or embed-session flow explicitly.
+7. If teammates or application users need access, check three things: they can view the Dive, every `REQUIRED_DATABASES` entry is a share they can read, and they hold a `run` grant on each Flight the Dive runs. Prefer an existing share of an owned database (`MD_INFORMATION_SCHEMA.OWNED_SHARES`). When the user asks to share the Dive's data with the whole organization, `share_dive_data` creates org-scoped shares and updates the Dive in one call; use `motherduck-share-data` for restricted audiences, and the embed-session flow for application users.
 
 For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize.
 

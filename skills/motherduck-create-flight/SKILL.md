@@ -26,9 +26,12 @@ license: MIT
 - Set and validate `max_runtime_sec` when the workload needs an explicit cap; read the current plan limit from `get_flight_guide` instead of hardcoding it.
 - For production, use a service-account token via `access_token_name` and keep its database permissions as narrow as the workload allows.
 - Treat a Flight as orchestration and light processing, not a place to crunch large tables in Python memory. Push heavy compute into SQL and verify runtime capacity with `get_flight_guide` before sizing disk- or memory-intensive work.
-- Pick the smallest Flight size that fits the Python work: `F4` for API calls and SQL-driven jobs, `F16` (the default on paid plans) for dbt or dlt, `F32` (Business and Enterprise) for in-process ML or large dbt projects. SQL sent over `md:` runs on a Duckling, not the Flight, so size for Python memory only. Set it with `instance_type` on `MD_CREATE_FLIGHT`/`MD_UPDATE_FLIGHT`; check `get_flight_guide` for the MCP field.
-- To let teammates, a role, or a Dive start a Flight, the owner runs `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`. Every run uses the owner's token and secrets, so validate each config value a caller can pass as untrusted input.
-- For multi-step Flights, add Flight Explainer instrumentation (a `# @flight` Mermaid step chart plus `@flight-run <step> <status>` log lines) so each run shows step progress, row counts, and where it failed.
+- Keep the default size (`F16`) for dbt, dlt, and multi-step Python. Choose `F4` for light jobs that mostly call APIs or send SQL, since SQL over `md:` runs on a Duckling, not the Flight. Move to `F32` (Business and Enterprise) only when runs still fail from memory after reducing peak memory. Set it with `instance_type` on `create_flight`/`update_flight` or `MD_CREATE_FLIGHT`/`MD_UPDATE_FLIGHT`.
+- When a Flight touches only one or a few databases, connect with `duckdb.connect("md:<db>?attach_mode=single")` and attach the others explicitly; attaching the whole workspace slows every run's startup.
+- For classification, extraction, or embeddings inside a Flight, call `prompt_jev()`, `prompt()`, or `embedding()` in SQL over the existing connection instead of adding an LLM SDK.
+- To let teammates, a role, or a Dive's viewers start a Flight, the owner grants `run` (`grant_access` over MCP, or `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`). Recommend the grantees and grant only after the user confirms; a request to share a Dive is not that confirmation. Prefer a role over `ORGANIZATION`, which includes service accounts. Every run uses the owner's token and secrets, so validate each config value a caller can pass as untrusted input.
+- Decide before writing a multi-step Flight whether runs should be watchable: Flight Explainer instrumentation (a `# @flight` Mermaid step chart plus `@flight-run <step> <status>` log lines) only covers runs that start after it is added. Call `get_flight_viz_guide` before adding it, and use `view_flight_run` to show a run as a step diagram instead of pasting raw logs.
+- Ask the user to create Flight secrets in the MotherDuck UI (Settings, Secrets) so values never pass through chat; check existence with `SELECT name FROM duckdb_secrets() WHERE type = 'flights'`.
 
 ## Workflow
 
@@ -38,7 +41,8 @@ license: MIT
 4. Create any required `TYPE flights` secret first, then `create_flight` with `name`, `source_code`, pinned `requirements_txt`, `config`, and secret names — no `schedule_cron` yet.
 5. `run_flight`, poll `get_flight_run` when available (or `list_flight_runs` as a fallback) until terminal, and read `get_flight_logs`. Iterate with `edit_flight_source` (surgical) or `update_flight` (full field replacement); each content change creates a new version.
 6. If scheduling was requested, set it only after a successful run with `update_flight(schedule_cron = ...)` and state that cron is UTC. Clear it with `schedule_cron = ""` only when requested; preserve an existing schedule during unrelated edits.
-7. If other users or a Dive must trigger the Flight, grant `RUN` after the validated run and confirm with `SHOW GRANTS ON FLIGHT '<flight_id>'`.
+7. After the first successful run that creates or refreshes a durable table, document that table in a Guide under the `data-sources` topic (see `motherduck-manage-guides`).
+8. If other users or a Dive must trigger the Flight, recommend `run` grants, apply them only after the user confirms, and verify with `SHOW GRANTS ON FLIGHT '<flight_id>'`.
 
 For answer, review, or planning requests, do not create or schedule a Flight. For create or update requests, complete the requested in-scope deployment and on-demand validation; attaching a recurring schedule is authorized only when the request includes scheduling.
 

@@ -36,11 +36,12 @@ Use a flight when a job should run unattended on MotherDuck, retry on a schedule
 | `name` | Human-readable, non-empty; used in UI, logs, listings. |
 | `source_code` | One single-file Python script. Convention: top-level `def main() -> None:` plus `if __name__ == "__main__": main()`. Executed as `python main.py`. No CLI args. |
 | `requirements_txt` | Plain `requirements.txt` text, one pinned package per line. Anything on PyPI. Not PEP 723 inline metadata. |
-| `access_token_name` / `md_token_name` | Label of a MotherDuck access token to inject as `MOTHERDUCK_TOKEN`. Omit to use the default `MotherDuck Flights` token. List labels with `SELECT * FROM md_access_tokens();`. |
+| `access_token_name` | Label of a MotherDuck access token to inject as `MOTHERDUCK_TOKEN`. Omit to use the default `MotherDuck Flights` token. List labels with `SELECT * FROM md_access_tokens();`. |
 | `config` | `{string: string}` map of **non-secret** values surfaced as env vars under their original key. Full-replace on update. |
-| `flight_secret_names` / `md_secret_names` | Names of `TYPE flights` secrets whose params are injected as env vars (encrypted at rest). Full-replace on update. |
+| `flight_secret_names` | Names of `TYPE flights` secrets whose params are injected as env vars (encrypted at rest). Full-replace on update. |
 | `schedule_cron` | Optional standard 5-field cron expression, **UTC**. Omit for on-demand only. |
-| `max_runtime_sec` | Optional run cap. Validate it against the current plan limit before create/update. |
+| `max_runtime_sec` | Optional run cap; `0` means no timeout, omission uses the plan default, and values above the plan cap are rejected. |
+| `instance_type` | Optional runner size: `F4`, `F16`, or `F32`. Omission uses the plan default. |
 
 ## Runtime Environment
 
@@ -50,11 +51,11 @@ The container is constrained. Call `get_flight_guide` for the current scratch-di
 
 Flight sizes (the name is the memory in GB):
 
-| Size | vCPU | Memory | Use for |
-| --- | --- | --- | --- |
-| `F4` | 0.5 | 4 GB | API calls, alerts, SQL-driven transforms where MotherDuck does the work |
-| `F16` | 2 | 16 GB | dbt with `dbt-duckdb`, dlt ingest, multi-step Python (default on paid plans) |
-| `F32` | 4 | 32 GB | In-process ML such as embeddings, large dbt projects (Business and Enterprise) |
+| Size | vCPU | Memory | Scratch | Use for |
+| --- | --- | --- | --- | --- |
+| `F4` | 0.5 | 4 GB | 20 GB | API calls, alerts, jobs that mostly send SQL |
+| `F16` | 2 | 16 GB | 150 GB | dbt with `dbt-duckdb`, dlt ingest, multi-step Python (default on paid plans) |
+| `F32` | 4 | 32 GB | 300 GB | In-process ML, large dbt projects, after reducing peak memory did not help (Business and Enterprise) |
 
 Set the size with `instance_type` on `MD_CREATE_FLIGHT` or `MD_UPDATE_FLIGHT` (for example `CALL MD_UPDATE_FLIGHT(flight_id := '<id>', instance_type := 'F4')`). Omitting it on create uses the plan default; omitting it on update keeps the current size. A size change creates a new version and applies from the next run. Lite orgs without a payment method run F4 only. Billing is per run-hour at a per-size, per-region rate; read current rates from the pricing page instead of storing them. SQL sent over `md:` executes on a Duckling and is billed as Duckling compute, so a Flight that only orchestrates SQL rarely needs more than F4.
 
@@ -68,7 +69,7 @@ Flights are generally available. They can process protected health information o
 
 ## Authentication
 
-The runtime provides a MotherDuck access token as the `MOTHERDUCK_TOKEN` env var, so `duckdb.connect("md:")` works with no credentials in code. By default it is the `MotherDuck Flights` token for your user; pin a specific token (for example a service-account token) by passing its label as `access_token_name` (`md_token_name` on MCP). Pick a label whose scope covers exactly the databases the flight needs — and no more.
+The runtime provides a MotherDuck access token as the `MOTHERDUCK_TOKEN` env var, so `duckdb.connect("md:")` works with no credentials in code. By default it is the `MotherDuck Flights` token for your user; pin a specific token (for example a service-account token) by passing its label as `access_token_name` (the same name on MCP and SQL). Pick a label whose scope covers exactly the databases the flight needs — and no more.
 
 ## Config vs Secrets
 
@@ -129,13 +130,18 @@ SHOW GRANTS ON FLIGHT '<flight_id>';
 REVOKE RUN ON FLIGHT '<flight_id>' FROM USER "ops-bot";
 ```
 
-- Grantees are typed: `USER <username>` (a MotherDuck username, not an email), `ROLE <role>` (preset roles nest, so `explorer` reaches Builders and Admins), or `ORGANIZATION` (includes service accounts). Use the Flight ID, not its name. A statement is all-or-nothing.
+- Grantees are typed: `USER <username>` (a MotherDuck username, not an email), `ROLE <role>` (preset roles nest, so `explorer` reaches Builders and Admins), or `ORGANIZATION` (includes service accounts). Use the Flight ID, not its name. A statement is all-or-nothing. Over MCP, use `grant_access` / `revoke_access` with `resource_type = 'flight'`.
+- Recommend grants and apply them only after the user confirms who should run the Flight. Prefer a role that matches the intended audience over `ORGANIZATION`.
+- Find roles with `SELECT role_name, role_type FROM md_list_roles()` and a username from an email with `SELECT member_name FROM md_list_role_members('<role>') WHERE email = '<email>'` (non-admins only see roles they belong to). Never guess a username; ask, or grant to a role.
+- Removing someone's access to a Dive does not remove their `run` grant; revoke it separately.
 - Every run uses the owner's token, secrets, and database permissions, whoever starts it. Treat per-run config from grantees as untrusted: validate it in `main()` and bind values as parameters. Config values appear in run history, so keep sensitive values in secrets.
-- Grantees can start runs (including from a Dive) and read the status of runs they started with `MD_GET_FLIGHT_RUN`. They cannot list all runs, read source or logs, cancel, edit, or delete.
+- Grantees can start runs (including from a Dive) and read the status of runs they started with `MD_GET_FLIGHT_RUN` / `get_flight_run`. They cannot list all runs, read source or logs, use `view_flight_run`, cancel, edit, or delete. Restricted members cannot run Flights even with a grant.
 - Only the owner can add `RUN` grants. Admins can list and revoke them. Users with no roles, and read-scaling tokens, cannot run Flights even with a grant.
 - `MD_LIST_FLIGHT_RUNS` records who started each run (`started_by_name`), visible to the owner and Admins. `MD_LIST_FLIGHT_GRANTEES` returns grants as a joinable table.
 
 ## Flight Explainer
+
+Over MCP, load `get_flight_viz_guide` before authoring instrumentation (it covers fan-out, branches, child Flights, and JSON logging) and open runs with `view_flight_run`.
 
 The Explainer tab on a run shows a live step graph with status, row counts, timing, touched tables, and the failing step. It needs two pieces in `main.py`, matched by step ID:
 
@@ -168,16 +174,19 @@ Call `get_flight_guide` (no arguments) first — it returns the current authorin
 
 | Tool | Required | Optional | Notes |
 | --- | --- | --- | --- |
-| `create_flight` | `name`, `source_code` | `requirements_txt`, `config`, `md_secret_names`, `md_token_name`, `schedule_cron`, `max_runtime_sec` | Returns flight `id` + `current_version` (1). |
+| `create_flight` | `name`, `source_code` | `requirements_txt`, `config`, `flight_secret_names`, `access_token_name`, `schedule_cron`, `max_runtime_sec`, `instance_type` | Returns flight `id` + `current_version` (1). |
 | `update_flight` | `id` | any field above, plus `name` | PATCH; content fields bump the version; `schedule_cron: ""` clears; validate runtime cap first. |
 | `edit_flight_source` | `id`, `edits[]` | — | Each edit: `{old_string, new_string, replace_all?}`; `old_string` must match exactly once unless `replace_all`. Applied sequentially; creates a new version. No prior `get_flight` needed. MCP-only. |
 | `get_flight` | `id` | `version` | Metadata + full version snapshot (source, requirements, config, secrets) in one call. |
-| `list_flights` | — | `keywords`, `limit` (default 100, max 500) | Case-insensitive name filter; all words must match. Summary only. |
+| `list_flights` | — | `keywords`, `limit` (default 100, max 500), `owner_only` | Case-insensitive name filter; all words must match. Admins see org Flights; `owner_only = true` restricts to their own. Returns `owner_name`. |
 | `list_flight_versions` | `id` | `limit` | Newest first, full content per version. |
 | `run_flight` | `id` | `config` | Async; returns run with `run_number`, status `PENDING`/`RUNNING`. |
 | `get_flight_run` | `id`, `run_number` | — | Reads one exact run without re-listing the run history. |
 | `list_flight_runs` | `id` | `limit` | Newest first; each run reports the effective config it ran with. |
-| `get_flight_logs` | `id`, `run_number` | `max_bytes` | Logs + run record; tail on truncation. (Docs page: `get-flight-run-logs`.) |
+| `get_flight_logs` | `id`, `run_number` | `limit`, `offset`, `order`, `max_bytes` | Logs + run record. Returns the last 200 lines by default (`order` `'desc'`); page with `limit`/`offset`. |
+| `view_flight_run` | `id` | `run_number` | Opens a run as a live step diagram when the Flight is instrumented (`has_chart=false` otherwise). Prefer it over raw logs when the user wants to see how a run went. Owner or Admin only. |
+| `get_flight_viz_guide` | — | `section` | Full Flight Explainer convention; load it before adding or debugging instrumentation. |
+| `grant_access` / `revoke_access` | `resource_type = 'flight'`, `id`, `grantees` | `permission` (`run`) | Grantees are `{type: 'user'|'role'|'organization', name}`; an unknown name fails the whole call. "Could not find Flight" can mean no permission. |
 | `cancel_flight_run` | `id`, `run_number` | — | Error on terminal/nonexistent runs. |
 | `delete_flight` | `id` | — | Permanently deletes flight, versions, schedule, run history, logs; cancels active runs. Irreversible — confirm with the user first. |
 
@@ -189,14 +198,16 @@ The same operations exist as server-side SQL functions (`FROM MD_CREATE_FLIGHT(.
 
 | MCP | SQL |
 | --- | --- |
-| `md_token_name` | `access_token_name` |
-| `md_secret_names` | `flight_secret_names` |
 | `id` | `flight_id` (cast as `?::UUID`) |
 | `limit` | quoted `"LIMIT"` / `"OFFSET"` |
 | status `SUCCEEDED` | status `RUN_STATUS_SUCCEEDED` |
 | `edit_flight_source` | no equivalent — `MD_GET_FLIGHT` → edit client-side → `MD_UPDATE_FLIGHT` |
 
+Token and secret parameters use the same names on both surfaces (`access_token_name`, `flight_secret_names`).
+
 Resolve a flight by name in SQL with `SELECT flight_id FROM MD_LIST_FLIGHTS() WHERE flight_name = ?`.
+
+Every query a run issues is tagged in `query_history` and `recent_queries` with a `user_agent` starting `md-flights(<flight_id>,run_id=<run uuid>)`, followed by the Flight's own `custom_user_agent` when set. Filter on that prefix to see what a Flight or one run queried and what it cost.
 
 `MD_GET_FLIGHT_LOGS` is tabular: it returns one row per log line rather than one `logs` blob column. Inspect the current function schema and preserve its ordering columns; do not select a nonexistent `logs` field. The MCP and CLI log commands adapt that table into their user-facing output.
 
@@ -245,5 +256,8 @@ Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-tr
 | `MOTHERDUCK_TOKEN` missing | Wrong `access_token_name` label. |
 | Schedule didn't fire | Schedule `disabled`, or the cron is UTC and you expected local time. |
 | New version not picked up | The run started before the update; runs lock to the version current at start. |
-| Run killed without a traceback | Check the current memory limit, then switch to disk-buffered loading. |
+| Run killed without a traceback | Reduce peak memory (push work into SQL, bounded batches, lower dbt `--threads`); if it still fails, raise `instance_type` within the plan cap. |
+| `ModuleNotFoundError: No module named 'motherduck'` | There is no `motherduck` package; use `import duckdb` and `duckdb.connect("md:")`. |
+| Slow startup on every run | Connect with `md:<db>?attach_mode=single` instead of attaching the whole workspace. |
+| `You can only run or modify Flights that you own` | Ask the owner (`owner_name`) to act or grant `run`, or copy the source into a new Flight you own. |
 | Older flight reports empty `config` on runs | Flight predates per-run config overrides; one `update_flight` redeploys it. |
