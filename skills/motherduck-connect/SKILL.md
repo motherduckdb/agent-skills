@@ -39,7 +39,7 @@ Before installing a DuckDB client, check `https://motherduck.com/docs/duckdb-ver
 2. Put the MotherDuck token in environment-managed secrets, not in source code.
 3. Establish the connection with explicit SSL settings where required.
 4. Verify the connection with `SELECT 1 AS connected` and then list reachable tables.
-5. If the workload is read-heavy and concurrent, evaluate read scaling and `session_hint`.
+5. If the workload is read-heavy and concurrent, evaluate read scaling and a stable `session_name` per end user.
 
 ## References
 

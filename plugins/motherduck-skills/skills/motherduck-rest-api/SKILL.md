@@ -37,7 +37,7 @@ license: MIT
 4. For Duckling config changes, read the current config first, then update both `read_write` and `read_scaling` because the `PUT` payload requires both.
 5. Preserve response fields that are only returned once, especially newly created token strings and embed session strings.
 6. Surface API errors by status and response body; do not hide `400`, `401`, `403`, `404`, or `500` responses behind success-shaped fallbacks.
-7. When the MotherDuck MCP server is connected, prefer its admin tools over raw HTTP. Call `get_user_admin_guide` first, or read the MCP column in `references/REST_API_GUIDE.md`.
+7. If the connected MotherDuck MCP server lists user-admin tools (such as `create_service_account`), prefer them over raw HTTP and call `get_user_admin_guide` first when it is listed. Many MCP setups do not expose them; then use the REST API directly. The MCP column in `references/REST_API_GUIDE.md` maps the names.
 
 For answer, review, or planning requests, inspect and report without mutating the control plane. For create or update requests, perform the requested in-scope operation and verify the response; retain confirmation for destructive deletes or broader administrative changes.
 

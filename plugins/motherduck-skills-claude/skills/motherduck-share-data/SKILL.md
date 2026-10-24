@@ -25,7 +25,7 @@ A working connection, the source database, and the intended audience. Reuse thes
 ## Default Posture
 
 - Prefer `ACCESS RESTRICTED` plus `GRANT READ ON SHARE ... TO ROLE ...` for governed internal distribution. Use `ACCESS ORGANIZATION` only when the caller deliberately wants its legacy organization-wide behavior.
-- Use `INCLUDE_PATTERN` when every recipient of one share should see the same table/view subset. Create separate shares when audiences need different subsets.
+- Use `INCLUDE_PATTERN` when every recipient of one share should see the same table/view subset. Create separate shares when audiences need different table subsets; when they differ only by rows, columns, or masked values, one share with secure views can serve them all.
 - Use `UPDATE MANUAL` when the recipient needs a stable snapshot or versioned delivery.
 - Use `ACCESS RESTRICTED` or `VISIBILITY HIDDEN` when distribution should stay tightly controlled.
 - Confirm whether the recipient is an internal user, another organization, or public before choosing access and visibility.

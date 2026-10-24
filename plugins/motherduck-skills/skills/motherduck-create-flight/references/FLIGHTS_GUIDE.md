@@ -63,7 +63,7 @@ Flights run in every MotherDuck region, including the AWS Asia Pacific regions; 
 
 - It is a Linux process: `subprocess` works, `apt-get install` of Debian packages works (git, ffmpeg, Playwright). dlt and similar tools that write under `HOME` should set `os.environ.setdefault("HOME", "/tmp")`.
 - DuckDB extensions can be installed inside the flight's *local* DuckDB process (`INSTALL postgres`, `INSTALL bigquery FROM community`) — the no-runtime-extension rule applies to MotherDuck's server-side engine, not to the flight container.
-- Python version, run timeout, and concurrency quotas are not publicly documented; treat long runs and parallel runs conservatively.
+- Source is limited to 200 KB and `requirements_txt` to 20 KB; load datasets and fixtures from object storage at runtime. The run timeout is `max_runtime_sec` (plan default and cap). Read the Python version and concurrency limits from `get_flight_guide` rather than assuming them.
 
 Flights are generally available. They can process protected health information only when the organization has a signed HIPAA BAA with MotherDuck (an existing BAA covers Flights). For other regulated workloads, verify the isolation model and workload restrictions in current docs; do not infer guarantees from this reference.
 
