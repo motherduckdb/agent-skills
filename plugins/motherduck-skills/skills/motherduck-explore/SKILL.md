@@ -14,7 +14,7 @@ license: MIT
 
 - Start at the known catalog object; broaden to databases or shares only when the target is unknown.
 - Prefer fully qualified `"database"."schema"."table"` names; they are required once more than one database or share is attached.
-- Check shared databases before concluding that data is unavailable.
+- Check shared databases before concluding that data is unavailable. A share with secure views can hide columns and rows: a missing column in an attached share may be policy, not schema drift.
 - Use the MotherDuck MCP tools (`list_databases`, `list_tables`, `list_columns`, `search_catalog`) when available because they return structured results faster than ad hoc SQL.
 - Before business-semantic exploration through MCP, call `get_query_guide`, then read only relevant root Guides and topic branches. Follow `relatedGuides` returned by catalog tools when they govern the objects in scope.
 - Record whether a share is filtered and whether an existing Dive is Draft, Ready, Endorsed, or Archived; these attributes change what downstream agents should trust or expect to see.
@@ -26,7 +26,7 @@ license: MIT
 2. Load relevant Guide context, then list tables and views in the target database.
 3. Inspect columns, types, nullability, and comments before writing queries.
 4. Use targeted profiling or `SUMMARIZE` when ranges, cardinality, or null rates affect the answer; avoid broad scans for a catalog lookup.
-5. Preview rows, capture grain and join assumptions, and only then move into analytical SQL or modeling work.
+5. Preview rows with `SELECT * ... LIMIT n` or `USING SAMPLE`; on wide tables these read only the row groups they need. Capture grain and join assumptions, and only then move into analytical SQL or modeling work.
 
 ## References
 

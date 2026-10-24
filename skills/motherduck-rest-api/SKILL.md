@@ -20,7 +20,9 @@ license: MIT
 - Authenticate with `Authorization: Bearer ${MOTHERDUCK_ADMIN_TOKEN}` and keep admin read-write tokens in backend-managed secrets.
 - Never use read-scaling tokens for REST API administration.
 - Prefer read-before-write flows for configuration changes so the current account, service account, Duckling config, or Dive metadata is known before mutation.
-- Treat `POST /v1/users` as service-account creation unless current docs explicitly broaden the API.
+- Treat `POST /v1/users` as service-account creation unless current docs explicitly broaden the API. `GET /v1/users` lists every user and service account in the org; filter with `is_service_account` and `is_deprovisioned` and page with `limit`/`offset`. Use it for access reviews and to find a service account before creating a duplicate.
+- Service accounts and access tokens accept an optional, searchable description. Set one that names the workload and owner; check the current API spec for the field name.
+- For repeatable provisioning (environments, partner or per-customer setups), prefer the Terraform provider `motherduckdb/motherduck` over scripted REST calls. It authenticates with `MOTHERDUCK_TOKEN`, plus `MOTHERDUCK_ADMIN_TOKEN` for service accounts, tokens, and Duckling configuration.
 - Assume active-account, Duckling configuration, service-account creation, service-account token creation, and Dive embed-session endpoints require an organization admin bearer token unless current docs say otherwise.
 - Never expose generated access tokens in logs, browser code, client bundles, or committed files.
 - Confirm destructive deletes with the user. Deleting a user permanently deletes that user and all of their data.

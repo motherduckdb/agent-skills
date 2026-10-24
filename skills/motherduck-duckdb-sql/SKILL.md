@@ -22,10 +22,11 @@ license: MIT
 - Verify current MotherDuck support before relying on recently released upstream DuckDB features such as `VARIANT`, native `GEOMETRY`, `MERGE INTO`, or `date_trunc` return-type changes.
 - Check whether the statement depends on local files, extension install/load, temporary-table behavior, or other client-only features before claiming it will work in MotherDuck.
 - Treat snapshot, restore, and `UNDROP DATABASE` statements as operational SQL with plan-specific retention behavior, not ordinary analytical syntax.
-- Treat `INCLUDE_PATTERN` as whole-table/view filtering on a Share, not row-level or column-level security. Use `ALTER SHARE` only for include-pattern changes.
-- Distinguish physical import (`CREATE DATABASE ... FROM '<file-url>'`) from zero-copy clone sources, and reject filtered shares as clone sources.
+- Treat `INCLUDE_PATTERN` as whole-table/view filtering on a Share. Row filters, hidden columns, and masking use share secure views (`WITH SECURE VIEW ... REPLACES <table> AS (SELECT ...)`, `ALTER SHARE ... ADD|DROP SECURE VIEW`), which are unrelated to DuckDB's `CREATE SECURE VIEW` optimizer barrier.
+- Distinguish physical import (`CREATE DATABASE ... FROM '<file-url>'`, including a DuckDB file in cloud storage such as `'s3://bucket/app.db'`) from zero-copy clone sources. Reject filtered shares and shares with secure views as clone sources; use `COPY FROM DATABASE` instead.
 - Use role/grant SQL for governed access and audit it with `SHOW ...` statements; do not preserve `ACCESS ORGANIZATION` as the preferred RBAC pattern.
 - Treat MotherDuck SQL as an additional surface on top of DuckDB SQL, not a replacement for it.
+- MotherDuck adds SQL AI functions: `prompt()` for generated or structured text, `embedding()` for vectors, and `prompt_jev()` for typed classification, scoring, yes/no probabilities, and image bounding boxes. See `motherduck-query` for usage and cost rules.
 
 ## Workflow
 

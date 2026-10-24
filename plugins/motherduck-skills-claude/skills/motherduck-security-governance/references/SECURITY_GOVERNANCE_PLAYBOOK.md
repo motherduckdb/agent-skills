@@ -10,10 +10,10 @@ Reference for discussing MotherDuck security posture, access-control boundaries,
 | Secure Defaults | Service accounts, credentials, isolation posture |
 | Publicly Documented Security Anchors | SOC 2, GDPR, service accounts, shares, SSO, recovery |
 | Governance Checklist | Questions every design must answer |
-| Region and Residency Guidance | Region availability vs residency vs contracts |
-| Roles and Grants | Preset/custom roles, inheritance, assignments, and Share grants |
+| Region and Residency Guidance | Region availability vs residency vs contracts, AI data flows |
+| Roles and Grants | Preset/custom roles, inheritance, assignments, Share and Flight grants, Terraform |
 | Product-Specific Patterns To Prefer | Hypertenancy, per-boundary service accounts, read tokens |
-| Dives and Sharing Guidance | Share vs Dive vs application boundaries |
+| Dives and Sharing Guidance | Share vs Dive vs application boundaries, secure views, write-back |
 | SSO Guidance | Plan gating, verified domains, IdP rollout |
 | Recovery and Retention Guidance | Snapshots, restore windows, UNDROP DATABASE |
 | What Not To Overstate | Compliance claims requiring commercial confirmation |
@@ -105,6 +105,16 @@ If the design claims governed distribution, also ask:
   - network connectivity requirements
   - contractual or compliance requirements
 
+AI features move data differently from queries. Check each one the design uses:
+
+| Feature | Where processing happens | Control |
+|---|---|---|
+| `prompt_jev()` | TypeSafe servers in the US for every MotherDuck region; input text or images, instructions, and labels are sent; only the token count is kept | Off by default in EU regions; Admins toggle it on the AI Features settings page or disable all AI functions |
+| `prompt()` | US processing for US regions, European processing for Dublin (`eu-west-1`); Asia Pacific regions use a US endpoint | AI Features settings; contact support before use under residency rules; verify other regions and `embedding()` in current docs |
+| Agent Chat (in-app agent, AI Chat in Dives) | Amazon Bedrock in the organization's geography (US or Europe), zero data retention | Admins toggle it on the AI Features settings page |
+
+Verify this table against current docs before giving a residency answer; AI feature routing changes often.
+
 If the user is really asking for a residency guarantee or legal assurance, direct them to current Trust & Security materials and the account/security channel rather than improvising.
 
 ## Product-Specific Patterns To Prefer
@@ -133,12 +143,27 @@ SHOW ROLES TO USER alice;
 SHOW GRANTS ON SHARE finance_share;
 ```
 
-Use `GRANT ROLE ... TO USER ...`, `GRANT ROLE ... TO ROLE ...`, and `GRANT READ ON SHARE ... TO ROLE ...` only after confirming the caller has the required permissions. A grant determines who receives a Share; its include pattern determines which tables and views all its grantees see.
+Use `GRANT ROLE ... TO USER ...`, `GRANT ROLE ... TO ROLE ...`, and `GRANT READ ON SHARE ... TO ROLE ...` only after confirming the caller has the required permissions. A grant determines who receives a Share; its include pattern determines which tables and views all its grantees see; its secure views determine which rows, columns, and values each grantee sees.
+
+Custom roles are available on Business and Enterprise.
+
+Flight run grants are a separate privilege:
+
+```sql
+SHOW GRANTS ON FLIGHT '<flight_id>';
+SELECT * FROM MD_LIST_FLIGHT_GRANTEES('<flight_id>'::UUID);
+```
+
+A run always uses the Flight owner's token, secrets, and database permissions, so a `RUN` grant to `ORGANIZATION` lets every member and service account trigger writes the owner can make. Only the owner can add grants; Admins can list and revoke them and can cancel any run.
+
+Governance as code: the official Terraform provider (`motherduckdb/motherduck`, Terraform 1.5+ or OpenTofu) manages databases, schemas, shares and share grants, roles and role grants, secrets, and, with `MOTHERDUCK_ADMIN_TOKEN`, service accounts, tokens, and Duckling configuration. A clean plan only covers resources in state; compare observed grants (`SHOW GRANTS ...`) with policy to catch grants made outside Terraform. State can hold sensitive values, so keep it in an encrypted, access-controlled remote backend.
 
 ## Dives and Sharing Guidance
 
 - Dives are shareable live visualizations that persist in the MotherDuck workspace.
-- Shares are zero-copy and read-only. They may expose the whole source database or a table/view subset. Use them for governed distribution, not as a substitute for row-level or column-level entitlement logic.
+- Shares are zero-copy and read-only. They may expose the whole source database or a table/view subset, and secure views on the share can filter rows, drop columns, or mask values per consumer using `current_email()`, `current_user`, or `is_role_in_session()`. Consumers cannot read the policy definitions. Verify a policy by attaching the share as a test identity; identity functions evaluate as whoever runs the query.
+- A table the share exposes without a replacing secure view is fully readable. DuckDB's `CREATE SECURE VIEW` is unrelated and enforces nothing.
+- Dive write-back runs Flights with the owner's credentials. The Dive viewer needs a `RUN` grant, and the Flight must validate every value the viewer sends.
 - Do not assume Dives replace all BI tooling; MotherDuck positions them for the long tail of questions that do not justify a full dashboard.
 - For broad external or client-facing access, be explicit about whether the right pattern is a share, a Dive, or a full customer-facing application.
 

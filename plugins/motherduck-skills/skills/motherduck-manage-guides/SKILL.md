@@ -20,6 +20,7 @@ license: MIT
 - Attach references to the databases, shares, schemas, tables, columns, Dives, Flights, or Guides the content governs so agents discover it at the right time.
 - Validate referenced objects and executable SQL against the live workspace before presenting a Guide as trustworthy.
 - Use version comments to explain why guidance changed. Read before update and avoid overwriting concurrent work.
+- When a shell is available and Guides should live in Git or be reviewed like code, use `motherduck guide` (see `motherduck-cli`): edit `guide.md` locally, `push` with `--version-description`, and pass the commit SHA as `--external-id` so each version traces to a change.
 
 ## Workflow
 

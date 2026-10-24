@@ -20,7 +20,8 @@ license: MIT
 - Request `--output json` for machine-readable resource operations and check both the exit code and returned `success` field. `motherduck query --output json` returns a bare JSON array instead.
 - Redirect large query results to a file rather than pulling every row into model context.
 - Never run `motherduck new` merely because authentication is missing. Account creation requires an explicit signup request.
-- Treat `dive push`, `flight push`, scheduling, secret changes, and account creation as external mutations. Perform them only when the user's build/change request includes that outcome.
+- Keep Guides as files with `motherduck guide init|pull|push`; `push` creates or updates and only adds a version when content changes. Record a Git SHA with `--external-id` and the reason with `--version-description`. `pull` overwrites local files, so push or save local edits first.
+- Treat `dive push`, `flight push`, `guide push`, scheduling, secret changes, and account creation as external mutations. Perform them only when the user's build/change request includes that outcome.
 
 ## Workflow
 

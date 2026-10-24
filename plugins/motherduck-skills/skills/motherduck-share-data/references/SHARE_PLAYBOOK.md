@@ -12,6 +12,7 @@ Reference for creating, operating, and consuming MotherDuck shares safely.
 | SQL Workflow Template | Copyable end-to-end owner and consumer SQL |
 | Create a Share | `CREATE SHARE` options |
 | Table-Level Security | `INCLUDE_PATTERN`, preview, alter, and limitations |
+| Secure Views | Row filters, hidden columns, masking, identity functions, limits |
 | Access Levels | ORGANIZATION vs RESTRICTED vs UNRESTRICTED |
 | Role Grants | Governed user and role access |
 | Visibility Options | DISCOVERABLE vs HIDDEN |
@@ -131,10 +132,49 @@ Read the stored value from `LIST SHARES` or `MD_INFORMATION_SCHEMA.OWNED_SHARES`
 
 Limitations:
 
-- Filtered shares require native MotherDuck storage. DuckLake shares can be unfiltered; Iceberg catalogs cannot be shared.
+- Filtered shares require native MotherDuck storage or a fully managed DuckLake. DuckLake databases with their own `DATA_PATH` can be shared only unfiltered; Iceberg catalogs cannot be shared.
 - A filtered share cannot be the source of `CREATE DATABASE ... FROM` or a wholesale `COPY DATABASE`. Copy its visible tables with `COPY FROM DATABASE` instead.
 - Patterns select tables and views only. Macros, sequences, and types follow schema visibility; objects in the default schema may remain visible.
 - Visible view or macro definitions can name hidden objects even though the hidden data remains unreadable.
+
+## Secure Views
+
+Secure views attach row, column, and masking policy to a share. Consumers query them under the original table name and cannot read the view definitions. Available on Business and Enterprise (including trials). Only the share creator can manage them; SQL management needs DuckDB 1.5.6+ and a read-write token. The source must be native MotherDuck storage or a fully managed DuckLake.
+
+```sql
+CREATE SHARE partner_share FROM sales (ACCESS RESTRICTED, UPDATE AUTOMATIC)
+WITH
+  -- row filter: each partner service account sees its own rows
+  SECURE VIEW REPLACES orders AS (
+    SELECT order_id, partner_id, order_date, amount
+    FROM orders
+    WHERE partner_id = current_user
+  ),
+  -- column masking plus a role-based exception
+  SECURE VIEW REPLACES customers AS (
+    SELECT customer_id,
+           CASE WHEN is_role_in_session('support') THEN email ELSE NULL::VARCHAR END AS email,
+           region
+    FROM customers
+  );
+
+ALTER SHARE partner_share ADD OR REPLACE SECURE VIEW REPLACES orders AS (
+  SELECT order_id, partner_id, order_date FROM orders WHERE partner_id = current_user
+);
+ALTER SHARE partner_share DROP SECURE VIEW customers;
+SHOW SECURE VIEWS ON SHARE partner_share;
+```
+
+- **Rows:** a `WHERE` clause. **Columns:** leave the column out; consumers get a missing-column error. **Masking:** an aliased expression, or `NULL::<type>` to keep the column but empty it.
+- `REPLACES <table>` stands in for an existing table or view (one per table per share). Without `REPLACES`, the view appears as a new table whose name must not collide.
+- Identity: `current_user` (username, or the service account name), `current_email()` (use this for people; `NULL` for service accounts), `session_roles()`, and `is_role_in_session(role_or_list)` (case-insensitive). `current_role` is not available. Prefer the positive `WHERE is_role_in_session(...)` form over `NOT`.
+- Body rules: one parenthesized `SELECT` over the shared database only. Joins, aggregates, window functions, CTEs, and scalar macros work; other databases, table functions, `LIMIT`, `SAMPLE`, and non-deterministic functions such as `random()` do not. Use explicit column lists; a source schema change can break a stored view until the owner updates it.
+- Reuse policy by calling scalar macros or joining mapping tables from a schema the share does not expose. Macro edits reach consumers within a minute or two (after the next `UPDATE SHARE` on manual shares). A mapping table created after the share is not visible to its view until the share publishes it.
+- Combining with `INCLUDE_PATTERN`: the pattern picks tables, secure views filter them. A secure view stays visible even when the pattern excludes its source. A table the pattern includes without a replacing view is fully readable.
+- Limits: 100 secure views per share, 256 KiB per view, 4 MiB total. `CREATE DATABASE ... FROM <share>` is refused; copy with `COPY FROM DATABASE`, which copies only what the views return. `CREATE OR REPLACE SHARE` drops views it does not restate. `rowid` is unavailable through a secure view.
+- DuckLake: fully managed only, the share must be `UPDATE AUTOMATIC`, and consumers lose time travel and DuckLake metadata functions.
+- Consumer clients: DuckDB 1.5.5+ supports every query shape; 1.4.0 to 1.5.4 fail on `ORDER BY ... LIMIT`, `LIMIT ... OFFSET`, and `USING SAMPLE`.
+- DuckDB's `CREATE SECURE VIEW` is a different feature (an optimizer barrier) and enforces nothing.
 
 ## Access Levels
 
@@ -365,7 +405,7 @@ SUMMARIZE "partner_data"."main"."customers";
 - Zero-copy means no storage duplication for the share itself.
 - Use `MANUAL` update mode for snapshots and `AUTOMATIC` for always-current delivery.
 - Prefer restricted shares and role grants for internal sharing.
-- Use `INCLUDE_PATTERN` only for whole-table/view filtering; use separate shares when audiences need different subsets.
+- Use `INCLUDE_PATTERN` for whole-table/view filtering and secure views for rows, columns, and masking; use separate shares when audiences need different table subsets and no identity-based rule can express the difference.
 - Use `RESTRICTED` for named recipients and ACL-style control.
 - Use `DISCOVERABLE` by default and `HIDDEN` when distribution should stay controlled.
 - Notify recipients after `UPDATE SHARE` on manual shares because they may need `REFRESH DATABASE`.
@@ -389,7 +429,7 @@ SELECT * FROM "partner_data"."main"."customers";
 
 ### Treating Table-Level Security Like Row-Level Security
 
-`INCLUDE_PATTERN` selects whole tables and views. If you need row-level, column-level, per-customer, or per-user isolation, publish separate databases/shares or move to customer-facing analytics patterns with stronger structural isolation.
+`INCLUDE_PATTERN` selects whole tables and views. For row-level, column-level, or masking rules per consumer, add secure views to the share. For per-customer isolation in a customer-facing product, structural isolation (a database per customer) is still the stronger default.
 
 ### Forgetting to Update a Manual Share
 

@@ -14,6 +14,7 @@ license: MIT
 - Keep the sharing model aligned with the documented behavior:
   - zero-copy and metadata-only
   - a database is the share source, with optional table/view filtering through `INCLUDE_PATTERN`
+  - optional secure views that filter rows, drop columns, or mask values for each consumer
   - read-only recipients
   - owner-controlled update and include-pattern policy
 
@@ -29,7 +30,10 @@ A working connection, the source database, and the intended audience. Reuse thes
 - Use `ACCESS RESTRICTED` or `VISIBILITY HIDDEN` when distribution should stay tightly controlled.
 - Confirm whether the recipient is an internal user, another organization, or public before choosing access and visibility.
 - For write-heavy publishers, verify the DuckDB client version is one MotherDuck supports before relying on checkpoint or concurrent-write behavior during share-update workflows.
-- Never describe `INCLUDE_PATTERN` as row-level or column-level security. It selects whole tables and views and requires native MotherDuck storage.
+- `INCLUDE_PATTERN` selects whole tables and views; never describe it as row- or column-level security. It works on native MotherDuck and fully managed DuckLake sources.
+- For row filtering, hidden columns, or masked values, add secure views to the share: `CREATE SHARE ... WITH SECURE VIEW REPLACES <table> AS (SELECT ...)` or `ALTER SHARE ... ADD [OR REPLACE] SECURE VIEW`. Key the policy on `current_email()` for people, `current_user` for service accounts, or `is_role_in_session('<role>')`. One share with secure views can replace a set of per-audience shares. Business and Enterprise plans; managing them in SQL needs DuckDB 1.5.6 or later and a read-write token.
+- A table the share exposes without a replacing secure view stays fully readable. Combine `INCLUDE_PATTERN` (which tables) with secure views (which rows and columns) and keep macro schemas and mapping tables outside the pattern.
+- MotherDuck secure views are share policies. DuckDB's own `CREATE SECURE VIEW` is only an optimizer barrier and restricts nothing.
 
 ## Workflow
 
@@ -37,9 +41,9 @@ A working connection, the source database, and the intended audience. Reuse thes
 2. Decide the audience, visible table/view subset, discoverability, and freshness requirements before writing SQL.
 3. Preview and validate any include pattern against the live source catalog, then create the share with explicit access, visibility, update mode, and optional `INCLUDE_PATTERN`.
 4. If access is restricted, grant users or roles explicitly. If the share is hidden or link-based, distribute the share URL directly.
-5. Read the share back with `LIST SHARES` or `MD_INFORMATION_SCHEMA.OWNED_SHARES`; for filtered shares, verify the stored pattern and consumer-visible catalog.
+5. Read the share back with `LIST SHARES` or `MD_INFORMATION_SCHEMA.OWNED_SHARES`; for filtered shares, verify the stored pattern and consumer-visible catalog. For secure views, run `SHOW SECURE VIEWS ON SHARE <name>` and attach the share as a consumer to check the result; identity functions evaluate as whoever runs the test.
 6. Have recipients `ATTACH` the shared database and query it read-only.
-7. Use `ALTER SHARE ... SET|RESET INCLUDE_PATTERN` for table/view scope changes. If the share uses `UPDATE MANUAL`, the owner runs `UPDATE SHARE` and consumers run `REFRESH DATABASE` when a new snapshot is ready.
+7. Use `ALTER SHARE ... SET|RESET INCLUDE_PATTERN` for table/view scope changes and `ALTER SHARE ... ADD|DROP SECURE VIEW` for policy changes (not both in one statement). Avoid `CREATE OR REPLACE SHARE` on a share with secure views; it drops any view it does not restate. If the share uses `UPDATE MANUAL`, the owner runs `UPDATE SHARE` and consumers run `REFRESH DATABASE` when a new snapshot is ready.
 
 For answer, review, or planning requests, return the sharing design and SQL without provisioning. For create, update, grant, or revoke requests, perform the requested in-scope operation and validate the resulting access; ask before public exposure, destructive revocation, or unrelated grants.
 
@@ -47,7 +51,7 @@ For answer, review, or planning requests, return the sharing design and SQL with
 
 Read only the reference sections needed for the current task.
 
-- Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, role grants, include-pattern rules, access/update decisions, consumer workflow, and common failure modes.
+- Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, role grants, include-pattern rules, secure views, access/update decisions, consumer workflow, and common failure modes.
 
 ## Related Skills
 

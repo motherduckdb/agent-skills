@@ -17,6 +17,8 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - One story per dashboard.
 - Start with a responsive KPI group, a primary chart, and supporting detail where it helps the decision. Add sections only when the question or data warrants them; these are defaults, not fixed chart quotas.
 - Heavy shaping in SQL, not React.
+- When the dashboard should trigger an action (approve, refresh, submit), add a write-back button that runs a Flight; see `motherduck-create-dive`.
+- Viewers can ask follow-up questions through the Dive's AI Chat, so name sections and metrics in business terms.
 
 ## Workflow
 

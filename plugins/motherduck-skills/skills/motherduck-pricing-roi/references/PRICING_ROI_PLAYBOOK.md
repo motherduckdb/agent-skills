@@ -13,6 +13,7 @@ Reference for framing MotherDuck pricing, workload cost drivers, and ROI discuss
 | Internal Chargeback and Customer Billing | Workload vs tenant chargeback models |
 | Storage and Lifecycle Visibility | STORAGE_INFO and retention-driven cost |
 | Public Pricing Structure / Compute Realities | Plans, instance types, cooldown, SHUTDOWN |
+| Flights, AI Functions, and Procurement | Flight sizes, AI Units, AWS Marketplace |
 | Workload-to-Cost Mapping | Instance-type heuristics |
 | ROI Questions and Guidance | What MotherDuck replaces or simplifies |
 | Plan-Aware Talking Points | Publicly positioned plan differences |
@@ -232,6 +233,13 @@ Use the live pricing page to identify the current plan names, instance classes, 
 - Storage billing is for compressed MotherDuck-managed storage plus retained recoverability windows, not just the current visible table size.
 - Shares are zero-copy and do not add storage cost by themselves.
 - Data kept in the customer's own object store for DuckLake or BYOB-style patterns is not billed as MotherDuck-managed storage.
+
+## Flights, AI Functions, and Procurement
+
+- **Flights:** billed per hour of run time at a rate set by size and region tier. Size names track memory (`F4` 4 GB, `F16` 16 GB default, `F32` 32 GB on Business and Enterprise). Lite orgs get a small free daily Flight allowance; on paid Lite, Flight usage draws from the same monthly compute allowance as Ducklings. The SQL a Flight sends over `md:` runs on a Duckling and belongs in the Duckling estimate, so a Flight that mostly orchestrates SQL should be sized `F4`.
+- **AI functions:** `prompt()`, `embedding()`, and `prompt_jev()` share one AI Unit meter and the AI session cap that Admins set. `prompt_jev()` bills input tokens only (output is free) and batches text rows; `multiple_choice` and `batch_size := 1` cost several times more per row. `prompt()` cost varies widely by model, and raising `reasoning_effort` above `'none'` adds reasoning tokens. Estimate from a `LIMIT` sample and the current rows-per-AI-Unit figures in the pricing docs, and plan to materialize results so they are paid for once.
+- **Attribution:** the Duckling Overview shows the client and `custom_user_agent` per query, which makes tagging visible to admins without SQL.
+- **Procurement:** AWS Marketplace Private Offers let a customer pay through its AWS bill and draw down AWS commitments. Treat terms as a sales conversation.
 
 ## How To Map Workload To Cost Shape
 

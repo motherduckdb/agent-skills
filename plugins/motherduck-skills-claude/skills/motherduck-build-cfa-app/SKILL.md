@@ -25,7 +25,9 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
   - a backend can create embed sessions and keep admin tokens server-side
 - **DuckDB-Wasm** is acceptable only for small, browser-side, read-only workloads.
 - **Single shared tenant_id filtering** is the fallback, not the recommendation.
-- A filtered Share can expose a curated table/view subset to one audience, but it is not row-level tenant isolation. Different audiences need separate Shares or stronger structural boundaries.
+- A filtered Share exposes a curated table/view subset. Secure views on a Share add row filters, hidden columns, and masking keyed on the consumer's identity (`current_user` for a per-customer service account), which can serve a modest number of customers from one database. Keep a database per customer as the default when tenants need independent compute, data lifecycle, or contractual isolation.
+- Bound backend connects with `connection_timeout` so a cold Duckling fails over instead of hanging a request.
+- Embedded Dives are read-only and cannot run Flights; in-app actions go through the backend API.
 - For embedded Dives, validate `postMessage` origin/type/payload, use `initial_state` only for JSON-serializable UI state, and keep navigation, export, and persistence policy in the host application.
 
 ## Workflow

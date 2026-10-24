@@ -21,7 +21,8 @@ license: MIT
 - Filter early, aggregate early, and prefer serving tables or summaries for repeated reads.
 - Keep SQL obvious, multi-line, and explicit about grain, filters, and output shape.
 - Treat DDL, DML, `ATTACH`, `DETACH`, recovery commands such as `CREATE SNAPSHOT`, `ALTER DATABASE ... SET SNAPSHOT`, `UNDROP DATABASE`, and lifecycle commands such as `SHUTDOWN` as writes. Use the MotherDuck MCP `query_rw` tool when the user's change request authorizes the write. Ask for confirmation only when the action is destructive, externally visible, or outside the stated scope.
-- Tag long-lived integrations with `custom_user_agent` when the connection path supports it.
+- Tag long-lived integrations with `custom_user_agent` when the connection path supports it; the tag appears per query in the Duckling Overview and in query history.
+- For classification, scoring, routing, or yes/no judgments over text or images, use `prompt_jev()`: it returns typed probabilities and labels, bills input tokens only, and batches rows. Use `prompt()` for generated text or open extraction with `struct` or `json_schema`. Both are per-row billable calls: test on a small `LIMIT`, store results in a table, and rerun only `NULL` rows.
 
 ## Workflow
 
@@ -37,6 +38,7 @@ license: MIT
 Read only the reference sections needed for the current task.
 
 - Read `references/QUERY_PLAYBOOK.md` for DuckDB query patterns, exploration SQL, performance rules, common analytical shapes, and common mistakes
+- Read `references/AI_FUNCTIONS.md` when a query calls `prompt_jev()`, `prompt()`, or `embedding()`
 
 ## Related Skills
 
