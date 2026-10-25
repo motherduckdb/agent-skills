@@ -10,14 +10,14 @@ license: MIT
 ## Source Of Truth
 
 - Prefer the current MotherDuck Guides documentation and MCP tool descriptions.
-- For analytical queries through MCP, call `get_query_guide` before writing SQL, then traverse only relevant topics and Guides.
+- When MotherDuck MCP is available and the SQL answers a business question, call `get_query_guide` first, then read only the relevant Guide topics and validate their claims against the live schema.
 - `get_dive_guide` and `get_flight_guide` automatically include summaries from the reserved `dives` and `flights` topics; do not load those topics separately unless deeper context is needed.
 
 ## Default Posture
 
 - Keep one short root orientation Guide only when its guidance applies broadly. Put domain-specific knowledge under shallow, descriptive topics.
 - Default new Guides to `access = 'user'`. Organization visibility requires an explicit request and the required admin permission; change it with `set_guide_access` (MCP) or `--access` on `motherduck guide push`.
-- Document tables that Flights create under the `data-sources` topic (not `flights`, which holds authoring conventions): source, purpose, grain, key columns, transformations, refresh behavior, and caveats, with references to the table, its producing Flight, and any consuming Dive. Use `organization` access when the table's database has an owned share, `user` otherwise.
+- Document tables that Flights create under the `data-sources` topic (not `flights`, which holds authoring conventions): source, purpose, grain, key columns, transformations, refresh behavior, and caveats, with references to the table, its producing Flight, and any consuming Dive. Create these with `user` access; when the table's database has an owned share, propose `organization` access and apply it only on request.
 - Write one coherent subject per Guide, with a discriminating title and description. Lead with rules, tested SQL, and named pitfalls.
 - Attach references to the databases, shares, schemas, tables, columns, Dives, Flights, or Guides the content governs so agents discover it at the right time.
 - Validate referenced objects and executable SQL against the live workspace before presenting a Guide as trustworthy.
@@ -33,7 +33,7 @@ license: MIT
 5. For a create or update request, apply the change through MCP or the documented SQL function and read it back.
 6. Verify metadata, access, references, current version, and change comment. For query work, follow the Guide and still validate the resulting SQL against the live schema.
 
-For answer, review, or planning requests, inspect and draft without creating or modifying Guides. For explicit create/update requests, perform the in-scope mutation and verify it; ask before deletion or expanding visibility beyond the authorized audience. An explicit organization-publication request already authorizes that audience, subject to admin permission.
+For answer, review, or planning requests, inspect and draft without creating or modifying Guides. For explicit create/update requests, perform the in-scope mutation and verify it; ask before deletion (`delete_guide`) or expanding visibility beyond the authorized audience. An explicit organization-publication request already authorizes that audience, subject to admin permission.
 
 ## References
 

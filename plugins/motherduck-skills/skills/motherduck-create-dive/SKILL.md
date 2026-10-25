@@ -1,6 +1,6 @@
 ---
 name: motherduck-create-dive
-description: Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime.
+description: Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime, including buttons that write back through Flights.
 license: MIT
 ---
 
@@ -9,7 +9,7 @@ license: MIT
 ## Source Of Truth
 
 - Prefer current MotherDuck Dive docs first.
-- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive` or `update_dive`. The guide defines the current component API and runtime libraries.
+- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive`, `update_dive`, or `edit_dive_content`. The guide defines the current component API and runtime libraries.
 - `get_dive_guide` also surfaces relevant conventions from the reserved `dives` Guide topic. Apply those conventions when they do not conflict with the user's explicit requirements.
 - Use the blessed Dives example repo as the reference implementation for local preview, Dives-as-code layout, metadata, CI previews, and deploy scripts.
 - Use Dives SQL functions when the user wants a scriptable SQL-native create/read/update/delete workflow instead of MCP tools.
@@ -27,7 +27,7 @@ license: MIT
 - Preserve an existing Dive’s visual system for scoped edits. For a new Dive, choose a concrete theme direction that fits its audience.
 - Prefer one query per visual section or interaction surface rather than one giant cross-purpose query.
 - Preview locally before saving when the environment supports it.
-- For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions. Use `edit_dive_content` (exact text replacements) for focused edits and `update_dive` for a full rewrite.
+- For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions. Use `edit_dive_content` (exact text replacements) for focused edits and `update_dive` for a full rewrite. Use `view_dive` to show the user a saved Dive, and `delete_dive` only after explicit confirmation; deletion is permanent.
 - Add export controls only when the use case calls for them: `exportAs` on a query result or the `useExport` hook (CSV, JSON, Parquet, XLSX), started from a click. Do not build Blob URLs, hidden anchors, or `COPY TO` exports.
 - Dive SQL is read-only. For actions such as approving a record, submitting a form, or refreshing a pipeline, have a button start a Flight the Dive owner controls with `useRunFlight` and track it with `useFlightRun` (from `@motherduck/react-sql-query`). Hardcode the Flight ID, pass only string config values, disable the control while a run is pending, render the hook's `error`, and rerun the affected queries when the run succeeds. Viewers need a `run` grant: recommend the grantees and grant only after the user confirms. Embedded Dives cannot run Flights.
 - Viewers can open **AI Chat** in the Dive header. It sees the Dive's queries, data, and current filters, and can edit the Dive with each change kept in version history. Clear section titles, query names, and the Dive description make its answers better.
@@ -44,7 +44,7 @@ license: MIT
 6. Read the resulting URL, version, and status back. If the requested delivery includes publication, promote a validated Draft to Ready through the write-capable path.
 7. If teammates or application users need access, check three things: they can view the Dive, every `REQUIRED_DATABASES` entry is a share they can read, and they hold a `run` grant on each Flight the Dive runs. Prefer an existing share of an owned database (`MD_INFORMATION_SCHEMA.OWNED_SHARES`). When the user asks to share the Dive's data with the whole organization, `share_dive_data` creates org-scoped shares and updates the Dive in one call; use `motherduck-share-data` for restricted audiences, and the embed-session flow for application users.
 
-For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize.
+For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize. Before `save_dive` or `update_dive`, follow the review step that `get_dive_guide` sets for your client: when it asks you to show the final source or preview and get the user's go-ahead, do that once, unless the user already said to save without review.
 
 ## References
 

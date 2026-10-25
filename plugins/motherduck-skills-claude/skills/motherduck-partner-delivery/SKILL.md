@@ -1,6 +1,6 @@
 ---
 name: motherduck-partner-delivery
-description: Standardize MotherDuck delivery across client engagements with reusable provisioning, isolation, and handoff patterns.
+description: Standardize MotherDuck delivery for consultancies and agencies across client engagements with reusable provisioning, isolation, and handoff patterns.
 argument-hint: [client-delivery-scenario]
 license: MIT
 ---
@@ -73,3 +73,5 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-query` -- validate core metrics and data contracts
 - `motherduck-share-data` -- publish governed share boundaries
 - `motherduck-create-dive` -- create repeatable client-facing answer surfaces when needed
+- `motherduck-rest-api` -- provision per-client service accounts and tokens
+- `motherduck-security-governance` -- review per-client isolation and grants

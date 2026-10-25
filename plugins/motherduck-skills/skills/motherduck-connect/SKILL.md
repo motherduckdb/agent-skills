@@ -1,6 +1,6 @@
 ---
 name: motherduck-connect
-description: Set up or troubleshoot MotherDuck connections, authentication, client runtimes, and read scaling.
+description: Set up or troubleshoot MotherDuck connections, the MotherDuck MCP server in AI clients, authentication, client runtimes, and read scaling.
 license: MIT
 ---
 
@@ -21,6 +21,7 @@ license: MIT
 - Reuse an existing connection, connector, or environment-managed token when the user's context already provides one; do not ask for secrets that can be discovered from the active workspace. When only the MotherDuck MCP server is connected and a one-off local session needs credentials, `get_short_lived_token` returns a temporary token and endpoint details; pass it through the process environment and never write it to files, code, or logs. Deployed services still need a service-account token.
 - Start with one connection. Add pooling or read scaling only when real concurrent-read pressure exists.
 - For services that should fail over instead of blocking while a Duckling starts, bound native `md:` connects with `connection_timeout` (`md:my_db?connection_timeout=30s`, `MOTHERDUCK_CONNECTION_TIMEOUT`, or `SET motherduck_connection_timeout = '30s'` before the first `ATTACH 'md:'`). It applies to DuckDB clients with the MotherDuck extension, not the PG endpoint or Wasm. Without it, only network retries are bounded.
+- To connect an AI client (Claude, Cursor, VS Code, Gemini CLI, ChatGPT, Codex) to MotherDuck, use the hosted MCP server at `https://api.motherduck.com/mcp`; read `references/MCP_SETUP.md`.
 - Use native DuckDB `custom_user_agent` where supported; for PG endpoint clients, prefer the client's `application_name` setting when available. The tag shows per query in the Duckling Overview, which makes it the quickest way to see which workload is using a Duckling.
 
 ## Runtime Selection
@@ -42,6 +43,8 @@ Before installing a DuckDB client, check `https://motherduck.com/docs/duckdb-ver
 5. If the workload is read-heavy and concurrent, evaluate read scaling and a stable `session_name` per end user.
 
 ## References
+
+- Read `references/MCP_SETUP.md` to add the MotherDuck MCP server to an AI client.
 
 Read only the reference sections needed for the current task.
 

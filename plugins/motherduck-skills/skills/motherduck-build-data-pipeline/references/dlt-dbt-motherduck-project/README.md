@@ -2,6 +2,17 @@
 
 This is a minimal end-to-end pipeline reference for the `motherduck-build-data-pipeline` skill.
 
+## Contents
+
+| Section | Covers |
+| --- | --- |
+| Why One Database | Database layout for the example |
+| Verified Constraints | What the project was verified against |
+| Files | Project layout |
+| Run It | Commands to run the pipeline |
+| Expected Output | What a successful run prints |
+| Real MotherDuck Test Posture | Temporary databases and cleanup |
+
 It captures the pipeline shape that this repo repeatedly verified against real MotherDuck runs:
 
 - `dlt` for the raw loading step

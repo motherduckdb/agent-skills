@@ -1,6 +1,6 @@
 ---
 name: motherduck-ducklake
-description: Evaluate or operate DuckLake on MotherDuck when open table formats, bucket ownership, or file maintenance matter.
+description: Decide whether DuckLake fits a MotherDuck workload and operate it safely. Use whenever DuckLake, open table formats, or customer-owned buckets come up.
 license: MIT
 ---
 

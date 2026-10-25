@@ -165,7 +165,7 @@ MCP path:
 1. `list_dives` to find the Dive and current version.
 2. `read_dive` for the latest content, or `read_dive(version = N)` for a historical version.
 3. Edit and preview the component.
-4. Apply focused changes with `edit_dive_content` (a list of exact `old_string`/`new_string` replacements; no prior read needed) or a full rewrite with `update_dive`, after the user approves the changed behavior.
+4. Apply focused changes with `edit_dive_content` (a list of exact `old_string`/`new_string` replacements; no prior read needed) or a full rewrite with `update_dive`, following the review step `get_dive_guide` sets for your client.
 
 SQL path:
 
@@ -312,7 +312,7 @@ A Dive never writes through its own SQL. A control in the Dive starts a run of a
 
 1. Build and validate the Flight first (see `motherduck-create-flight`). Declare every key the Dive will send in the Flight's stored `config`; a run can override only existing keys, and the Flight reads them as environment variables.
 2. Validate every value inside the Flight as untrusted input and bind it as a SQL parameter.
-3. Grant viewers access: `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`.
+3. Recommend who should run the Flight, and after the user confirms, grant it: `GRANT RUN ON FLIGHT '<flight_id>' TO ROLE <role>`.
 4. Wire the control:
 
 ```jsx

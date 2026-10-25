@@ -40,7 +40,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 - For use-case skills, if a remote MotherDuck MCP server or local MotherDuck server is active, start from the real database in scope.
 - Resolve the database or workspace from the request and active context; ask only if a remaining ambiguity materially changes the result.
 - Inspect schemas, tables, columns, joins, and time dimensions before inventing example models or rollout steps.
-- Call `get_dive_guide` before `save_dive` or `update_dive`.
+- Call `get_dive_guide` before `save_dive`, `update_dive`, or `edit_dive_content`.
 - Call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`.
 - Prefer Parquet when choosing formats.
 - Prefer comments on analytical tables and columns.

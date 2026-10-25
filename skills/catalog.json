@@ -9,7 +9,9 @@
       "motherduck-query",
       "motherduck-load-data",
       "motherduck-explore",
-      "motherduck-manage-guides"
+      "motherduck-manage-guides",
+      "motherduck-rest-api",
+      "motherduck-security-governance"
     ],
     "references": [
       "references/CFA_IMPLEMENTATION_GUIDE.md",
@@ -71,7 +73,8 @@
       "motherduck-query",
       "motherduck-share-data",
       "motherduck-ducklake",
-      "motherduck-manage-guides"
+      "motherduck-manage-guides",
+      "motherduck-create-flight"
     ],
     "references": [
       "references/PIPELINE_IMPLEMENTATION_GUIDE.md",
@@ -112,12 +115,13 @@
   },
   "motherduck-connect": {
     "name": "motherduck-connect",
-    "description": "Set up or troubleshoot MotherDuck connections, authentication, client runtimes, and read scaling.",
+    "description": "Set up or troubleshoot MotherDuck connections, the MotherDuck MCP server in AI clients, authentication, client runtimes, and read scaling.",
     "layer": "utility",
     "depends_on": [],
     "references": [
       "references/CONNECTION_GUIDE.md",
-      "references/RUNTIME_SELECTION.md"
+      "references/RUNTIME_SELECTION.md",
+      "references/MCP_SETUP.md"
     ],
     "artifacts": [],
     "source_docs": [
@@ -129,13 +133,14 @@
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/attach-modes/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/",
-      "https://motherduck.com/docs/sql-reference/connection-string-parameters/"
+      "https://motherduck.com/docs/sql-reference/connection-string-parameters/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-setup/"
     ],
     "needs_live_discovery": false
   },
   "motherduck-create-dive": {
     "name": "motherduck-create-dive",
-    "description": "Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime.",
+    "description": "Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime, including buttons that write back through Flights.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-explore",
@@ -238,7 +243,7 @@
   },
   "motherduck-ducklake": {
     "name": "motherduck-ducklake",
-    "description": "Evaluate or operate DuckLake on MotherDuck when open table formats, bucket ownership, or file maintenance matter.",
+    "description": "Decide whether DuckLake fits a MotherDuck workload and operate it safely. Use whenever DuckLake, open table formats, or customer-owned buckets come up.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -271,7 +276,8 @@
       "motherduck-model-data",
       "motherduck-create-dive",
       "motherduck-share-data",
-      "motherduck-manage-guides"
+      "motherduck-manage-guides",
+      "motherduck-security-governance"
     ],
     "references": [
       "references/SELF_SERVE_ROLLOUT_GUIDE.md",
@@ -291,7 +297,7 @@
   },
   "motherduck-explore": {
     "name": "motherduck-explore",
-    "description": "Discover MotherDuck databases, tables, columns, shares, and sample data to understand an available dataset.",
+    "description": "Discover MotherDuck databases, tables, columns, shares, and sample data. Use first when a MotherDuck workspace or schema is unfamiliar.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -307,7 +313,7 @@
   },
   "motherduck-load-data": {
     "name": "motherduck-load-data",
-    "description": "Load files, object storage, dataframes, or external databases into MotherDuck using an appropriate bulk ingestion path.",
+    "description": "Load files, object storage, dataframes, or external databases into MotherDuck with bulk ingestion. Use for any import of data into MotherDuck.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -361,7 +367,8 @@
       "motherduck-model-data",
       "motherduck-query",
       "motherduck-ducklake",
-      "motherduck-manage-guides"
+      "motherduck-manage-guides",
+      "motherduck-security-governance"
     ],
     "references": [
       "references/MIGRATION_PLAYBOOK.md",
@@ -404,7 +411,7 @@
   },
   "motherduck-partner-delivery": {
     "name": "motherduck-partner-delivery",
-    "description": "Standardize MotherDuck delivery across client engagements with reusable provisioning, isolation, and handoff patterns.",
+    "description": "Standardize MotherDuck delivery for consultancies and agencies across client engagements with reusable provisioning, isolation, and handoff patterns.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -413,7 +420,9 @@
       "motherduck-query",
       "motherduck-share-data",
       "motherduck-create-dive",
-      "motherduck-manage-guides"
+      "motherduck-manage-guides",
+      "motherduck-rest-api",
+      "motherduck-security-governance"
     ],
     "references": [
       "references/PARTNER_DELIVERY_GUIDE.md",
@@ -437,7 +446,7 @@
   },
   "motherduck-pricing-roi": {
     "name": "motherduck-pricing-roi",
-    "description": "Assess MotherDuck costs, plan fit, and ROI using current pricing and the workload’s compute and storage needs.",
+    "description": "Assess MotherDuck costs, plan fit, cost attribution, and ROI from the workload's compute and storage needs.",
     "layer": "workflow",
     "depends_on": [],
     "references": [
@@ -459,12 +468,13 @@
   },
   "motherduck-query": {
     "name": "motherduck-query",
-    "description": "Write, execute, or optimize analytical DuckDB SQL against MotherDuck data.",
+    "description": "Write, run, optimize, or troubleshoot DuckDB SQL against MotherDuck, including AI functions such as prompt_jev for in-SQL classification. Use for any SQL that targets MotherDuck.",
     "layer": "utility",
     "depends_on": [],
     "references": [
       "references/QUERY_PLAYBOOK.md",
-      "references/AI_FUNCTIONS.md"
+      "references/AI_FUNCTIONS.md",
+      "references/PERFORMANCE.md"
     ],
     "artifacts": [],
     "source_docs": [
@@ -477,7 +487,9 @@
       "https://motherduck.com/docs/sql-reference/postgres-endpoint/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt-jev/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt/",
-      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/embedding/"
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/embedding/",
+      "https://motherduck.com/docs/key-tasks/query-performance/",
+      "https://motherduck.com/docs/about-motherduck/billing/duckling-sizes/"
     ],
     "needs_live_discovery": false
   },
@@ -506,7 +518,7 @@
   },
   "motherduck-security-governance": {
     "name": "motherduck-security-governance",
-    "description": "Assess MotherDuck security, permissions, isolation, residency, and compliance requirements against documented controls.",
+    "description": "Assess or configure MotherDuck security: roles and grants, isolation, residency, compliance, and governance as code.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",

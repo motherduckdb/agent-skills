@@ -335,7 +335,7 @@ GROUP BY customer_id;
 ## Key Rules
 
 - Use DuckDB SQL syntax, never PostgreSQL SQL.
-- Always use fully qualified table names.
+- Prefer fully qualified table names; they are required once more than one database or share is attached.
 - Use CTEs for readability and DuckDB-friendly planning.
 - Use `QUALIFY` to filter window-function results.
 - Use `GROUP BY ALL` to avoid duplicated grouping lists.

@@ -41,7 +41,7 @@ license: MIT
 4. Create any required `TYPE flights` secret first, then `create_flight` with `name`, `source_code`, pinned `requirements_txt`, `config`, and secret names — no `schedule_cron` yet.
 5. `run_flight`, poll `get_flight_run` when available (or `list_flight_runs` as a fallback) until terminal, and read `get_flight_logs`. Iterate with `edit_flight_source` (surgical) or `update_flight` (full field replacement); each content change creates a new version.
 6. If scheduling was requested, set it only after a successful run with `update_flight(schedule_cron = ...)` and state that cron is UTC. Clear it with `schedule_cron = ""` only when requested; preserve an existing schedule during unrelated edits.
-7. After the first successful run that creates or refreshes a durable table, document that table in a Guide under the `data-sources` topic (see `motherduck-manage-guides`).
+7. After the first successful run that creates or refreshes a durable table, create or update a private (`user` access) Guide for it under the `data-sources` topic, as `get_flight_guide` directs, and tell the user which Guide changed (see `motherduck-manage-guides`).
 8. If other users or a Dive must trigger the Flight, recommend `run` grants, apply them only after the user confirms, and verify with `SHOW GRANTS ON FLIGHT '<flight_id>'`.
 
 For answer, review, or planning requests, do not create or schedule a Flight. For create or update requests, complete the requested in-scope deployment and on-demand validation; attaching a recurring schedule is authorized only when the request includes scheduling.

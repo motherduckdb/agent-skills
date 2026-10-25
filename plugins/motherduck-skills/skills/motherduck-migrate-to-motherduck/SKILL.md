@@ -33,7 +33,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 5. Inventory incompatible SQL, functions, data types, and operational assumptions.
 6. Rebuild the analytical model in DuckDB SQL.
 7. Run source-vs-target validation.
-8. Create or update the relevant MotherDuck Guides so post-cutover agents use the validated target definitions.
+8. When Guide maintenance is in scope, create or update the relevant MotherDuck Guides so post-cutover agents use the validated target definitions.
 9. Cut over one workload at a time.
 
 Match execution to the request: answer, review, or planning work returns the requested migration artifacts; build or change work executes only the requested in-scope migration slice and validates it. Require confirmation for cutover, destructive source changes, or external writes not already authorized.
@@ -76,4 +76,5 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-model-data` -- shape the target analytical model
 - `motherduck-query` -- port and validate critical SQL
 - `motherduck-ducklake` -- only when open-table-format requirements are explicit
+- `motherduck-security-governance` -- map source access policies to roles, grants, and secure views
 - `motherduck-manage-guides` -- preserve validated target semantics and migration caveats
