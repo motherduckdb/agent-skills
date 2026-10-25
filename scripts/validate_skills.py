@@ -25,6 +25,7 @@ from _lib.claude_plugin import (
     CLAUDE_PACKAGED_PLUGIN_SKILLS,
     CLAUDE_SKILL_ARGUMENT_HINTS,
 )
+from _lib.evals import EvalError, load_tasks
 from _lib.repo import ROOT, read_json_file
 
 SKILLS_DIR = ROOT / "skills"
@@ -643,6 +644,10 @@ def main() -> int:
             )
 
     validate_product_contracts(catalog)
+    try:
+        load_tasks()
+    except EvalError as exc:
+        raise ValidationError(str(exc)) from exc
 
     claude_plugin_name = validate_claude_plugin()
     validate_claude_marketplace(claude_plugin_name)
