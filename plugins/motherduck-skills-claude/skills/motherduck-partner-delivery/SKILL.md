@@ -38,7 +38,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 
 Match execution to the request: answer, review, or planning work returns the requested delivery artifacts; build or change work creates the requested in-scope templates or client assets and validates them. Ask before provisioning additional client environments, destructive changes, or external writes not already authorized.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/2.6.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/3.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`.
 
 ## Output
 
