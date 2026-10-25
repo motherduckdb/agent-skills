@@ -28,6 +28,8 @@ The canonical version is the top-level `version` in `package.json`. Every releas
 
    The tag triggers the publish job, which verifies every version surface matches the tag (`scripts/bump_version.py --check`), revalidates the catalog, and creates the GitHub release with the Gemini extension archive attached. The release body is the version's `CHANGELOG.md` section; without one, the job falls back to generated notes and logs a warning.
 
+If you cannot push tags, run the **Release** workflow from `main` with the version and `publish` checked instead. It verifies the version surfaces, creates and pushes the tag with the workflow token, and publishes the same release. It refuses a version whose tag already exists.
+
 ## Editing Published Notes
 
 Edit the version's section in `CHANGELOG.md` and merge it. The **Release notes** workflow rewrites every published release that has a section. Run it by hand (`workflow_dispatch`) or locally with `uv run scripts/release_notes.py sync` (needs an authenticated `gh`).
