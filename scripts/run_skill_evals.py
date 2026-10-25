@@ -41,6 +41,8 @@ def main() -> int:
     parser.add_argument("--tasks", nargs="*", help="Subset of task ids.")
     parser.add_argument("--concurrency", type=int, default=4)
     parser.add_argument("--timeout-seconds", type=int, default=300)
+    parser.add_argument("--plugin-dir", type=Path,
+                        help="Claude only: plugin directory to test (default: this checkout's packaged plugin).")
     parser.add_argument("--out", type=Path, help="Write the full JSON report here.")
     parser.add_argument("--baseline", type=Path, help="Earlier report to compare per-task results against.")
     parser.add_argument("--fail-under", type=float, default=None,
@@ -64,7 +66,7 @@ def main() -> int:
     def execute(job):
         task, run = job
         output = runner(f"{task['prompt']}\n\n{suffix}".strip(), model=args.model,
-                        timeout=args.timeout_seconds, known=known)
+                        timeout=args.timeout_seconds, known=known, plugin_dir=args.plugin_dir)
         result = grade(task, run, output)
         status = "PASS" if result.passed else "FAIL"
         print(f"[{status}] {task['id']} run {run} skills={result.loaded_skills}", file=sys.stderr)

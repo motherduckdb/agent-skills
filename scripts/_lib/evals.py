@@ -106,12 +106,13 @@ def _ordered_unique(items: list[str]) -> list[str]:
     return ordered
 
 
-def run_claude(prompt: str, *, model: str | None, timeout: int, known: set[str]) -> RunOutput:
+def run_claude(prompt: str, *, model: str | None, timeout: int, known: set[str],
+               plugin_dir: Path | None = None) -> RunOutput:
     if shutil.which("claude") is None:
         raise EvalError("claude CLI is not installed or not on PATH")
     command = [
         "claude", "-p", prompt,
-        "--plugin-dir", str(CLAUDE_PLUGIN_DIR),
+        "--plugin-dir", str(plugin_dir or CLAUDE_PLUGIN_DIR),
         "--setting-sources", "project",
         "--strict-mcp-config",
         "--output-format", "stream-json", "--verbose",
@@ -154,7 +155,8 @@ def run_claude(prompt: str, *, model: str | None, timeout: int, known: set[str])
     return RunOutput(answer, _ordered_unique(loaded), elapsed, result.returncode, cost, error)
 
 
-def run_codex(prompt: str, *, model: str | None, timeout: int, known: set[str]) -> RunOutput:
+def run_codex(prompt: str, *, model: str | None, timeout: int, known: set[str],
+              plugin_dir: Path | None = None) -> RunOutput:
     """Runs through the installed Codex plugin in an isolated CODEX home.
 
     Skill loading is inferred from SKILL.md paths that appear in tool events, because
@@ -184,7 +186,8 @@ def run_codex(prompt: str, *, model: str | None, timeout: int, known: set[str]) 
     return RunOutput(answer, loaded, time.perf_counter() - start, result.returncode, None, error)
 
 
-def run_gemini(prompt: str, *, model: str | None, timeout: int, known: set[str]) -> RunOutput:
+def run_gemini(prompt: str, *, model: str | None, timeout: int, known: set[str],
+               plugin_dir: Path | None = None) -> RunOutput:
     """Runs headless Gemini CLI with the MotherDuck extension already installed
     (`gemini extensions install https://github.com/motherduckdb/agent-skills`).
 

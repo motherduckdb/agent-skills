@@ -1,0 +1,708 @@
+{
+  "generated_at": "2026-10-25T09:02:53+00:00",
+  "environment": "claude:default",
+  "summary": {
+    "runs_per_task": 2,
+    "task_pass_rate": 0.55,
+    "run_pass_rate": 0.65,
+    "routing_accuracy": 0.7,
+    "cost_usd": 2.2625,
+    "tasks": {
+      "share-row-level-security": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "dive-write-back-button": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 1,
+        "intermittent": true,
+        "failures": [
+          "must: Dives write by starting a Flight (useRunFlight)",
+          "routing: expected one of ['motherduck-create-dive', 'motherduck-build-dashboard'], loaded none"
+        ]
+      },
+      "share-dive-with-refresh-button": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "classify-tickets-in-sql": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "must: a fixed label set uses the choice question (choice)",
+          "must: closed classification uses prompt_jev (prompt_jev)",
+          "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+        ]
+      },
+      "flight-size-for-sql-job": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "flight-run-visual": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "serverless-connection": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "fail-fast-cold-start": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "load-parquet-from-s3": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 1,
+        "intermittent": true,
+        "failures": [
+          "routing: expected one of ['motherduck-load-data'], loaded none"
+        ]
+      },
+      "ducklake-not-needed": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "routing: expected one of ['motherduck-ducklake'], loaded none"
+        ]
+      },
+      "guides-in-git": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "list-service-accounts": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "cfa-tenant-isolation": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "build-revenue-dashboard": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 1,
+        "intermittent": true,
+        "failures": [
+          "must: read the Dive guide before writing Dive code (get_dive_guide)",
+          "routing: expected one of ['motherduck-build-dashboard', 'motherduck-create-dive'], loaded none"
+        ]
+      },
+      "dive-mobile-dark-mode": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "migrate-row-access-policies": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "stripe-pipeline": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 1,
+        "intermittent": true,
+        "failures": [
+          "routing: expected one of ['motherduck-build-data-pipeline', 'motherduck-create-flight', 'motherduck-load-data'], loaded none"
+        ]
+      },
+      "postgres-dialect-trap": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+        ]
+      },
+      "cost-attribution": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": [
+          "must: attribute compute by user agent (custom_user_agent|user_agent)"
+        ]
+      },
+      "explore-unknown-workspace": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "routing: expected one of ['motherduck-explore'], loaded none"
+        ]
+      }
+    }
+  },
+  "runs": [
+    {
+      "task_id": "share-row-level-security",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-share-data"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 24.3,
+      "cost_usd": 0.10467320000000001,
+      "error": null
+    },
+    {
+      "task_id": "share-row-level-security",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-share-data"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 23.0,
+      "cost_usd": 0.1025044,
+      "error": null
+    },
+    {
+      "task_id": "dive-write-back-button",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-create-dive', 'motherduck-build-dashboard'], loaded none",
+        "must: Dives write by starting a Flight (useRunFlight)"
+      ],
+      "elapsed_seconds": 15.9,
+      "cost_usd": 0.0434641,
+      "error": null
+    },
+    {
+      "task_id": "dive-write-back-button",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.2,
+      "cost_usd": 0.0625609,
+      "error": null
+    },
+    {
+      "task_id": "share-dive-with-refresh-button",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight",
+        "motherduck-create-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.4,
+      "cost_usd": 0.073275,
+      "error": null
+    },
+    {
+      "task_id": "share-dive-with-refresh-button",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.5,
+      "cost_usd": 0.058887,
+      "error": null
+    },
+    {
+      "task_id": "classify-tickets-in-sql",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none",
+        "must: closed classification uses prompt_jev (prompt_jev)",
+        "must: a fixed label set uses the choice question (choice)"
+      ],
+      "elapsed_seconds": 18.6,
+      "cost_usd": 0.04994320000000001,
+      "error": null
+    },
+    {
+      "task_id": "classify-tickets-in-sql",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none",
+        "must: closed classification uses prompt_jev (prompt_jev)",
+        "must: a fixed label set uses the choice question (choice)"
+      ],
+      "elapsed_seconds": 19.5,
+      "cost_usd": 0.053466700000000006,
+      "error": null
+    },
+    {
+      "task_id": "flight-size-for-sql-job",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.2,
+      "cost_usd": 0.0566095,
+      "error": null
+    },
+    {
+      "task_id": "flight-size-for-sql-job",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 14.2,
+      "cost_usd": 0.052554000000000003,
+      "error": null
+    },
+    {
+      "task_id": "flight-run-visual",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.5,
+      "cost_usd": 0.0633084,
+      "error": null
+    },
+    {
+      "task_id": "flight-run-visual",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.7,
+      "cost_usd": 0.0613374,
+      "error": null
+    },
+    {
+      "task_id": "serverless-connection",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 14.3,
+      "cost_usd": 0.052885,
+      "error": null
+    },
+    {
+      "task_id": "serverless-connection",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 15.7,
+      "cost_usd": 0.0520623,
+      "error": null
+    },
+    {
+      "task_id": "fail-fast-cold-start",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 13.6,
+      "cost_usd": 0.046197600000000005,
+      "error": null
+    },
+    {
+      "task_id": "fail-fast-cold-start",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 10.4,
+      "cost_usd": 0.0456732,
+      "error": null
+    },
+    {
+      "task_id": "load-parquet-from-s3",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-load-data"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.9,
+      "cost_usd": 0.0510168,
+      "error": null
+    },
+    {
+      "task_id": "load-parquet-from-s3",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-load-data'], loaded none"
+      ],
+      "elapsed_seconds": 12.3,
+      "cost_usd": 0.0391787,
+      "error": null
+    },
+    {
+      "task_id": "ducklake-not-needed",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-ducklake'], loaded none"
+      ],
+      "elapsed_seconds": 14.4,
+      "cost_usd": 0.043151300000000004,
+      "error": null
+    },
+    {
+      "task_id": "ducklake-not-needed",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-ducklake'], loaded none"
+      ],
+      "elapsed_seconds": 15.2,
+      "cost_usd": 0.0436053,
+      "error": null
+    },
+    {
+      "task_id": "guides-in-git",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-manage-guides"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.2,
+      "cost_usd": 0.0548473,
+      "error": null
+    },
+    {
+      "task_id": "guides-in-git",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-manage-guides"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.3,
+      "cost_usd": 0.051350999999999994,
+      "error": null
+    },
+    {
+      "task_id": "list-service-accounts",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-rest-api"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 11.4,
+      "cost_usd": 0.051725099999999996,
+      "error": null
+    },
+    {
+      "task_id": "list-service-accounts",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-rest-api"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 11.1,
+      "cost_usd": 0.0483378,
+      "error": null
+    },
+    {
+      "task_id": "cfa-tenant-isolation",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-cfa-app"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 19.9,
+      "cost_usd": 0.0615403,
+      "error": null
+    },
+    {
+      "task_id": "cfa-tenant-isolation",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-cfa-app"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 20.8,
+      "cost_usd": 0.0586633,
+      "error": null
+    },
+    {
+      "task_id": "build-revenue-dashboard",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-build-dashboard', 'motherduck-create-dive'], loaded none",
+        "must: read the Dive guide before writing Dive code (get_dive_guide)"
+      ],
+      "elapsed_seconds": 19.2,
+      "cost_usd": 0.0518011,
+      "error": null
+    },
+    {
+      "task_id": "build-revenue-dashboard",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-dashboard"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 18.5,
+      "cost_usd": 0.058677999999999994,
+      "error": null
+    },
+    {
+      "task_id": "dive-mobile-dark-mode",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-design-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 24.9,
+      "cost_usd": 0.0662856,
+      "error": null
+    },
+    {
+      "task_id": "dive-mobile-dark-mode",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-design-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 19.3,
+      "cost_usd": 0.0600084,
+      "error": null
+    },
+    {
+      "task_id": "migrate-row-access-policies",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-security-governance"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 21.8,
+      "cost_usd": 0.062061000000000005,
+      "error": null
+    },
+    {
+      "task_id": "migrate-row-access-policies",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-security-governance"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 21.8,
+      "cost_usd": 0.058937,
+      "error": null
+    },
+    {
+      "task_id": "stripe-pipeline",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-data-pipeline"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 26.5,
+      "cost_usd": 0.07349159999999999,
+      "error": null
+    },
+    {
+      "task_id": "stripe-pipeline",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-build-data-pipeline', 'motherduck-create-flight', 'motherduck-load-data'], loaded none"
+      ],
+      "elapsed_seconds": 28.1,
+      "cost_usd": 0.06428129999999999,
+      "error": null
+    },
+    {
+      "task_id": "postgres-dialect-trap",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+      ],
+      "elapsed_seconds": 9.6,
+      "cost_usd": 0.03668690000000001,
+      "error": null
+    },
+    {
+      "task_id": "postgres-dialect-trap",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+      ],
+      "elapsed_seconds": 7.1,
+      "cost_usd": 0.0321809,
+      "error": null
+    },
+    {
+      "task_id": "cost-attribution",
+      "run": 1,
+      "passed": false,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-pricing-roi"
+      ],
+      "failed_checks": [
+        "must: attribute compute by user agent (custom_user_agent|user_agent)"
+      ],
+      "elapsed_seconds": 21.9,
+      "cost_usd": 0.058400200000000006,
+      "error": null
+    },
+    {
+      "task_id": "cost-attribution",
+      "run": 2,
+      "passed": false,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-pricing-roi"
+      ],
+      "failed_checks": [
+        "must: attribute compute by user agent (custom_user_agent|user_agent)"
+      ],
+      "elapsed_seconds": 20.3,
+      "cost_usd": 0.0597233,
+      "error": null
+    },
+    {
+      "task_id": "explore-unknown-workspace",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-explore'], loaded none"
+      ],
+      "elapsed_seconds": 17.5,
+      "cost_usd": 0.048194799999999996,
+      "error": null
+    },
+    {
+      "task_id": "explore-unknown-workspace",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-explore'], loaded none"
+      ],
+      "elapsed_seconds": 17.7,
+      "cost_usd": 0.04896879999999999,
+      "error": null
+    }
+  ]
+}
