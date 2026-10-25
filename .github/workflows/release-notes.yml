@@ -1,0 +1,27 @@
+name: Release notes
+
+# Keep published GitHub releases in sync with CHANGELOG.md, so rewriting a
+# past release's notes only needs a merged CHANGELOG.md edit.
+on:
+  push:
+    branches: [main]
+    paths: [CHANGELOG.md]
+  workflow_dispatch:
+
+jobs:
+  sync-release-notes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Rewrite published releases from CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run scripts/release_notes.py sync
