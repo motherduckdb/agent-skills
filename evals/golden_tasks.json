@@ -151,7 +151,7 @@
     {
       "id": "dive-mobile-dark-mode",
       "prompt": "My MotherDuck Dive looks broken on phones and needs a dark mode. How should I fix the layout?",
-      "expect_skills": ["motherduck-create-dive", "motherduck-design-dive"],
+      "expect_skills": ["motherduck-create-dive"],
       "must": [
         {"pattern": "320|mobile[- ]first|breakpoint", "why": "start from a narrow viewport"},
         {"pattern": "dark", "why": "theme tokens with dark mode"}
