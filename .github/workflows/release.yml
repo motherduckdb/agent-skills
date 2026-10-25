@@ -80,7 +80,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Customer-facing notes come from the matching CHANGELOG.md section;
+          # fall back to generated notes only when the section is missing.
+          if uv run scripts/release_notes.py show "$GITHUB_REF_NAME" > release-notes.md; then
+            notes=(--notes-file release-notes.md)
+          else
+            echo "::warning::CHANGELOG.md has no section for ${GITHUB_REF_NAME}; using generated notes"
+            notes=(--generate-notes)
+          fi
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
-            --generate-notes \
+            "${notes[@]}" \
             release/motherduck-skills.tar.gz
