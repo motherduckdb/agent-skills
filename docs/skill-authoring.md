@@ -101,7 +101,7 @@ Repo maintenance layout:
 - inspect active servers, workspace context, and supplied artifacts before asking questions; ask only when a missing choice materially changes the result and cannot be discovered safely
 - give multi-step workflows a concrete completion or validation condition so the agent does not stop after a partial result
 - use workflows as decision guidance; reserve fixed ordering for real dependencies such as reading the Dive runtime guide before authoring or validating a Flight before enabling its requested schedule
-- preserve existing user authorization; do not add a second approval gate for an already requested operation
+- preserve existing user authorization; do not add a second approval gate for an already requested operation, except where a MotherDuck runtime guide (`get_dive_guide`, `get_flight_guide`) defines a review step; then defer to it with one shared sentence instead of restating or contradicting it
 - keep structured-output contracts and example test commands in conditional references; ordinary replies should fit the request
 - scale validation to affected behavior; examples and full visual evidence matrices are not prerequisites for unrelated edits
 - keep shared skills model-neutral so the same MotherDuck contracts work across capable coding agents

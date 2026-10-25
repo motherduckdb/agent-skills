@@ -165,7 +165,7 @@ MCP path:
 1. `list_dives` to find the Dive and current version.
 2. `read_dive` for the latest content, or `read_dive(version = N)` for a historical version.
 3. Edit and preview the component.
-4. Apply focused changes with `edit_dive_content` (a list of exact `old_string`/`new_string` replacements; no prior read needed) or a full rewrite with `update_dive`, after the user approves the changed behavior.
+4. Apply focused changes with `edit_dive_content` (a list of exact `old_string`/`new_string` replacements; no prior read needed) or a full rewrite with `update_dive`, following the review step `get_dive_guide` sets for your client.
 
 SQL path:
 

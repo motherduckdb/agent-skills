@@ -44,7 +44,7 @@ license: MIT
 6. Read the resulting URL, version, and status back. If the requested delivery includes publication, promote a validated Draft to Ready through the write-capable path.
 7. If teammates or application users need access, check three things: they can view the Dive, every `REQUIRED_DATABASES` entry is a share they can read, and they hold a `run` grant on each Flight the Dive runs. Prefer an existing share of an owned database (`MD_INFORMATION_SCHEMA.OWNED_SHARES`). When the user asks to share the Dive's data with the whole organization, `share_dive_data` creates org-scoped shares and updates the Dive in one call; use `motherduck-share-data` for restricted audiences, and the embed-session flow for application users.
 
-For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize.
+For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize. Before `save_dive` or `update_dive`, follow the review step that `get_dive_guide` sets for your client: when it asks you to show the final source or preview and get the user's go-ahead, do that once, unless the user already said to save without review.
 
 ## References
 
