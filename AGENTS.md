@@ -26,6 +26,7 @@ Primary source-of-truth files:
 - `ARCHITECTURE.md`: invariants and dependency rules
 - `docs/skill-authoring.md`: repo-specific authoring guidance
 - `docs/skills-sync.md`: docs-to-skills drift workflow
+- `docs/evals.md` and `evals/golden_tasks.json`: cross-model routing and rubric evals
 - `docs/release-process.md`: version bump and release publishing workflow
 - `docs/install-matrix.md`: copy-paste install routes by harness
 - `CLAUDE.md`: Claude-facing catalog/context
@@ -123,6 +124,12 @@ Run this when changing use-case skill output contracts or use-case reference gui
 
 ```bash
 uv run scripts/test_codex_use_cases.py
+```
+
+Run the golden evals before and after merging, splitting, or renaming skills, rewriting descriptions, or adding a launch, and compare with `--baseline` (see `docs/evals.md`):
+
+```bash
+uv run scripts/run_skill_evals.py --harness claude --runs 2 --out evals/results/<label>.json --baseline evals/results/<previous>.json
 ```
 
 ## Releasing

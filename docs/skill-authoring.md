@@ -121,7 +121,7 @@ These skills run inside one agent loop on many models (Claude, GPT, Gemini). The
 - Numbered workflows describe dependencies and a done condition, not a pipeline to replay. Fixed order only where a real contract requires it.
 - Hard preconditions belong in tools when we control the tool. A skill sentence is a fallback for harnesses or MCP versions that do not enforce it.
 - Before adding a skill, check whether it chains with an existing one (always loaded together, same objects, one hands output to the other). If so, add a reference to the existing skill instead.
-- Every new or merged skill ships with eval tasks that check the right skill loads and the result passes a rubric, run more than once and on more than one model family.
+- Every new or merged skill ships with eval tasks in `evals/golden_tasks.json` that check the right skill loads and the result passes a rubric, run more than once and on more than one model family (see `docs/evals.md`).
 
 ## Required Checks
 
