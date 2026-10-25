@@ -243,7 +243,7 @@ Avoid: `executemany()` (row-by-row under the hood), many small `INSERT` round-tr
 7. `max_runtime_sec` fits the current plan and workload.
 8. Non-zero exit on failure (raise, or `sys.exit(1)`) so the run reports `FAILED` instead of silently succeeding.
 9. Smallest Flight size that fits the Python work.
-10. Explainer step chart and `@flight-run` lines for multi-step jobs; `RUN` grants only for the users or roles that need them.
+10. Explainer step chart and `@flight-run` lines on every Flight; `RUN` grants only for the users or roles that need them.
 
 ## Troubleshooting
 

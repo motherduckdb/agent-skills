@@ -24,6 +24,7 @@ Every template follows the same contract; preserve these when adapting:
 - `CREATE DATABASE IF NOT EXISTS` / `CREATE SCHEMA IF NOT EXISTS` bootstrap so the first run works on a fresh account.
 - Idempotent writes (merge, atomic `CREATE OR REPLACE`, or partition `DELETE` + `INSERT`) plus an append-only run ledger with `run_at TIMESTAMPTZ` first.
 - `print()`/`logging` to stdout (captured as run logs); exit non-zero on failure.
+- Flight Explainer instrumentation on by default: a `# @flight` Mermaid step chart at the top of the file and a `mark(step, status, ...)` helper that prints `@flight-run` lines with `flush=True` at each step boundary. It costs a few lines and only applies to runs that start after it is added.
 - Pinned `requirements_txt` with the examples' tested `duckdb==1.5.2`. Before adapting a template for deployment, resolve the highest supported version from `https://motherduck.com/docs/duckdb-versions.json` and retest.
 
 ## Example: dlt Ingestion Flight
@@ -31,9 +32,15 @@ Every template follows the same contract; preserve these when adapting:
 Runs a dlt pipeline into MotherDuck on a schedule: Parquet loader files, schema evolution, merge semantics keyed on `PRIMARY_KEY`, and a run ledger. The demo source is public GitHub repo metadata (no credentials) so a fresh deploy produces a successful run; replace `repo_rows` with any dlt source — an API, a database, a filesystem, or a dlt verified source.
 
 ```python
+# @flight
+#   flowchart TD
+#     bootstrap[Create destination database]:::query --> load[Load source with dlt]:::load
+#     load --> ledger[Record run ledger]:::load
+# @end-flight
 import os
 import re
 from collections.abc import Iterator
+from datetime import datetime, timezone
 
 import dlt
 import duckdb
@@ -96,9 +103,12 @@ def main() -> None:
 
     # Create the destination database so dlt has a catalog to build the dataset in;
     # dlt creates the dataset (schema) and tables, but not the database itself.
+    mark("bootstrap", "running")
     con = duckdb.connect("md:")
     con.execute(f"CREATE DATABASE IF NOT EXISTS {database}")
+    mark("bootstrap", "ok")
 
+    mark("load", "running")
     pipeline = dlt.pipeline(
         pipeline_name=pipeline_name,
         destination="motherduck",
@@ -114,6 +124,7 @@ def main() -> None:
         # a reason to change it.
         loader_file_format="parquet",
     )
+    mark("load", "ok", effect=f"table:{database}.{dataset_name}.{table_name}")
 
     # Record the dlt load package summary so each run leaves an audit trail. The
     # ledger lives in the database's main schema, separate from the dlt dataset.
@@ -133,8 +144,17 @@ def main() -> None:
         f"INSERT INTO {database}.main.{ledger_table} VALUES (current_timestamp, ?, ?, ?, ?)",
         [pipeline_name, dataset_name, table_name, str(load_info)],
     )
+    mark("ledger", "ok", effect=f"table:{database}.main.{ledger_table}")
     con.close()
     print(load_info)
+
+
+def mark(step: str, status: str, **fields: object) -> None:
+    """Report step progress to the Flight Explainer (format: get_flight_viz_guide)."""
+    parts = [f"@flight-run {step} {status}"]
+    parts += [f'{k}="{v}"' if " " in str(v) else f"{k}={v}" for k, v in fields.items()]
+    parts.append(f"ts={datetime.now(timezone.utc).isoformat()}")
+    print(" ".join(parts), flush=True)
 
 
 def env(name: str, default: str) -> str:
@@ -186,6 +206,12 @@ CREATE SECRET pg IN motherduck (
 ```
 
 ```python
+# @flight
+#   flowchart TD
+#     attach[Attach Postgres]:::extract --> discover[Discover tables]:::query
+#     discover --> copy[Copy each table]:::load
+#     copy --> verify{All tables copied?}:::check
+# @end-flight
 """
 Postgres -> MotherDuck batch ELT flight
 
@@ -229,6 +255,14 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 log = logging.getLogger("pg2md")
+
+
+def mark(step: str, status: str, **fields: object) -> None:
+    """Report step progress to the Flight Explainer (format: get_flight_viz_guide)."""
+    parts = [f"@flight-run {step} {status}"]
+    parts += [f'{k}="{v}"' if " " in str(v) else f"{k}={v}" for k, v in fields.items()]
+    parts.append(f"ts={datetime.now(timezone.utc).isoformat()}")
+    print(" ".join(parts), flush=True)
 
 # PostgreSQL system schemas that are never mirrored.
 SYSTEM_SCHEMAS = {"information_schema", "pg_catalog", "pg_toast"}
@@ -408,16 +442,20 @@ def main() -> None:
 
     log.info("Run %s -> target %r", RUN_ID, TARGET_DB)
 
+    mark("attach", "running")
     con = connect_motherduck()
     attach_postgres(con, SECRET_NAME)
     ensure_target(con, TARGET_DB)
+    mark("attach", "ok")
 
+    mark("discover", "running")
     all_tables = discover_base_tables(con)
     selected = [
         (s, t) for (s, t) in all_tables
         if is_selected(s, t, INCLUDED_SCHEMAS, EXCLUDED_SCHEMAS, INCLUDED_TABLES, EXCLUDED_TABLES)
     ]
     log.info("Discovered %d base table(s); %d selected after filters", len(all_tables), len(selected))
+    mark("discover", "ok", rows=len(selected))
 
     if not selected:
         log.warning("No tables selected - nothing to do.")
@@ -435,6 +473,7 @@ def main() -> None:
     for schema, table in selected:
         fqtn = f"{schema}.{table}"
         started = datetime.now(timezone.utc)
+        mark("copy", "running", key=fqtn)
         retryer = Retrying(
             stop=stop_after_attempt(MAX_RETRIES),
             wait=wait_exponential(multiplier=RETRY_BASE_SECONDS, max=60) + wait_random(0, 1),
@@ -449,10 +488,12 @@ def main() -> None:
             succeeded += 1
             rows_total += rows
             log.info("OK   %-50s %12d rows (attempts=%d)", fqtn, rows, attempts)
+            mark("copy", "ok", key=fqtn, rows=rows, effect=f"table:{TARGET_DB}.{fqtn}")
         except Exception as exc:  # noqa: BLE001 - per-table isolation is intentional
             attempts = retryer.statistics.get("attempt_number", 1)
             failed.append(fqtn)
             log.error("FAIL %-50s (attempts=%d) %s: %s", fqtn, attempts, type(exc).__name__, exc)
+            mark("copy", "failed", key=fqtn, error=type(exc).__name__)
 
     total_seconds = (datetime.now(timezone.utc) - started_all).total_seconds()
     log.info("Summary: %d succeeded, %d failed, %d rows in %.1fs (run %s)",
@@ -460,7 +501,9 @@ def main() -> None:
 
     if failed:
         log.error("Failed tables: %s", ", ".join(failed))
+        mark("verify", "failed", error=f"{len(failed)} table(s) failed")
         sys.exit(1)
+    mark("verify", "ok", rows=rows_total)
 
 
 if __name__ == "__main__":
@@ -479,6 +522,12 @@ tenacity==9.0.0
 Refreshes exactly one Hive partition of a MotherDuck table from partitioned Parquet in S3 on each run: schema inferred once via a zero-row CTAS, then `DELETE` + `INSERT` scoped to the partition so DuckDB prunes every other partition folder. Defaults read the public DuckDB PyPI download stats, partitioned by `year`. Override `LOAD_PARTITION` per run (via `run_flight` config overrides) to backfill specific partitions.
 
 ```python
+# @flight
+#   flowchart TD
+#     bootstrap[Create destination]:::query --> replace[Replace one partition]:::load
+#     replace --> verify[Count partition rows]:::check
+#     verify --> ledger[Record run ledger]:::load
+# @end-flight
 import os
 import re
 from datetime import datetime, timezone
@@ -487,6 +536,14 @@ import duckdb
 
 
 IDENTIFIER_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def mark(step: str, status: str, **fields: object) -> None:
+    """Report step progress to the Flight Explainer (format: get_flight_viz_guide)."""
+    parts = [f"@flight-run {step} {status}"]
+    parts += [f'{k}="{v}"' if " " in str(v) else f"{k}={v}" for k, v in fields.items()]
+    parts.append(f"ts={datetime.now(timezone.utc).isoformat()}")
+    print(" ".join(parts), flush=True)
 
 
 def main() -> None:
@@ -508,6 +565,7 @@ def main() -> None:
     destination = f"{database}.{schema}.{table}"
     ledger = f"{database}.{schema}.{ledger_table}"
 
+    mark("bootstrap", "running")
     con = duckdb.connect("md:")
 
     # The Flight creates its own destination, so it runs on the first deploy
@@ -533,6 +591,8 @@ def main() -> None:
     # prune every other partition folder, so the scan cost stays flat as more
     # partitions land. To transform instead of copying through, replace this
     # SELECT * with your own projection or aggregation (keep the partition column).
+    mark("bootstrap", "ok")
+    mark("replace", "running", key=load_partition)
     con.execute(f"DELETE FROM {destination} WHERE {partition_column} = ?", [load_partition])
     con.execute(
         f"""
@@ -544,10 +604,12 @@ def main() -> None:
         [source_glob, load_partition],
     )
 
+    mark("replace", "ok", key=load_partition, effect=f"table:{destination}")
     row_count = con.execute(
         f"SELECT count(*) FROM {destination} WHERE {partition_column} = ?",
         [load_partition],
     ).fetchone()[0]
+    mark("verify", "ok", rows=row_count)
 
     # A lightweight audit trail of which partition each run refreshed.
     con.execute(
@@ -566,6 +628,7 @@ def main() -> None:
         f"INSERT INTO {ledger} VALUES (current_timestamp, ?, ?, ?, ?, ?)",
         [source_glob, destination, partition_column, str(load_partition), row_count],
     )
+    mark("ledger", "ok", effect=f"table:{ledger}")
     print(f"refreshed {destination} partition {partition_column}={load_partition}: {row_count} rows")
 
 

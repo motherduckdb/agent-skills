@@ -2,7 +2,7 @@
 
 Use this reference once the Dive's audience, decision, metrics, and filter dimensions are known.
 
-This is the default system for a new Dive or full redesign. Preserve explicit user requirements and existing conventions for scoped edits; run the QA cases affected by the change rather than rebuilding the full system.
+It extends the runtime design rules that `get_dive_guide` returns (MotherDuck palette, chart sizing, no card chrome by default, static Tailwind only); where they differ, the runtime guide wins. `artifacts/feature_complete_dive.tsx` implements this system. This is the default system for a new Dive or full redesign. Preserve explicit user requirements and existing conventions for scoped edits; run the QA cases affected by the change rather than rebuilding the full system.
 
 ## Contents
 
@@ -46,7 +46,7 @@ Reject these common generated-UI tells:
 - inspirational subtitles or vague editorial copy
 - layouts that look balanced only with demo-length labels
 
-Use a 4 px spacing base. A practical scale is 4, 8, 12, 16, 24, 32, and 48 px. Default card padding should be 16 px on phones and 20–24 px on wider screens.
+Use a 4 px spacing base (Tailwind `gap-4`, `p-4`, `p-6`). Let KPIs and charts sit on the page background: no white bordered card around every KPI or chart. Group with spacing and one subtle divider where a boundary carries meaning.
 
 ## 2. Responsive Layout
 
@@ -59,7 +59,8 @@ Preserve one reading order in the DOM. Change grid placement, not the logical se
 | 768–1199 px | fluid, 24 px gutters | 12 columns | compact filter bar or collapsible rail | KPI 3–6; chart 6–12 |
 | 1200 px and up | centered, max 1440 px, 24–32 px gutters | 12 columns | persistent 240–280 px rail or full filter bar | KPI 3; chart 6–8 |
 
-Use these implementation rules:
+Use these implementation rules. Apply them with static Tailwind classes (`min-w-0`, `grid-cols-2 md:grid-cols-4`, `lg:col-span-2`) or inline `style`; arbitrary-value classes such as `w-[300px]` do not resolve in the runtime.
+
 
 - set `min-width: 0` on grid and flex children that contain charts or long text
 - use `minmax(0, 1fr)` for fluid grid tracks
@@ -149,21 +150,21 @@ Use the card only when it communicates grouping. A page full of identical contai
 
 ## 5. Theme System
 
-Drive UI and chart styling from semantic CSS variables on the Dive root. Do not scatter light-theme hex values through JSX.
+Drive UI and chart styling from one token object per theme, applied through inline `style` props (or CSS custom properties set in inline `style` on the root). Do not scatter hex values through JSX, and do not build Tailwind color classes dynamically. Light tokens follow the MotherDuck palette from `get_dive_guide`.
 
 ```tsx
 const themeTokens = {
   light: {
-    canvas: "#f4f6f8",
+    canvas: "#f8f8f8",
     surface: "#ffffff",
-    surfaceMuted: "#eef1f4",
-    text: "#18212b",
-    textMuted: "#5f6b78",
-    border: "#d8dee5",
-    accent: "#2563eb",
-    success: "#16834a",
-    warning: "#a45f00",
-    danger: "#c43d3d",
+    surfaceMuted: "#efefef",
+    text: "#231f20",
+    textMuted: "#6a6a6a",
+    border: "#d6d6d6",
+    accent: "#0777b3",
+    success: "#2d7a00",
+    warning: "#e18727",
+    danger: "#bc1200",
   },
   dark: {
     canvas: "#11161c",
@@ -180,7 +181,7 @@ const themeTokens = {
 };
 ```
 
-Use a three-state preference when practical: system, light, dark. Persist an explicit choice locally, but render a stable default before browser-only APIs are available. The toggle needs an accessible label and must not rely on icon shape alone.
+Start from the viewer's `prefers-color-scheme` and offer a toggle held in `useState`; theme is a personal display choice, so do not put it in `useDiveState`, which travels with shared links. Render a stable default before browser-only APIs are available. The toggle needs an accessible label and must not rely on icon shape alone.
 
 Chart palettes need separate light and dark values with comparable perceptual separation. Keep grid lines quieter than data marks, keep tooltips on a solid surface, and verify semantic colors against both backgrounds. Never encode a category only by red versus green.
 
@@ -197,9 +198,9 @@ Keep the shell stable. Parameterize:
 
 Do not parameterize the basic reading order, breakpoint model, spacing scale, loading states, or accessibility behavior per customer.
 
-Prefer a small component vocabulary:
+Prefer a small vocabulary of components defined inside the Dive file (none of these are importable; the runtime has no `DiveShell` or UI-kit package):
 
-- `DiveShell`
+- `PageShell`
 - `DiveHeader`
 - `FilterSurface`
 - `ActiveFilters`
