@@ -1,6 +1,6 @@
 # Dashboard Patterns
 
-Query and composition templates for common dashboard stories. Each shows complete Dive data wiring with proper imports, independent loading states, and the `N()` helper. Before using one, apply `motherduck-design-dive`: replace the presentation shell and literal palette with the responsive grid, semantic light/dark tokens, filter surface, and viewport QA from that skill's design-system reference. Replace placeholder table names with actual fully qualified names.
+Query and composition templates for common dashboard stories. Each shows complete Dive data wiring with proper imports, independent loading states, and the `N()` helper. Before using one, apply the design defaults in `motherduck-create-dive`: replace the presentation shell and literal palette with the responsive grid, semantic light/dark tokens, filter surface, and viewport QA from its responsive design-system reference. Replace placeholder table names with actual fully qualified names.
 
 ## Contents
 
