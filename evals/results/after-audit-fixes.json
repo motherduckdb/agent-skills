@@ -1,0 +1,709 @@
+{
+  "generated_at": "2026-10-25T09:07:25+00:00",
+  "environment": "claude:default",
+  "summary": {
+    "runs_per_task": 2,
+    "task_pass_rate": 0.7,
+    "run_pass_rate": 0.75,
+    "routing_accuracy": 0.825,
+    "cost_usd": 2.2578,
+    "tasks": {
+      "share-row-level-security": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": true,
+        "failures": [
+          "must_not: secure views should use explicit column lists (SECURE VIEW[\\s\\S]{0,120}SELECT \\*)"
+        ]
+      },
+      "dive-write-back-button": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "share-dive-with-refresh-button": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "classify-tickets-in-sql": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "flight-size-for-sql-job": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "flight-run-visual": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "serverless-connection": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "fail-fast-cold-start": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "load-parquet-from-s3": {
+        "passes": 1,
+        "runs": 2,
+        "routing_hits": 1,
+        "intermittent": true,
+        "failures": [
+          "routing: expected one of ['motherduck-load-data'], loaded none"
+        ]
+      },
+      "ducklake-not-needed": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "guides-in-git": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "list-service-accounts": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "cfa-tenant-isolation": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "build-revenue-dashboard": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "dive-mobile-dark-mode": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "migrate-row-access-policies": {
+        "passes": 2,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": []
+      },
+      "stripe-pipeline": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "must_not: never row-by-row (executemany)",
+          "routing: expected one of ['motherduck-build-data-pipeline', 'motherduck-create-flight', 'motherduck-load-data'], loaded none"
+        ]
+      },
+      "postgres-dialect-trap": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+        ]
+      },
+      "cost-attribution": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 2,
+        "intermittent": false,
+        "failures": [
+          "must: attribute compute by user agent (custom_user_agent|user_agent)"
+        ]
+      },
+      "explore-unknown-workspace": {
+        "passes": 0,
+        "runs": 2,
+        "routing_hits": 0,
+        "intermittent": false,
+        "failures": [
+          "routing: expected one of ['motherduck-explore'], loaded none"
+        ]
+      }
+    }
+  },
+  "runs": [
+    {
+      "task_id": "share-row-level-security",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-share-data",
+        "motherduck-security-governance"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 21.1,
+      "cost_usd": 0.06725880000000001,
+      "error": null
+    },
+    {
+      "task_id": "share-row-level-security",
+      "run": 2,
+      "passed": false,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-share-data"
+      ],
+      "failed_checks": [
+        "must_not: secure views should use explicit column lists (SECURE VIEW[\\s\\S]{0,120}SELECT \\*)"
+      ],
+      "elapsed_seconds": 18.6,
+      "cost_usd": 0.059222800000000006,
+      "error": null
+    },
+    {
+      "task_id": "dive-write-back-button",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 18.4,
+      "cost_usd": 0.061780100000000004,
+      "error": null
+    },
+    {
+      "task_id": "dive-write-back-button",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.5,
+      "cost_usd": 0.061787600000000005,
+      "error": null
+    },
+    {
+      "task_id": "share-dive-with-refresh-button",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive",
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 15.5,
+      "cost_usd": 0.0697522,
+      "error": null
+    },
+    {
+      "task_id": "share-dive-with-refresh-button",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive",
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 15.8,
+      "cost_usd": 0.0695816,
+      "error": null
+    },
+    {
+      "task_id": "classify-tickets-in-sql",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-query"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.1,
+      "cost_usd": 0.0684516,
+      "error": null
+    },
+    {
+      "task_id": "classify-tickets-in-sql",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-query"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.8,
+      "cost_usd": 0.0699092,
+      "error": null
+    },
+    {
+      "task_id": "flight-size-for-sql-job",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 9.8,
+      "cost_usd": 0.052089899999999995,
+      "error": null
+    },
+    {
+      "task_id": "flight-size-for-sql-job",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 11.4,
+      "cost_usd": 0.0528174,
+      "error": null
+    },
+    {
+      "task_id": "flight-run-visual",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 18.3,
+      "cost_usd": 0.06409720000000001,
+      "error": null
+    },
+    {
+      "task_id": "flight-run-visual",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-flight"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 13.9,
+      "cost_usd": 0.05884829999999999,
+      "error": null
+    },
+    {
+      "task_id": "serverless-connection",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.4,
+      "cost_usd": 0.0506592,
+      "error": null
+    },
+    {
+      "task_id": "serverless-connection",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.4,
+      "cost_usd": 0.0879865,
+      "error": null
+    },
+    {
+      "task_id": "fail-fast-cold-start",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.1,
+      "cost_usd": 0.0486689,
+      "error": null
+    },
+    {
+      "task_id": "fail-fast-cold-start",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-connect"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 10.9,
+      "cost_usd": 0.0472698,
+      "error": null
+    },
+    {
+      "task_id": "load-parquet-from-s3",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-load-data'], loaded none"
+      ],
+      "elapsed_seconds": 12.6,
+      "cost_usd": 0.038928700000000004,
+      "error": null
+    },
+    {
+      "task_id": "load-parquet-from-s3",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-load-data"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.4,
+      "cost_usd": 0.049054,
+      "error": null
+    },
+    {
+      "task_id": "ducklake-not-needed",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-ducklake"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 13.9,
+      "cost_usd": 0.0516657,
+      "error": null
+    },
+    {
+      "task_id": "ducklake-not-needed",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-ducklake"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 18.0,
+      "cost_usd": 0.0548597,
+      "error": null
+    },
+    {
+      "task_id": "guides-in-git",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-manage-guides"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.4,
+      "cost_usd": 0.0535504,
+      "error": null
+    },
+    {
+      "task_id": "guides-in-git",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-manage-guides"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 12.9,
+      "cost_usd": 0.050035300000000005,
+      "error": null
+    },
+    {
+      "task_id": "list-service-accounts",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-rest-api"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 9.6,
+      "cost_usd": 0.0502258,
+      "error": null
+    },
+    {
+      "task_id": "list-service-accounts",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-rest-api"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 11.4,
+      "cost_usd": 0.0489903,
+      "error": null
+    },
+    {
+      "task_id": "cfa-tenant-isolation",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-cfa-app"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 20.6,
+      "cost_usd": 0.059944500000000005,
+      "error": null
+    },
+    {
+      "task_id": "cfa-tenant-isolation",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-cfa-app"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 20.3,
+      "cost_usd": 0.06064850000000001,
+      "error": null
+    },
+    {
+      "task_id": "build-revenue-dashboard",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-dashboard"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 16.4,
+      "cost_usd": 0.0567343,
+      "error": null
+    },
+    {
+      "task_id": "build-revenue-dashboard",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-build-dashboard"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 17.2,
+      "cost_usd": 0.056498900000000005,
+      "error": null
+    },
+    {
+      "task_id": "dive-mobile-dark-mode",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-design-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 23.1,
+      "cost_usd": 0.0650585,
+      "error": null
+    },
+    {
+      "task_id": "dive-mobile-dark-mode",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-create-dive"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 21.2,
+      "cost_usd": 0.0656792,
+      "error": null
+    },
+    {
+      "task_id": "migrate-row-access-policies",
+      "run": 1,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-security-governance"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 23.8,
+      "cost_usd": 0.059795600000000004,
+      "error": null
+    },
+    {
+      "task_id": "migrate-row-access-policies",
+      "run": 2,
+      "passed": true,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-security-governance"
+      ],
+      "failed_checks": [],
+      "elapsed_seconds": 19.1,
+      "cost_usd": 0.0550754,
+      "error": null
+    },
+    {
+      "task_id": "stripe-pipeline",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-build-data-pipeline', 'motherduck-create-flight', 'motherduck-load-data'], loaded none",
+        "must_not: never row-by-row (executemany)"
+      ],
+      "elapsed_seconds": 24.9,
+      "cost_usd": 0.060051299999999995,
+      "error": null
+    },
+    {
+      "task_id": "stripe-pipeline",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-build-data-pipeline', 'motherduck-create-flight', 'motherduck-load-data'], loaded none"
+      ],
+      "elapsed_seconds": 24.3,
+      "cost_usd": 0.0586113,
+      "error": null
+    },
+    {
+      "task_id": "postgres-dialect-trap",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+      ],
+      "elapsed_seconds": 7.1,
+      "cost_usd": 0.0326089,
+      "error": null
+    },
+    {
+      "task_id": "postgres-dialect-trap",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-query', 'motherduck-duckdb-sql'], loaded none"
+      ],
+      "elapsed_seconds": 6.3,
+      "cost_usd": 0.0329729,
+      "error": null
+    },
+    {
+      "task_id": "cost-attribution",
+      "run": 1,
+      "passed": false,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-pricing-roi"
+      ],
+      "failed_checks": [
+        "must: attribute compute by user agent (custom_user_agent|user_agent)"
+      ],
+      "elapsed_seconds": 21.0,
+      "cost_usd": 0.0571074,
+      "error": null
+    },
+    {
+      "task_id": "cost-attribution",
+      "run": 2,
+      "passed": false,
+      "routed": true,
+      "loaded_skills": [
+        "motherduck-pricing-roi"
+      ],
+      "failed_checks": [
+        "must: attribute compute by user agent (custom_user_agent|user_agent)"
+      ],
+      "elapsed_seconds": 20.0,
+      "cost_usd": 0.0549187,
+      "error": null
+    },
+    {
+      "task_id": "explore-unknown-workspace",
+      "run": 1,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-explore'], loaded none"
+      ],
+      "elapsed_seconds": 19.1,
+      "cost_usd": 0.047890699999999994,
+      "error": null
+    },
+    {
+      "task_id": "explore-unknown-workspace",
+      "run": 2,
+      "passed": false,
+      "routed": false,
+      "loaded_skills": [],
+      "failed_checks": [
+        "routing: expected one of ['motherduck-explore'], loaded none"
+      ],
+      "elapsed_seconds": 19.0,
+      "cost_usd": 0.0466912,
+      "error": null
+    }
+  ],
+  "flips": {
+    "regressed": [
+      "share-row-level-security"
+    ],
+    "improved": [
+      "dive-write-back-button",
+      "classify-tickets-in-sql",
+      "ducklake-not-needed",
+      "build-revenue-dashboard"
+    ]
+  }
+}

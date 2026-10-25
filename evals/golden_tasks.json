@@ -5,209 +5,556 @@
     {
       "id": "share-row-level-security",
       "prompt": "In MotherDuck, the EU sales team should only see EU rows of sales.main.orders, and nobody outside finance should see the customer_email column. How do I set this up with a share?",
-      "expect_skills": ["motherduck-share-data", "motherduck-security-governance"],
+      "expect_skills": [
+        "motherduck-share-data",
+        "motherduck-security-governance"
+      ],
       "must": [
-        {"pattern": "SECURE VIEW", "why": "row and column rules on shares use secure views"},
-        {"pattern": "is_role_in_session|current_email|current_user", "why": "policy keys on consumer identity"}
+        {
+          "pattern": "SECURE VIEW",
+          "why": "row and column rules on shares use secure views"
+        },
+        {
+          "pattern": "is_role_in_session|current_email|current_user",
+          "why": "policy keys on consumer identity"
+        }
       ],
       "must_not": [
-        {"pattern": "SECURE VIEW[\\s\\S]{0,120}SELECT \\*", "why": "secure views should use explicit column lists"}
+        {
+          "pattern": "SECURE VIEW[\\s\\S]{0,120}SELECT \\*",
+          "why": "secure views should use explicit column lists"
+        }
       ]
     },
     {
       "id": "dive-write-back-button",
       "prompt": "Add an Approve button to my MotherDuck Dive that marks the selected order as approved in ops.main.orders.",
-      "expect_skills": ["motherduck-create-dive", "motherduck-build-dashboard"],
+      "expect_skills": [
+        "motherduck-create-dive",
+        "motherduck-build-dashboard"
+      ],
       "must": [
-        {"pattern": "useRunFlight", "why": "Dives write by starting a Flight"},
-        {"pattern": "Flight", "why": "the write happens in a Flight"}
+        {
+          "pattern": "useRunFlight",
+          "why": "Dives write by starting a Flight"
+        },
+        {
+          "pattern": "Flight",
+          "why": "the write happens in a Flight"
+        }
       ],
       "must_not": [
-        {"pattern": "useSQLQuery\\([^)]{0,200}\\b(UPDATE|INSERT)\\b", "why": "Dive SQL is read-only"}
+        {
+          "pattern": "useSQLQuery\\([^)]{0,200}\\b(UPDATE|INSERT)\\b",
+          "why": "Dive SQL is read-only"
+        }
       ]
     },
     {
       "id": "share-dive-with-refresh-button",
       "prompt": "My MotherDuck Dive has a Refresh button that runs a Flight I own. I want the finance team to use the Dive. What do I need to set up?",
-      "expect_skills": ["motherduck-create-dive", "motherduck-create-flight", "motherduck-share-data"],
+      "expect_skills": [
+        "motherduck-create-dive",
+        "motherduck-create-flight",
+        "motherduck-share-data"
+      ],
       "must": [
-        {"pattern": "GRANT RUN|run grant|grant_access|\\brun\\b.{0,40}grant", "why": "viewers need a run grant on the Flight"},
-        {"pattern": "share", "why": "viewers need to read the Dive's data"}
+        {
+          "pattern": "GRANT RUN|run grant|grant_access|\\brun\\b.{0,40}grant",
+          "why": "viewers need a run grant on the Flight"
+        },
+        {
+          "pattern": "share",
+          "why": "viewers need to read the Dive's data"
+        }
       ],
       "must_not": []
     },
     {
       "id": "classify-tickets-in-sql",
       "prompt": "I have 2 million support tickets in support.main.tickets. I want to label each one as billing, bug, or feature request as cheaply as possible, directly in MotherDuck SQL.",
-      "expect_skills": ["motherduck-query", "motherduck-duckdb-sql"],
+      "expect_skills": [
+        "motherduck-query",
+        "motherduck-duckdb-sql"
+      ],
       "must": [
-        {"pattern": "prompt_jev", "why": "closed classification uses prompt_jev"},
-        {"pattern": "choice", "why": "a fixed label set uses the choice question"}
+        {
+          "pattern": "prompt_jev",
+          "why": "closed classification uses prompt_jev"
+        },
+        {
+          "pattern": "choice",
+          "why": "a fixed label set uses the choice question"
+        }
       ],
       "must_not": [
-        {"pattern": "import openai|from openai", "why": "use SQL AI functions, not an SDK"}
+        {
+          "pattern": "import openai|from openai",
+          "why": "use SQL AI functions, not an SDK"
+        }
       ]
     },
     {
       "id": "flight-size-for-sql-job",
       "prompt": "I have a nightly MotherDuck Flight that only runs three SQL statements against MotherDuck and finishes in two minutes. Which Flight size should it use?",
-      "expect_skills": ["motherduck-create-flight", "motherduck-pricing-roi"],
+      "expect_skills": [
+        "motherduck-create-flight",
+        "motherduck-pricing-roi"
+      ],
       "must": [
-        {"pattern": "F4", "why": "SQL-only Flights fit the smallest size"},
-        {"pattern": "Duckling", "why": "SQL over md: runs on a Duckling"}
+        {
+          "pattern": "F4",
+          "why": "SQL-only Flights fit the smallest size"
+        },
+        {
+          "pattern": "Duckling",
+          "why": "SQL over md: runs on a Duckling"
+        }
       ],
       "must_not": []
     },
     {
       "id": "flight-run-visual",
       "prompt": "My MotherDuck Flight has five steps and sometimes fails halfway. How can I see which step failed and how long each step took?",
-      "expect_skills": ["motherduck-create-flight"],
+      "expect_skills": [
+        "motherduck-create-flight"
+      ],
       "must": [
-        {"pattern": "Explainer|@flight-run|view_flight_run", "why": "Flight Explainer instrumentation"}
+        {
+          "pattern": "Explainer|@flight-run|view_flight_run",
+          "why": "Flight Explainer instrumentation"
+        }
       ],
       "must_not": []
     },
     {
       "id": "serverless-connection",
       "prompt": "I'm building a Vercel serverless function in TypeScript that runs a few small queries against MotherDuck per request. How should it connect?",
-      "expect_skills": ["motherduck-connect"],
+      "expect_skills": [
+        "motherduck-connect"
+      ],
       "must": [
-        {"pattern": "Postgres|PG endpoint", "why": "thin serverless clients use the Postgres endpoint"},
-        {"pattern": "MOTHERDUCK_TOKEN|environment variable|env", "why": "tokens come from the environment"}
+        {
+          "pattern": "Postgres|PG endpoint",
+          "why": "thin serverless clients use the Postgres endpoint"
+        },
+        {
+          "pattern": "MOTHERDUCK_TOKEN|environment variable|env",
+          "why": "tokens come from the environment"
+        }
       ],
       "must_not": [
-        {"pattern": "token\\s*[:=]\\s*['\"][A-Za-z0-9._-]{24,}", "why": "never hardcode a token"}
+        {
+          "pattern": "token\\s*[:=]\\s*['\"][A-Za-z0-9._-]{24,}",
+          "why": "never hardcode a token"
+        }
       ]
     },
     {
       "id": "fail-fast-cold-start",
       "prompt": "My Python API server connects to MotherDuck with duckdb.connect('md:analytics'). Sometimes the first request hangs for a long time while the Duckling starts. How do I make it fail fast so I can retry elsewhere?",
-      "expect_skills": ["motherduck-connect"],
+      "expect_skills": [
+        "motherduck-connect"
+      ],
       "must": [
-        {"pattern": "connection_timeout", "why": "bounded connect is the documented fix"}
+        {
+          "pattern": "connection_timeout",
+          "why": "bounded connect is the documented fix"
+        }
       ],
       "must_not": []
     },
     {
       "id": "load-parquet-from-s3",
       "prompt": "Load 500 Parquet files from s3://acme-raw/events/ into a MotherDuck table raw.main.events.",
-      "expect_skills": ["motherduck-load-data"],
+      "expect_skills": [
+        "motherduck-load-data"
+      ],
       "must": [
-        {"pattern": "read_parquet", "why": "bulk load with read_parquet"},
-        {"pattern": "SECRET", "why": "private buckets need a secret"}
+        {
+          "pattern": "read_parquet",
+          "why": "bulk load with read_parquet"
+        },
+        {
+          "pattern": "SECRET",
+          "why": "private buckets need a secret"
+        }
       ],
       "must_not": [
-        {"pattern": "executemany", "why": "never row-by-row"}
+        {
+          "pattern": "executemany",
+          "why": "never row-by-row"
+        }
       ]
     },
     {
       "id": "ducklake-not-needed",
       "prompt": "We have a 2 TB events table in MotherDuck and just want fast dashboards. Should we move it to DuckLake?",
-      "expect_skills": ["motherduck-ducklake"],
+      "expect_skills": [
+        "motherduck-ducklake"
+      ],
       "must": [
-        {"pattern": "native", "why": "native storage is the default for read-heavy dashboards"}
+        {
+          "pattern": "native",
+          "why": "native storage is the default for read-heavy dashboards"
+        }
       ],
       "must_not": []
     },
     {
       "id": "guides-in-git",
       "prompt": "Our metric definitions live in Markdown in a Git repo. How do we keep them synced to MotherDuck Guides from CI?",
-      "expect_skills": ["motherduck-manage-guides", "motherduck-cli"],
+      "expect_skills": [
+        "motherduck-manage-guides",
+        "motherduck-cli"
+      ],
       "must": [
-        {"pattern": "motherduck guide", "why": "the CLI manages Guides as files"},
-        {"pattern": "push", "why": "push creates or updates a Guide"}
+        {
+          "pattern": "motherduck guide",
+          "why": "the CLI manages Guides as files"
+        },
+        {
+          "pattern": "push",
+          "why": "push creates or updates a Guide"
+        }
       ],
       "must_not": []
     },
     {
       "id": "list-service-accounts",
       "prompt": "How do I list every service account in our MotherDuck organization through the API?",
-      "expect_skills": ["motherduck-rest-api"],
+      "expect_skills": [
+        "motherduck-rest-api"
+      ],
       "must": [
-        {"pattern": "GET\\s+/v1/users|/v1/users\\?", "why": "GET /v1/users lists users and service accounts"},
-        {"pattern": "is_service_account", "why": "filter to service accounts"}
+        {
+          "pattern": "GET\\s+/v1/users|/v1/users\\?",
+          "why": "GET /v1/users lists users and service accounts"
+        },
+        {
+          "pattern": "is_service_account",
+          "why": "filter to service accounts"
+        }
       ],
       "must_not": []
     },
     {
       "id": "cfa-tenant-isolation",
       "prompt": "We're a B2B SaaS with 300 customers and want to embed per-customer analytics in our app backed by MotherDuck. How should we isolate tenants?",
-      "expect_skills": ["motherduck-build-cfa-app"],
+      "expect_skills": [
+        "motherduck-build-cfa-app"
+      ],
       "must": [
-        {"pattern": "per[- ]customer|database per customer|per[- ]tenant", "why": "structural isolation is the default"},
-        {"pattern": "service account", "why": "one service account per customer boundary"}
+        {
+          "pattern": "per[- ]customer|database per customer|per[- ]tenant",
+          "why": "structural isolation is the default"
+        },
+        {
+          "pattern": "service account",
+          "why": "one service account per customer boundary"
+        }
       ],
       "must_not": []
     },
     {
       "id": "build-revenue-dashboard",
       "prompt": "Build me a revenue dashboard Dive from my sales database in MotherDuck.",
-      "expect_skills": ["motherduck-build-dashboard", "motherduck-create-dive"],
+      "expect_skills": [
+        "motherduck-build-dashboard",
+        "motherduck-create-dive"
+      ],
       "must": [
-        {"pattern": "get_dive_guide", "why": "read the Dive guide before writing Dive code"}
+        {
+          "pattern": "get_dive_guide",
+          "why": "read the Dive guide before writing Dive code"
+        }
       ],
       "must_not": []
     },
     {
       "id": "dive-mobile-dark-mode",
       "prompt": "My MotherDuck Dive looks broken on phones and needs a dark mode. How should I fix the layout?",
-      "expect_skills": ["motherduck-create-dive"],
+      "expect_skills": [
+        "motherduck-create-dive"
+      ],
       "must": [
-        {"pattern": "320|mobile[- ]first|breakpoint", "why": "start from a narrow viewport"},
-        {"pattern": "dark", "why": "theme tokens with dark mode"}
+        {
+          "pattern": "320|mobile[- ]first|breakpoint",
+          "why": "start from a narrow viewport"
+        },
+        {
+          "pattern": "dark",
+          "why": "theme tokens with dark mode"
+        }
       ],
       "must_not": []
     },
     {
       "id": "migrate-row-access-policies",
       "prompt": "We're migrating from Snowflake to MotherDuck. Our Snowflake setup uses row access policies and masking policies. How do we carry those over?",
-      "expect_skills": ["motherduck-migrate-to-motherduck", "motherduck-security-governance", "motherduck-share-data"],
+      "expect_skills": [
+        "motherduck-migrate-to-motherduck",
+        "motherduck-security-governance",
+        "motherduck-share-data"
+      ],
       "must": [
-        {"pattern": "SECURE VIEW|secure view", "why": "secure views replace row access and masking policies"}
+        {
+          "pattern": "SECURE VIEW|secure view",
+          "why": "secure views replace row access and masking policies"
+        }
       ],
       "must_not": []
     },
     {
       "id": "stripe-pipeline",
       "prompt": "Set up a daily ingestion of Stripe charges into MotherDuck and model them for reporting.",
-      "expect_skills": ["motherduck-build-data-pipeline", "motherduck-create-flight", "motherduck-load-data"],
+      "expect_skills": [
+        "motherduck-build-data-pipeline",
+        "motherduck-create-flight",
+        "motherduck-load-data"
+      ],
       "must": [
-        {"pattern": "Flight|schedule", "why": "scheduled ingestion runs on Flights"},
-        {"pattern": "idempot|merge|CREATE OR REPLACE|primary_key", "why": "reruns must be safe"}
+        {
+          "pattern": "Flight|schedule",
+          "why": "scheduled ingestion runs on Flights"
+        },
+        {
+          "pattern": "idempot|merge|CREATE OR REPLACE|primary_key",
+          "why": "reruns must be safe"
+        }
       ],
       "must_not": [
-        {"pattern": "executemany", "why": "never row-by-row"}
+        {
+          "pattern": "executemany",
+          "why": "never row-by-row"
+        }
       ]
     },
     {
       "id": "postgres-dialect-trap",
       "prompt": "Write a MotherDuck query for daily revenue over the last 30 days from shop.main.orders (columns: order_ts timestamp, amount decimal).",
-      "expect_skills": ["motherduck-query", "motherduck-duckdb-sql"],
+      "expect_skills": [
+        "motherduck-query",
+        "motherduck-duckdb-sql"
+      ],
       "must": [
-        {"pattern": "\"?shop\"?\\.\"?main\"?\\.\"?orders\"?", "why": "fully qualified table name"}
+        {
+          "pattern": "\"?shop\"?\\.\"?main\"?\\.\"?orders\"?",
+          "why": "fully qualified table name"
+        }
       ],
       "must_not": [
-        {"pattern": "generate_series\\([^)]*::timestamp", "why": "PostgreSQL-only idiom"}
+        {
+          "pattern": "generate_series\\([^)]*::timestamp",
+          "why": "PostgreSQL-only idiom"
+        }
       ]
     },
     {
       "id": "cost-attribution",
       "prompt": "Our MotherDuck bill went up. How can I tell which pipelines and Flights are using the most compute?",
-      "expect_skills": ["motherduck-pricing-roi"],
+      "expect_skills": [
+        "motherduck-pricing-roi"
+      ],
       "must": [
-        {"pattern": "custom_user_agent|user_agent", "why": "attribute compute by user agent"},
-        {"pattern": "query_history|QUERY_HISTORY|Duckling Overview", "why": "where the attribution data lives"}
+        {
+          "pattern": "custom_user_agent|user_agent",
+          "why": "attribute compute by user agent"
+        },
+        {
+          "pattern": "query_history|QUERY_HISTORY|Duckling Overview",
+          "why": "where the attribution data lives"
+        }
       ],
       "must_not": []
     },
     {
       "id": "explore-unknown-workspace",
       "prompt": "I just got access to a MotherDuck workspace. How do I find which tables have customer data and what their grain is?",
-      "expect_skills": ["motherduck-explore"],
+      "expect_skills": [
+        "motherduck-explore"
+      ],
       "must": [
-        {"pattern": "duckdb_tables|duckdb_columns|search_catalog|list_tables|SHOW", "why": "catalog discovery"}
+        {
+          "pattern": "duckdb_tables|duckdb_columns|search_catalog|list_tables|SHOW",
+          "why": "catalog discovery"
+        }
       ],
       "must_not": []
+    },
+    {
+      "id": "team-schema-access",
+      "prompt": "In MotherDuck, the marketing team should be able to query only the reporting schema of our warehouse database, and nothing else. How do I set that up?",
+      "expect_skills": [
+        "motherduck-security-governance",
+        "motherduck-share-data"
+      ],
+      "must": [
+        {
+          "pattern": "INCLUDE_PATTERN|include_pattern",
+          "why": "table-level security selects the schema"
+        },
+        {
+          "pattern": "GRANT READ ON SHARE|share_grant",
+          "why": "grant the share to the team"
+        },
+        {
+          "pattern": "ROLE",
+          "why": "grant to a role, not user by user"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "GRANT (SELECT|USAGE) ON",
+          "why": "PostgreSQL-style object grants do not exist in MotherDuck"
+        }
+      ]
+    },
+    {
+      "id": "mask-pii-for-contractors",
+      "prompt": "Contractors in our MotherDuck org need to analyze crm.main.customers but must not see email addresses or full phone numbers. Our employees should still see everything. What should I build?",
+      "expect_skills": [
+        "motherduck-security-governance",
+        "motherduck-share-data"
+      ],
+      "must": [
+        {
+          "pattern": "SECURE VIEW",
+          "why": "column masking uses secure views"
+        },
+        {
+          "pattern": "is_role_in_session|current_email|current_user",
+          "why": "the policy depends on who is reading"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "SECURE VIEW[\\s\\S]{0,120}SELECT \\*",
+          "why": "secure views need explicit column lists"
+        }
+      ]
+    },
+    {
+      "id": "dev-prod-terraform",
+      "prompt": "Set up separate dev and prod MotherDuck environments managed with Terraform, each with its own writer and a BI token.",
+      "expect_skills": [
+        "motherduck-security-governance",
+        "motherduck-rest-api"
+      ],
+      "must": [
+        {
+          "pattern": "motherduck_service_account",
+          "why": "one writer service account per environment"
+        },
+        {
+          "pattern": "motherduck_access_token",
+          "why": "tokens per environment"
+        },
+        {
+          "pattern": "MOTHERDUCK_ADMIN_TOKEN",
+          "why": "service accounts and tokens need the admin token"
+        }
+      ],
+      "must_not": []
+    },
+    {
+      "id": "bi-curated-reader",
+      "prompt": "Our BI tool connects to MotherDuck with our pipeline's token and can see raw tables. How do we make it see only the marts database?",
+      "expect_skills": [
+        "motherduck-security-governance",
+        "motherduck-share-data"
+      ],
+      "must": [
+        {
+          "pattern": "share",
+          "why": "curated reads come from a share"
+        },
+        {
+          "pattern": "separate|dedicated|reader (account|service account)",
+          "why": "BI needs its own identity"
+        }
+      ],
+      "must_not": []
+    },
+    {
+      "id": "who-can-write",
+      "prompt": "How do I give the data engineering team write access to the analytics database owned by our pipeline service account in MotherDuck?",
+      "expect_skills": [
+        "motherduck-security-governance",
+        "motherduck-share-data"
+      ],
+      "must": [
+        {
+          "pattern": "owner|own",
+          "why": "writes belong to the database owner"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "GRANT (INSERT|UPDATE|WRITE|ALL)\\b",
+          "why": "there is no write grant in MotherDuck"
+        }
+      ]
+    },
+    {
+      "id": "new-dive-feature-complete",
+      "prompt": "Create a new MotherDuck Dive showing weekly signups from growth.main.signups for our leadership team. Show me the component code.",
+      "expect_skills": [
+        "motherduck-create-dive",
+        "motherduck-build-dashboard"
+      ],
+      "must": [
+        {
+          "pattern": "useDiveState",
+          "why": "filters persist and travel with links"
+        },
+        {
+          "pattern": "dark",
+          "why": "light and dark themes by default"
+        },
+        {
+          "pattern": "ResponsiveContainer",
+          "why": "charts resize with the pane"
+        },
+        {
+          "pattern": "isLoading|isError",
+          "why": "per-section loading and error states"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "className=\\{?[`'\"][^`'\"]*\\[#",
+          "why": "arbitrary-value Tailwind classes do not resolve"
+        }
+      ]
+    },
+    {
+      "id": "new-flight-explainer-default",
+      "prompt": "Write a MotherDuck Flight that pulls yesterday's orders from our REST API and appends them to ops.main.orders every morning.",
+      "expect_skills": [
+        "motherduck-create-flight",
+        "motherduck-build-data-pipeline"
+      ],
+      "must": [
+        {
+          "pattern": "@flight-run",
+          "why": "Flights ship with Explainer instrumentation"
+        },
+        {
+          "pattern": "# @flight",
+          "why": "step chart declared in the source"
+        },
+        {
+          "pattern": "duckdb==",
+          "why": "pinned duckdb"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "executemany",
+          "why": "never row-by-row"
+        }
+      ]
     }
   ]
 }
