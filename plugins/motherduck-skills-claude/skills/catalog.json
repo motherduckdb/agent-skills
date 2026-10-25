@@ -40,7 +40,6 @@
       "motherduck-explore",
       "motherduck-query",
       "motherduck-create-dive",
-      "motherduck-design-dive",
       "motherduck-manage-guides"
     ],
     "references": [
@@ -140,14 +139,16 @@
   },
   "motherduck-create-dive": {
     "name": "motherduck-create-dive",
-    "description": "Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime, including buttons that write back through Flights.",
+    "description": "Create, edit, design, publish, share, or embed MotherDuck Dives, including responsive layout, light/dark themes, and buttons that write back through Flights.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-explore",
       "motherduck-query"
     ],
     "references": [
-      "references/DIVE_DESIGN_GUIDE.md"
+      "references/DIVE_DESIGN_GUIDE.md",
+      "references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md",
+      "references/VISUAL_QA_PLAYBOOK.md"
     ],
     "artifacts": [],
     "source_docs": [
@@ -167,7 +168,8 @@
       "https://motherduck.com/docs/key-tasks/dives/run-flights-from-dives/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-run-flight/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-flight-run/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/"
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
+      "https://motherduck.com/product/dives/"
     ],
     "needs_live_discovery": false
   },
@@ -198,27 +200,6 @@
       "https://motherduck.com/docs/about-motherduck/billing/flight-sizes/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/grant-run-on-flight/",
       "https://motherduck.com/docs/key-tasks/flights/observability/explain-flight-runs/"
-    ],
-    "needs_live_discovery": false
-  },
-  "motherduck-design-dive": {
-    "name": "motherduck-design-dive",
-    "description": "Design or improve a MotherDuck Dive’s layout, responsive behavior, themes, filters, and visual accessibility.",
-    "layer": "workflow",
-    "depends_on": [
-      "motherduck-explore",
-      "motherduck-query"
-    ],
-    "references": [
-      "references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md",
-      "references/VISUAL_QA_PLAYBOOK.md"
-    ],
-    "artifacts": [],
-    "source_docs": [
-      "https://motherduck.com/docs/key-tasks/dives/",
-      "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
-      "https://motherduck.com/product/dives/",
-      "https://motherduck.com/dive-gallery/"
     ],
     "needs_live_discovery": false
   },

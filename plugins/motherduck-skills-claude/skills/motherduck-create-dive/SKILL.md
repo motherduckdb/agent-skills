@@ -1,6 +1,6 @@
 ---
 name: motherduck-create-dive
-description: Create, edit, publish, share, or embed MotherDuck Dives using their React and SQL runtime, including buttons that write back through Flights.
+description: Create, edit, design, publish, share, or embed MotherDuck Dives, including responsive layout, light/dark themes, and buttons that write back through Flights.
 argument-hint: [dive-goal]
 license: MIT
 ---
@@ -35,6 +35,20 @@ license: MIT
 - Treat embedded Dives as the first-choice path when a product needs a live read-only Dive surface with a backend-created embed session. Move to `motherduck-build-cfa-app` when the app needs custom API contracts, writes, non-Dive routing, tenant policy enforcement, or richer authorization.
 - For shared repos or CI/CD, use a service-account token so Dive ownership is not tied to one human user.
 
+## Design Defaults
+
+For a new Dive or a full redesign, use these defaults unless the user's design requirements differ. For a scoped edit (SQL, labels, one chart), preserve the existing visual system and check only the affected states.
+
+- Start at a 320 px viewport and enhance upward with fluid containers and responsive grids; keep reading order the same at every width.
+- Offer a light/dark theme control with token-based chart and UI colors, defaulting to the system preference.
+- Give filters a predictable home: visible on wide screens, a drawer or sheet on narrow ones.
+- Keep charts in bounded responsive containers with readable labels at every breakpoint.
+- Use a restrained analytics style: neutral surfaces, compact hierarchy, visible axes, quiet borders. Skip ornamental gradients, glass effects, glowing accents, oversized hero metrics, and marketing-style copy.
+- Make each KPI self-explanatory: value, label, comparison context, and a small trend when the data supports it.
+- Keep customer variation in data, labels, logo, and theme tokens, not in the information architecture.
+- Support keyboard use, visible focus, 44 px touch targets, sufficient contrast, and non-color status cues.
+- Do not call a Dive mobile-friendly from responsive CSS alone; report the viewports and states you actually checked.
+
 ## Workflow
 
 1. Choose the requested delivery path: workspace Dive, existing edit, Dives-as-code, write-back actions, sharing, or embedding. Follow only that path; a chart request does not itself authorize sharing, embedding, or write-back.
@@ -51,6 +65,8 @@ For answer, review, or planning requests, stop at the requested design or code a
 
 Read only the reference sections needed for the current task.
 
+- Read `references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md` for the layout grid, component anatomy, theme tokens, filter model, and design anti-patterns of a new Dive or redesign.
+- Read `references/VISUAL_QA_PLAYBOOK.md` for the screenshot and review loop when a full design handoff or evidence is requested.
 - Read `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, write-back with Flights, Agent Chat, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas
 
 ## Related Skills
@@ -59,7 +75,6 @@ Load related skills only for missing capabilities; reuse established context.
 
 - `motherduck-explore` for discovering the real tables, views, and dimensions before visualizing them
 - `motherduck-query` for validating the SQL each Dive section will run
-- `motherduck-design-dive` for mobile-first layout, light/dark themes, filter surfaces, reusable components, and responsive QA
 - `motherduck-build-dashboard` when the work is really a multi-section dashboard composition problem
 - `motherduck-build-cfa-app` when the requirement is a fuller product surface with per-customer isolation or backend policy control
 - `motherduck-cli` when the agent has a shell and should keep Dive source in local files

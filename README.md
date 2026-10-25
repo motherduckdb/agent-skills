@@ -3,7 +3,7 @@
 [![Latest release](https://img.shields.io/github/v/release/motherduckdb/agent-skills)](https://github.com/motherduckdb/agent-skills/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-22 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, query real data with DuckDB SQL, build Dives and Flights, and deliver analytics pipelines and apps.
+21 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, query real data with DuckDB SQL, build Dives and Flights, and deliver analytics pipelines and apps.
 
 Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection or MCP server.
 
@@ -64,9 +64,8 @@ Start with the skill that matches the task. Reuse established connection and sch
 | `motherduck-model-data` | Workflow | Analytical schemas and transformation models |
 | `motherduck-manage-guides` | Workflow | Business definitions and reusable warehouse context |
 | `motherduck-share-data` | Workflow | Share audiences, grants, table filters, and refresh policy |
-| `motherduck-create-dive` | Workflow | Creating, editing, publishing, sharing, or embedding Dives |
+| `motherduck-create-dive` | Workflow | Creating, editing, designing, publishing, sharing, or embedding Dives |
 | `motherduck-create-flight` | Workflow | Running and scheduling Python jobs on MotherDuck |
-| `motherduck-design-dive` | Workflow | Dive layout, responsive behavior, themes, and accessibility |
 | `motherduck-ducklake` | Workflow | DuckLake storage choices and operations |
 | `motherduck-security-governance` | Workflow | Permissions, isolation, residency, and compliance |
 | `motherduck-pricing-roi` | Workflow | Costs, plan fit, and ROI |

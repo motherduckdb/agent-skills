@@ -3,7 +3,7 @@
 
 # Build an Analytics Dashboard
 
-Use this skill when creating a multi-chart, multi-KPI interactive dashboard with live MotherDuck data. This is a use-case skill -- it ties together `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, `motherduck-design-dive`, and `motherduck-duckdb-sql` into a single end-to-end workflow.
+Use this skill when creating a multi-chart, multi-KPI interactive dashboard with live MotherDuck data. This is a use-case skill -- it ties together `motherduck-explore`, `motherduck-query`, `motherduck-create-dive`, and `motherduck-duckdb-sql` into a single end-to-end workflow.
 
 ## Contents
 
@@ -25,7 +25,7 @@ Use this skill when creating a multi-chart, multi-KPI interactive dashboard with
 
 - Prefer the current MotherDuck Dive guide and public Dives docs first.
 - If MotherDuck MCP is available, call `get_dive_guide` before saving or updating a dashboard Dive.
-- Apply `motherduck-design-dive` before copying presentation classes from this reference. Treat the examples here as query and composition patterns; the responsive shell, theme tokens, filter surface, and viewport QA come from the design skill.
+- Apply the design defaults in `motherduck-create-dive` before copying presentation classes from this reference. Treat the examples here as query and composition patterns; the responsive shell, theme tokens, filter surface, and viewport QA come from the design skill.
 - Keep the dashboard guidance aligned with the documented product posture:
   - Dives are for live workspace analytics and the long tail of questions
   - heavy shaping belongs in SQL, not in React

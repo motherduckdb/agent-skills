@@ -79,9 +79,8 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | motherduck-model-data | `/motherduck-model-data` | Design analytics-ready schemas and tables. |
 | motherduck-manage-guides | `/motherduck-manage-guides` | Create, discover, version, and govern agent context. |
 | motherduck-share-data | `/motherduck-share-data` | Distribute data with shares and share Dive-backed data safely. |
-| motherduck-create-dive | `/motherduck-create-dive` | Build, theme, preview, save, and update Dives. |
+| motherduck-create-dive | `/motherduck-create-dive` | Build, design, theme, preview, save, and update Dives. |
 | motherduck-create-flight | `/motherduck-create-flight` | Create, schedule, run, and debug Flights — Python jobs on MotherDuck compute. |
-| motherduck-design-dive | `/motherduck-design-dive` | Design responsive, reusable Dives with filters and light/dark themes. |
 | motherduck-ducklake | `/motherduck-ducklake` | Decide when DuckLake is appropriate and how to use it safely. |
 | motherduck-security-governance | `/motherduck-security-governance` | Answer security, governance, access, and residency questions. |
 | motherduck-pricing-roi | `/motherduck-pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |
