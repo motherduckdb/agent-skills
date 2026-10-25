@@ -1,6 +1,6 @@
 ---
 name: motherduck-load-data
-description: Load files, object storage, dataframes, or external databases into MotherDuck using an appropriate bulk ingestion path.
+description: Load files, object storage, dataframes, or external databases into MotherDuck with bulk ingestion. Use for any import of data into MotherDuck.
 license: MIT
 ---
 

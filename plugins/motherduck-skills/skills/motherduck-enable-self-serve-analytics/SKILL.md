@@ -21,7 +21,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - lightweight metric definitions and owners before inviting more users
 - a short root orientation Guide plus shallow domain Guides for definitions that agents cannot infer from schema
 - restricted Shares granted to roles; use include patterns for table/view subsets and secure views (keyed on `current_email()` or `is_role_in_session()`) for per-team rows, hidden columns, or masked values, instead of one Share per audience
-- Dives as the consumption surface, with AI Chat for follow-up questions on a governed Dive; Admins can turn Agent Chat off on the AI Features settings page
+- Dives as the consumption surface, with the Dive's AI Chat (Agent Chat) for follow-up questions on a governed Dive; Admins can turn it off on the AI Features settings page
 - roles, grants, and Shares managed as code with the Terraform provider once the rollout pattern is stable
 
 ## Workflow
@@ -74,3 +74,4 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-create-dive` -- build the first shareable answer surface
 - `motherduck-manage-guides` -- preserve governed metric and join context for agents
 - `motherduck-share-data` -- publish table/view subsets and role-granted access
+- `motherduck-security-governance` -- design roles, grants, and secure-view policy

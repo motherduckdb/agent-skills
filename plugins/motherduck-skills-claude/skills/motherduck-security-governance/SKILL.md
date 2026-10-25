@@ -1,6 +1,6 @@
 ---
 name: motherduck-security-governance
-description: Assess MotherDuck security, permissions, isolation, residency, and compliance requirements against documented controls.
+description: Assess or configure MotherDuck security: roles and grants, isolation, residency, compliance, and governance as code.
 argument-hint: [security-question]
 license: MIT
 ---
@@ -22,10 +22,10 @@ license: MIT
 - Treat region and residency as first-class architectural constraints that require current public confirmation.
 - Be explicit about whether the boundary is a share, a Dive, a database, or a full application.
 - Separate platform permissions (roles), data grants (who can attach a share), include patterns (which tables/views that share exposes), and secure views (which rows, columns, and values each consumer of that share sees).
-- Secure views on shares provide row-level security, column-level security, and masking keyed on the consumer's identity or roles (Business and Enterprise). For multi-tenant customer-facing products, structural isolation remains the stronger default; secure views fit internal audiences and partner or per-service-account shares.
+- Secure views on shares provide row-level security, column-level security, and masking keyed on the consumer's identity or roles (plan-gated; verify current availability). For multi-tenant customer-facing products, structural isolation remains the stronger default; secure views fit internal audiences and partner or per-service-account shares.
 - Flight `RUN` grants let others trigger a Flight that always executes with the owner's credentials. Review them like any privileged entry point: who holds the grant, which config the caller controls, and what the owner's token can write.
 - Map AI data flows explicitly: `prompt_jev()` sends text and images to TypeSafe in the US from every region (off by default in EU regions); `prompt()` from Asia Pacific regions is served by a US endpoint; Agent Chat inference stays in the organization's geography. Admins control these on the AI Features settings page.
-- Flights are generally available and can process PHI under a signed HIPAA BAA.
+- Flights can process PHI only under a signed HIPAA BAA; verify the current terms before relying on it.
 - Separate documented product guarantees from architectural recommendations and assumptions in the final answer.
 
 ## Workflow

@@ -1,6 +1,6 @@
 ---
 name: motherduck-pricing-roi
-description: Assess MotherDuck costs, plan fit, and ROI using current pricing and the workload’s compute and storage needs.
+description: Assess MotherDuck costs, plan fit, cost attribution, and ROI from the workload's compute and storage needs.
 argument-hint: [workload-or-pricing-question]
 license: MIT
 ---

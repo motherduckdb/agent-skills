@@ -48,7 +48,7 @@ Operational rules:
 
 ## Endpoint Summary
 
-| Operation | MCP tool | Method and path | Notes |
+| Operation | MCP tool (only if the server lists it) | Method and path | Notes |
 |---|---|---|---|
 | Load admin guide | `get_user_admin_guide` | — | In-session copy of this guide. |
 | List users | — | `GET /v1/users` | Users and service accounts; filters `is_service_account`, `is_deprovisioned`; `limit` (max 1000) and `offset`; returns `users` and `total_count`. |

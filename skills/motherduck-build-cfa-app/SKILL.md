@@ -83,3 +83,5 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-model-data` -- design analytics-ready per-customer tables
 - `motherduck-query` -- validate serving queries and latency-sensitive aggregations
 - `motherduck-load-data` -- build ingestion paths for customer-facing data refresh
+- `motherduck-rest-api` -- provision per-customer service accounts, tokens, and Dive embed sessions
+- `motherduck-security-governance` -- review the isolation boundary and access model

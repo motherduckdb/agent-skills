@@ -29,9 +29,8 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 
 ## Workflow
 
-1. Inspect the available MotherDuck server or supplied source and target context.
-2. Inspect the current workspace and target data model.
-3. Define raw, staging, and analytics boundaries.
+1. Inspect the available MotherDuck server or supplied source and target context, including the current target data model.
+2. Define raw, staging, and analytics boundaries.
 4. Ingest raw data.
 5. Deduplicate, type, and promote into staging.
 6. Materialize analytics-ready outputs.
@@ -60,7 +59,6 @@ Read only the sections relevant to the task; these are guidance, not a mandatory
 
 - `references/dlt-dbt-motherduck-project/` -- fully runnable MotherDuck reference project using `dlt`, `dbt-duckdb`, and validation queries
 - `references/PIPELINE_IMPLEMENTATION_GUIDE.md` -- stage design, transformation sequencing, and ingestion-to-serving examples
-- `../motherduck-load-data/references/INGESTION_PATTERNS.md` -- lower-level ingestion patterns
 
 ## Examples
 
@@ -79,3 +77,4 @@ Load related skills only for missing capabilities; reuse established context.
 - `motherduck-query` -- write transformations and validations
 - `motherduck-share-data` -- publish curated outputs
 - `motherduck-ducklake` -- only when open-table-format storage is a real requirement
+- `motherduck-create-flight` -- schedule and run the pipeline on MotherDuck compute

@@ -68,7 +68,7 @@ LIMIT 20;
 ```
 
 - Structured output: `return_type` (an exact DuckDB type or enum), `struct` (+ `struct_descr`), or `json_schema`. Pick one.
-- Reasoning models (`gpt-6-luna`, GPT-5 series) accept `reasoning_effort`, which defaults to `'none'`. Raise it to `'low'` or higher only for tasks that need reasoning; it adds cost and latency. `temperature` applies to non-reasoning models only.
+- The model list changes; check the current `prompt()` docs before naming a model. Reasoning models (`gpt-6-luna` and the GPT-5 series at the time of writing) accept `reasoning_effort`, which defaults to `'none'`. Raise it to `'low'` or higher only for tasks that need reasoning; it adds cost and latency. `temperature` applies to non-reasoning models only.
 - Results are not cached between queries. Pass untrusted user text through prepared statements.
 
 ## `embedding`

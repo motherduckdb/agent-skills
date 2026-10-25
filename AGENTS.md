@@ -63,7 +63,7 @@ Important supporting surfaces:
 - Prefer MCP-assisted exploration when MotherDuck MCP is available.
 - For use-case skills, if a remote or local MotherDuck server is active, start from the user's real database/schema instead of inventing one.
 - Prefer a native `md:` workspace connection for multi-database exploration, bootstrap flows, and temporary validation environments.
-- Call `get_dive_guide` before save/update Dive flows when MCP is available.
+- Call `get_dive_guide` before `save_dive`, `update_dive`, or `edit_dive_content` when MCP is available.
 - Call `get_query_guide` before business-semantic MCP queries and traverse only relevant Guide topics.
 - Prefer the MotherDuck CLI for file-shaped Dive/Flight work when a coding agent has a shell; prefer MCP for chat-only exploration.
 - Prefer Parquet over CSV when the format is under our control.

@@ -1,6 +1,6 @@
 ---
 name: motherduck-explore
-description: Discover MotherDuck databases, tables, columns, shares, and sample data to understand an available dataset.
+description: Discover MotherDuck databases, tables, columns, shares, and sample data. Use first when a MotherDuck workspace or schema is unfamiliar.
 license: MIT
 ---
 
@@ -16,7 +16,7 @@ license: MIT
 - Prefer fully qualified `"database"."schema"."table"` names; they are required once more than one database or share is attached.
 - Check shared databases before concluding that data is unavailable. A share with secure views can hide columns and rows: a missing column in an attached share may be policy, not schema drift.
 - Use the MotherDuck MCP tools (`list_databases`, `list_tables`, `list_views`, `list_columns`, `list_macros`, `search_catalog`) when available because they return structured results faster than ad hoc SQL. Check `list_macros` before reimplementing logic; table and scalar macros often encode governed definitions.
-- Before business-semantic exploration through MCP, call `get_query_guide`, then read only relevant root Guides and topic branches. Follow `relatedGuides` returned by catalog tools when they govern the objects in scope.
+- When MotherDuck MCP is available and the SQL answers a business question, call `get_query_guide` first, then read only the relevant Guide topics and validate their claims against the live schema. Follow `relatedGuides` returned by catalog tools when they govern the objects in scope.
 - Record whether a share is filtered and whether an existing Dive is Draft, Ready, Endorsed, or Archived; these attributes change what downstream agents should trust or expect to see.
 - Return a concise schema map with table grain, join keys, date columns, and likely measures before moving into modeling or dashboard work.
 
