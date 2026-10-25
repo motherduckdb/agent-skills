@@ -6,13 +6,17 @@ on:
       version:
         description: 'New version (X.Y.Z, no leading v)'
         required: true
+      publish:
+        description: 'Publish an already-merged version instead of opening a bump PR: tags main as vX.Y.Z and creates the release'
+        type: boolean
+        default: false
   push:
     tags:
       - 'v*'
 
 jobs:
   prepare-release:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && !inputs.publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -53,7 +57,10 @@ jobs:
             --body "$(printf 'Automated version bump to %s across manifests, INTEGRATION_VERSION, and watermark strings.\n\nAfter merging, tag the merge commit to publish the release:\n\n```\ngit tag v%s && git push origin v%s\n```\n\nNote: CI checks do not run automatically on PRs opened by GITHUB_TOKEN; the bump was validated inside the release workflow before this PR was opened.' "$version" "$version" "$version")"
 
   publish-release:
-    if: github.event_name == 'push'
+    # Runs for a pushed vX.Y.Z tag, or from the Release workflow with publish=true.
+    # In publish mode this job pushes the tag itself; a tag pushed with
+    # GITHUB_TOKEN does not trigger other workflows, so everything happens here.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -61,12 +68,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
 
+      - name: Resolve tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          else
+            echo "TAG=v${{ inputs.version }}" >> "$GITHUB_ENV"
+          fi
+
       - name: Verify tag matches repo version surfaces
-        run: uv run scripts/bump_version.py --check "${GITHUB_REF_NAME#v}"
+        run: uv run scripts/bump_version.py --check "${TAG#v}"
 
       - name: Validate skills and manifests
         run: |
@@ -76,19 +93,32 @@ jobs:
       - name: Build Gemini extension archive
         run: python3 scripts/package_gemini_extension.py
 
+      - name: Create and push tag (publish mode)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::${TAG} already exists; push a new version instead"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/${TAG}"
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Customer-facing notes come from the matching CHANGELOG.md section;
           # fall back to generated notes only when the section is missing.
-          if uv run scripts/release_notes.py show "$GITHUB_REF_NAME" > release-notes.md; then
+          if uv run scripts/release_notes.py show "$TAG" > release-notes.md; then
             notes=(--notes-file release-notes.md)
           else
-            echo "::warning::CHANGELOG.md has no section for ${GITHUB_REF_NAME}; using generated notes"
+            echo "::warning::CHANGELOG.md has no section for ${TAG}; using generated notes"
             notes=(--generate-notes)
           fi
-          gh release create "$GITHUB_REF_NAME" \
-            --title "$GITHUB_REF_NAME" \
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --verify-tag \
             "${notes[@]}" \
             release/motherduck-skills.tar.gz
