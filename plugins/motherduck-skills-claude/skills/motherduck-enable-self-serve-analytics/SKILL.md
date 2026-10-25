@@ -21,6 +21,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - standard ownership for metric changes
 - lightweight metric definitions and owners before inviting more users
 - a short root orientation Guide plus shallow domain Guides for definitions that agents cannot infer from schema
+- team access as custom roles that inherit `explorer` or `builder`, with share grants to the role (archetypes 4 and 5 in `motherduck-security-governance`)
 - restricted Shares granted to roles; use include patterns for table/view subsets and secure views (keyed on `current_email()` or `is_role_in_session()`) for per-team rows, hidden columns, or masked values, instead of one Share per audience
 - Dives as the consumption surface, with the Dive's AI Chat (Agent Chat) for follow-up questions on a governed Dive; Admins can turn it off on the AI Features settings page
 - roles, grants, and Shares managed as code with the Terraform provider once the rollout pattern is stable

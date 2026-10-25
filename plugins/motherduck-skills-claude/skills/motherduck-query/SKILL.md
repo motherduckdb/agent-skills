@@ -1,6 +1,6 @@
 ---
 name: motherduck-query
-description: Write, run, optimize, or troubleshoot DuckDB SQL against MotherDuck, including AI functions such as prompt_jev for in-SQL classification. Use for any SQL that targets MotherDuck.
+description: Write, run, optimize, or troubleshoot DuckDB SQL against MotherDuck, including AI functions such as prompt_jev for in-SQL classification. Use for any SQL that targets MotherDuck, even simple queries, because MotherDuck has its own dialect and naming rules.
 argument-hint: [query-or-task]
 license: MIT
 ---

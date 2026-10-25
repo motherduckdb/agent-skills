@@ -1,6 +1,6 @@
 ---
 name: motherduck-explore
-description: Discover MotherDuck databases, tables, columns, shares, and sample data. Use first when a MotherDuck workspace or schema is unfamiliar.
+description: Find and understand MotherDuck databases, tables, columns, shares, and sample data, including which tables hold a given kind of data. Use first when a MotherDuck workspace or schema is unfamiliar.
 argument-hint: [database-or-workspace]
 license: MIT
 ---

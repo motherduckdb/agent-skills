@@ -14,6 +14,7 @@ license: MIT
 
 ## Default Posture
 
+- To find what drives spend, group `md_information_schema.query_history` by `user_agent` (workload tags from `custom_user_agent`; Flight queries start with `md-flights(<flight_id>`), user or service account, and `instance_type`; the Duckling Overview shows the same in the UI. Recommend tagging untagged workloads.
 - Do not hardcode pricing numbers unless you have verified them in the current turn.
 - When quoting numbers, include the verification date and the public source you checked.
 - For estimates and comparisons, separate storage, compute, and operational overhead. A narrow price lookup needs only the relevant verified rate and conditions.

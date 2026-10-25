@@ -20,6 +20,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - shared architecture, client-specific schema
 - explicit sharing and revocation per client
 - versioned templates for provisioning, validation, handoff, and exception tracking
+- per-client identities and isolation following archetype 7 in `motherduck-security-governance` (`references/ACCESS_CONTROL_SETUPS.md`)
 - per-client provisioning as Terraform (`motherduckdb/motherduck`): databases, shares and grants, roles, secrets, and service accounts with descriptions that name the client
 - role-granted restricted Shares with per-audience include patterns where governed table-level delivery fits, plus secure views when a client's audiences need row, column, or masking rules
 - a reusable Guide topic layout with client-specific referenced definitions and exceptions

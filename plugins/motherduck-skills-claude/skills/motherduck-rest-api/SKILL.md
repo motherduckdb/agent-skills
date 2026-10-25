@@ -23,6 +23,7 @@ license: MIT
 - Prefer read-before-write flows for configuration changes so the current account, service account, Duckling config, or Dive metadata is known before mutation.
 - Treat `POST /v1/users` as service-account creation unless current docs explicitly broaden the API. `GET /v1/users` lists every user and service account in the org; filter with `is_service_account` and `is_deprovisioned` and page with `limit`/`offset`. Use it for access reviews and to find a service account before creating a duplicate.
 - Service accounts and access tokens accept an optional, searchable description. Set one that names the workload and owner; check the current API spec for the field name.
+- For the Terraform resources, state rules, and setup archetypes, read `references/ACCESS_CONTROL_SETUPS.md` in `motherduck-security-governance`.
 - For repeatable provisioning (environments, partner or per-customer setups), prefer the Terraform provider `motherduckdb/motherduck` over scripted REST calls. It authenticates with `MOTHERDUCK_TOKEN`, plus `MOTHERDUCK_ADMIN_TOKEN` for service accounts, tokens, and Duckling configuration.
 - Assume active-account, Duckling configuration, service-account creation, service-account token creation, and Dive embed-session endpoints require an organization admin bearer token unless current docs say otherwise.
 - Never expose generated access tokens in logs, browser code, client bundles, or committed files.
