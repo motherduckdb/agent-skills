@@ -31,7 +31,7 @@ A working connection, the source database, and the intended audience. Reuse thes
 - For write-heavy publishers, verify the DuckDB client version is one MotherDuck supports before relying on checkpoint or concurrent-write behavior during share-update workflows.
 - `INCLUDE_PATTERN` selects whole tables and views; never describe it as row- or column-level security. It works on native MotherDuck and fully managed DuckLake sources.
 - For row filtering, hidden columns, or masked values, add secure views to the share: `CREATE SHARE ... WITH SECURE VIEW REPLACES <table> AS (SELECT ...)` or `ALTER SHARE ... ADD [OR REPLACE] SECURE VIEW`. Key the policy on `current_email()` for people, `current_user` for service accounts, or `is_role_in_session('<role>')`. One share with secure views can replace a set of per-audience shares. They are plan-gated, and managing them in SQL needs a recent DuckDB client and a read-write token; check the current secure-views docs for both.
-- A table the share exposes without a replacing secure view stays fully readable. Combine `INCLUDE_PATTERN` (which tables) with secure views (which rows and columns) and keep macro schemas and mapping tables outside the pattern.
+- Write secure views with explicit column lists, never `SELECT *` (including `SELECT * EXCLUDE` or `SELECT * REPLACE`): a new source column would otherwise leak to every consumer, and schema changes break the view. A table the share exposes without a replacing secure view stays fully readable. Combine `INCLUDE_PATTERN` (which tables) with secure views (which rows and columns) and keep macro schemas and mapping tables outside the pattern.
 - MotherDuck secure views are share policies. DuckDB's own `CREATE SECURE VIEW` is only an optimizer barrier and restricts nothing.
 
 ## Workflow
@@ -50,6 +50,7 @@ For answer, review, or planning requests, return the sharing design and SQL with
 
 Read only the reference sections needed for the current task.
 
+- For who-gets-what design across teams, tenants, or environments, use `motherduck-security-governance` (`references/ACCESS_CONTROL_SETUPS.md`).
 - Read `references/SHARE_PLAYBOOK.md` for the full SQL playbook, role grants, include-pattern rules, secure views, access/update decisions, consumer workflow, and common failure modes.
 
 ## Related Skills

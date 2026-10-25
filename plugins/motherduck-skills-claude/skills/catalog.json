@@ -63,7 +63,7 @@
   },
   "motherduck-build-data-pipeline": {
     "name": "motherduck-build-data-pipeline",
-    "description": "Build ingestion-to-serving pipelines on MotherDuck, including stage boundaries, transformations, and publication.",
+    "description": "Build ingestion-to-serving pipelines on MotherDuck, including stage boundaries, transformations, and publication. Use for any recurring ingestion from an API, SaaS app, or database into MotherDuck.",
     "layer": "use-case",
     "depends_on": [
       "motherduck-connect",
@@ -150,7 +150,9 @@
       "references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md",
       "references/VISUAL_QA_PLAYBOOK.md"
     ],
-    "artifacts": [],
+    "artifacts": [
+      "artifacts/feature_complete_dive.tsx"
+    ],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/dives/",
       "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
@@ -278,7 +280,7 @@
   },
   "motherduck-explore": {
     "name": "motherduck-explore",
-    "description": "Discover MotherDuck databases, tables, columns, shares, and sample data. Use first when a MotherDuck workspace or schema is unfamiliar.",
+    "description": "Find and understand MotherDuck databases, tables, columns, shares, and sample data, including which tables hold a given kind of data. Use first when a MotherDuck workspace or schema is unfamiliar.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -449,7 +451,7 @@
   },
   "motherduck-query": {
     "name": "motherduck-query",
-    "description": "Write, run, optimize, or troubleshoot DuckDB SQL against MotherDuck, including AI functions such as prompt_jev for in-SQL classification. Use for any SQL that targets MotherDuck.",
+    "description": "Write, run, optimize, or troubleshoot DuckDB SQL against MotherDuck, including AI functions such as prompt_jev for in-SQL classification. Use for any SQL that targets MotherDuck, even simple queries, because MotherDuck has its own dialect and naming rules.",
     "layer": "utility",
     "depends_on": [],
     "references": [
@@ -499,14 +501,15 @@
   },
   "motherduck-security-governance": {
     "name": "motherduck-security-governance",
-    "description": "Assess or configure MotherDuck security: roles and grants, isolation, residency, compliance, and governance as code.",
+    "description": "Assess or configure MotherDuck access control: roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
       "motherduck-explore"
     ],
     "references": [
-      "references/SECURITY_GOVERNANCE_PLAYBOOK.md"
+      "references/SECURITY_GOVERNANCE_PLAYBOOK.md",
+      "references/ACCESS_CONTROL_SETUPS.md"
     ],
     "artifacts": [],
     "source_docs": [
@@ -525,7 +528,8 @@
       "https://motherduck.com/docs/integrations/data-science-ai/typesafe/",
       "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/grant-run-on-flight/",
-      "https://motherduck.com/docs/integrations/dev-tools/terraform/"
+      "https://motherduck.com/docs/integrations/dev-tools/terraform/",
+      "https://github.com/motherduckdb/terraform-provider-motherduck/tree/main/examples"
     ],
     "needs_live_discovery": false
   },

@@ -1,6 +1,6 @@
 ---
 name: motherduck-build-data-pipeline
-description: Build ingestion-to-serving pipelines on MotherDuck, including stage boundaries, transformations, and publication.
+description: Build ingestion-to-serving pipelines on MotherDuck, including stage boundaries, transformations, and publication. Use for any recurring ingestion from an API, SaaS app, or database into MotherDuck.
 argument-hint: [pipeline-goal]
 license: MIT
 ---
@@ -18,7 +18,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
 - batch over streaming
 - raw landing before curation
 - explicit raw -> staging -> analytics boundaries
-- bulk ingest paths over row-by-row writes
+- bulk ingest paths over row-by-row writes: stage files and load with `read_parquet`/`read_json_auto` or one `INSERT ... SELECT`; never `executemany()` or per-row `INSERT` loops against MotherDuck
 - idempotent stage rebuilds or append contracts before scheduled automation
 - verify the MotherDuck-supported DuckDB client version before recommending upstream-only write, checkpoint, or lakehouse features
 - native MotherDuck storage unless DuckLake is explicitly required

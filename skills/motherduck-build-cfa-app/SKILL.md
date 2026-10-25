@@ -23,6 +23,7 @@ Resolve the target from the request or active context. Ask only if ambiguity mat
   - app-side policy and UX control are limited
   - a backend can create embed sessions and keep admin tokens server-side
 - **DuckDB-Wasm** is acceptable only for small, browser-side, read-only workloads.
+- Default per-tenant build (read hypertenancy): a writer service account owns one database per tenant; each tenant gets a reader service account, a restricted hidden share of its database granted to that reader, a one-hour read-write token used once to attach the share, and a read-scaling token the backend uses. See archetype 6 in `motherduck-security-governance` (`references/ACCESS_CONTROL_SETUPS.md`) and manage it with Terraform.
 - **Single shared tenant_id filtering** is the fallback, not the recommendation.
 - A filtered Share exposes a curated table/view subset. Secure views on a Share add row filters, hidden columns, and masking keyed on the consumer's identity (`current_user` for a per-customer service account), which can serve a modest number of customers from one database. Keep a database per customer as the default when tenants need independent compute, data lifecycle, or contractual isolation.
 - Bound backend connects with `connection_timeout` so a cold Duckling fails over instead of hanging a request.

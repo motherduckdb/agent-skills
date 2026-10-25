@@ -35,19 +35,19 @@ license: MIT
 - Treat embedded Dives as the first-choice path when a product needs a live read-only Dive surface with a backend-created embed session. Move to `motherduck-build-cfa-app` when the app needs custom API contracts, writes, non-Dive routing, tenant policy enforcement, or richer authorization.
 - For shared repos or CI/CD, use a service-account token so Dive ownership is not tied to one human user.
 
-## Design Defaults
+## Feature-Complete Defaults
 
-For a new Dive or a full redesign, use these defaults unless the user's design requirements differ. For a scoped edit (SQL, labels, one chart), preserve the existing visual system and check only the affected states.
+`get_dive_guide` owns the runtime contract and the MotherDuck visual rules (palette, chart sizing, no card chrome, static Tailwind only); do not restate them. A new Dive or full redesign should also ship with these on the first save. Start from `artifacts/feature_complete_dive.tsx`, which implements all of them, and delete what the Dive does not need. For a scoped edit, preserve the existing design and check only the affected states.
 
-- Start at a 320 px viewport and enhance upward with fluid containers and responsive grids; keep reading order the same at every width.
-- Offer a light/dark theme control with token-based chart and UI colors, defaulting to the system preference.
-- Give filters a predictable home: visible on wide screens, a drawer or sheet on narrow ones.
-- Keep charts in bounded responsive containers with readable labels at every breakpoint.
-- Use a restrained analytics style: neutral surfaces, compact hierarchy, visible axes, quiet borders. Skip ornamental gradients, glass effects, glowing accents, oversized hero metrics, and marketing-style copy.
-- Make each KPI self-explanatory: value, label, comparison context, and a small trend when the data supports it.
-- Keep customer variation in data, labels, logo, and theme tokens, not in the information architecture.
-- Support keyboard use, visible focus, 44 px touch targets, sufficient contrast, and non-color status cues.
-- Do not call a Dive mobile-friendly from responsive CSS alone; report the viewports and states you actually checked.
+- Reflows from about 320 px to wide panes: breakpoint grids (2x2 KPIs on narrow, one row on wide), `ResponsiveContainer width="100%"`, no fixed widths or page-level horizontal scroll.
+- Light and dark themes from one token object per theme, applied with inline `style`, starting from the viewer's system preference.
+- Filters, sort, and selected view in `useDiveState` so they survive refresh and travel with a shared link.
+- Every section has its own loading skeleton, empty message, and `role="alert"` error.
+- A "data as of" freshness line and plain-language titles with units, so viewers and AI Chat can read the Dive.
+- Export with `exportAs` when people will take the data elsewhere.
+- When the Dive should change data, a write-back control backed by a Flight instrumented for the Flight Explainer.
+- Styled controls (the runtime strips button styles) with 44 px targets, visible focus, and non-color status cues.
+- Do not call a Dive mobile-friendly from responsive CSS alone; report the viewports and states you checked.
 
 ## Workflow
 
@@ -65,6 +65,7 @@ For answer, review, or planning requests, stop at the requested design or code a
 
 Read only the reference sections needed for the current task.
 
+- Copy and adapt `artifacts/feature_complete_dive.tsx` as the starting component for a new Dive.
 - Read `references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md` for the layout grid, component anatomy, theme tokens, filter model, and design anti-patterns of a new Dive or redesign.
 - Read `references/VISUAL_QA_PLAYBOOK.md` for the screenshot and review loop when a full design handoff or evidence is requested.
 - Read `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, write-back with Flights, Agent Chat, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas

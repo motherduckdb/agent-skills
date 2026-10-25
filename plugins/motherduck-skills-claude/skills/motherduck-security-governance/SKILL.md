@@ -1,6 +1,6 @@
 ---
 name: motherduck-security-governance
-description: Assess or configure MotherDuck security: roles and grants, isolation, residency, compliance, and governance as code.
+description: Assess or configure MotherDuck access control: roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.
 argument-hint: [security-question]
 license: MIT
 ---
@@ -18,6 +18,8 @@ license: MIT
 
 - Prefer service accounts for production systems, not personal tokens.
 - Keep credentials in backend-controlled secrets, not browsers or hardcoded notebooks.
+- Writes belong to the database owner; there is no write grant. Reads come from shares: restricted shares granted to roles, `INCLUDE_PATTERN` for which tables, secure views for which rows, columns, and values. Pick the archetype in `references/ACCESS_CONTROL_SETUPS.md` before writing grants.
+- For answer or review requests, report the current and proposed access without changing it. For configure requests, apply the in-scope roles and grants, then verify them with `SHOW` statements and a real reader; ask before revoking access or widening an audience beyond the request.
 - Prefer structural isolation over query-time tenant filtering for serious B2B or CFA workloads.
 - Treat region and residency as first-class architectural constraints that require current public confirmation.
 - Be explicit about whether the boundary is a share, a Dive, a database, or a full application.
@@ -40,6 +42,7 @@ license: MIT
 
 Read only the reference sections needed for the current task.
 
+- Read `references/ACCESS_CONTROL_SETUPS.md` to design or review who can read and write what: the access model, a requirement-to-mechanism table, seven setup archetypes (simple warehouse, dev/prod, curated BI reader, team roles, row- and column-level access, customer-facing hypertenancy, partners), Terraform, and verification.
 - Read `references/SECURITY_GOVERNANCE_PLAYBOOK.md` for public security anchors, service-account posture, residency and AI data flows, sharing boundaries, Flight run grants, governance as code, and what not to overstate
 
 ## Related Skills
