@@ -57,7 +57,7 @@ Pin the `duckdb` version to the one `get_flight_guide` lists for the Flight runt
 
 ```bash
 motherduck flight push recipes/<name>/flight --schedule-cron "0 6 * * *" \
-  --config '{"MODE":"briefing","PROMPT":"","REQUEST_ID":"","AS_OF":"","MODEL":"<model>","PARENT":"","FEEDBACK":""}' \
+  --config '{"MODE":"briefing","PROMPT":"","REQUEST_ID":"","AS_OF":"","MODEL":"<model>","PARENT":"","FEEDBACK":"","BOARD":""}' \
   --max-runtime-sec 600
 ```
 

@@ -58,13 +58,15 @@ The Dive learns from use:
 
 `references/LEARNING_LOOP.md` covers the tables, Guides, feedback and `eval.py`.
 
+One Flight can serve several boards: dashboards for different audiences on the same data, such as a daily team view and a monthly leadership view. Each board has its own morning page, memory and Dive, and they all share the marts, viewer notes and Guides. `references/RECIPE_GUIDE.md` covers `BOARDS`.
+
 The Dive reads only that table. It starts the Flight with `useRunFlight` and follows it with `useFlightRun`.
 
 ## Workflow
 
 1. Explore the data and write the recipe. Copy `artifacts/recipes/nyc-311` (public `sample_data`), then follow `references/RECIPE_GUIDE.md`.
 2. Build, then run the Flight locally with `MODE=briefing`. Check the spec against the guide's checklist. Ask 3 questions, including one off-topic, and investigate one insight. Run `python3 artifacts/eval.py recipes/<name>` and keep the `--out` file as the baseline. Run 3 briefings with consecutive `AS_OF` dates, and check that insights continue rather than repeat.
-3. When MotherDuck MCP is available, call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`. Push the Flight with `motherduck-cli`: a daily schedule, a 600-second max runtime, and every config key the Dive sends (`MODE`, `PROMPT`, `REQUEST_ID`, `PARENT`, `AS_OF`, `MODEL`, `FEEDBACK`). Run it once in the cloud and read the logs.
+3. When MotherDuck MCP is available, call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source`. Push the Flight with `motherduck-cli`: a daily schedule, a 600-second max runtime, and every config key the Dive sends (`MODE`, `PROMPT`, `REQUEST_ID`, `PARENT`, `AS_OF`, `MODEL`, `FEEDBACK`, `BOARD`). Run it once in the cloud and read the logs.
 4. Put the Flight id in `app.json`, rebuild, and preview with `motherduck dive watch recipes/<name>/dive`. Test the briefing, one question, one Investigate click and Arrange mode.
 5. When MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive`, `update_dive`, or `edit_dive_content`. Before `save_dive` or `update_dive`, follow the review step that `get_dive_guide` sets for your client: when it asks you to show the final source or preview and get the user's go-ahead, do that once, unless the user already said to save without review.
 
