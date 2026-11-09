@@ -13,6 +13,7 @@ CLAUDE_PACKAGED_PLUGIN_SKILLS = CLAUDE_PACKAGED_PLUGIN / "skills"
 CLAUDE_SKILL_ARGUMENT_HINTS: dict[str, str] = {
     "motherduck-build-cfa-app": "[app-or-tenant-scenario]",
     "motherduck-build-dashboard": "[dashboard-goal]",
+    "motherduck-build-malleable-dive": "[briefing-goal]",
     "motherduck-build-data-pipeline": "[pipeline-goal]",
     "motherduck-cli": "[terminal-task]",
     "motherduck-connect": "[app-or-runtime]",

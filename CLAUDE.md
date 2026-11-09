@@ -87,6 +87,7 @@ This repo is optimized for AI builders using MotherDuck to ship apps, pipelines,
 | motherduck-pricing-roi | `/motherduck-pricing-roi` | Frame workload cost, pricing posture, and ROI tradeoffs. |
 | motherduck-build-cfa-app | `/motherduck-build-cfa-app` | Build customer-facing analytics products on MotherDuck. |
 | motherduck-build-dashboard | `/motherduck-build-dashboard` | Create a coherent Dive-backed analytics dashboard. |
+| motherduck-build-malleable-dive | `/motherduck-build-malleable-dive` | Build a generated briefing Dive that answers questions and investigates insights. |
 | motherduck-build-data-pipeline | `/motherduck-build-data-pipeline` | Build ingestion-to-serving workflows on MotherDuck. |
 | motherduck-migrate-to-motherduck | `/motherduck-migrate-to-motherduck` | Plan migrations from legacy warehouses and Postgres estates. |
 | motherduck-enable-self-serve-analytics | `/motherduck-enable-self-serve-analytics` | Roll out governed self-serve analytics for internal teams. |
