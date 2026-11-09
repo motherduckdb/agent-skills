@@ -268,6 +268,7 @@
       "artifacts/kit/treemap.tsx",
       "artifacts/kit/timeline.tsx",
       "artifacts/kit/datepicker.tsx",
+      "artifacts/kit/notes.tsx",
       "artifacts/examples/funnel.tsx",
       "artifacts/gallery/app.tsx",
       "artifacts/gallery/build_page.py",
