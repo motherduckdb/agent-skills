@@ -27,6 +27,10 @@ The Flight writes one row per generation to `<DB>.main.dive_specs`:
   "summary": "2-3 sentences",
   "follow_ups": ["…", "…", "…"],     // rendered as "Ask next" buttons
   "problems": [],                      // components the compiler dropped
+  "prompt_version": "04751d1f87",      // hash of every instruction and schema
+  "checks": { "checked": 40, "grounded": 40, "ungrounded": [] },   // the number check
+  "context": { "briefings_remembered": 3, "earlier_insights": 12, "feedback_used": 4,
+               "guides": ["…"], "probes_run": 3, "probes_shown": 2 },
   // investigation pages only:
   "parent": "…",                       // id of the page the insight came from
   "parent_title": "311 briefing",
@@ -38,8 +42,11 @@ The Flight writes one row per generation to `<DB>.main.dive_specs`:
 ## Blocks
 
 Common fields: `id`, `type`, `title`, `span` (4, 6, 8 or 12 of a 12-column
-grid), `caption` (from the narrator), `why` (from the planner) and `source`
-(dataset, measures, dimension, window, filters, display-only SQL).
+grid), `caption` and an optional `insight` (from the narrator), `why` (from the
+planner), `about` (`definitions` from the catalog, and `why`) and `source`
+(dataset, measures, dimension, window, filters, display-only SQL). A follow-up
+query the analyst step ran and the narrator promoted has `probe: true`, an id
+`p1` to `p3`, and its `hypothesis`.
 
 | `type` | Data fields | Narrator fields | Viewer can switch to |
 | --- | --- | --- | --- |
@@ -51,7 +58,7 @@ grid), `caption` (from the narrator), `why` (from the planner) and `source`
 | `heatmap` | calendar: `mode: 'calendar'` with the line shape at day grain; matrix: the line shape with one series per row | `highlight[]` | line, area, table |
 | `sankey` | `nodes[]` (`name`, `side`), `links[]` (`source`, `target`, `value`), `format`, `source_label`, `target_label`, plus the flows in the bar shape | `highlight[]` | bar, table |
 | `treemap` | `tree` (`name`, `children[]`) and `format`, or the bar shape; plus the groups in the bar shape | `highlight[]` | bar, table |
-| `callouts` | `items[]`: `tone` (critical, warning, positive, info), `title`, `body`, `block_id`, `question` (the investigation behind the Investigate button) | — | — |
+| `callouts` | `items[]`: `tone` (critical, warning, positive, info), `title`, `body`, `block_id`, `question` (the investigation behind the Investigate button), `continuity` (new, ongoing, worsening, improving, resolved), `refers_to`, `first_seen`, `times_seen` | — | — |
 | `text` | `body` | — | — |
 
 `series[]` entries are `{key, label, format, good?, muted?}`. A key ending in

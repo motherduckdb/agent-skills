@@ -32,6 +32,14 @@ PLANNER_HINTS = """- Use descriptor to explain a complaint type's change: it is 
 - Use requests.avg_days_to_close and requests.slow_share for agency performance; compare agencies with a table.
 - Use channel for questions about how residents report (phone, online, mobile)."""
 
+# ---- Learning ------------------------------------------------------------------------
+# The Flight reads every Guide under topic "briefings/<DB>" (the business context from the
+# recipe interview, and the memory Guide it writes after each briefing) plus GUIDE_TOPICS.
+GUIDE_TOPICS = []          # e.g. ["core-metrics"] for organization metric definitions
+MEMORY_GUIDE = True        # keep "What the <DB> briefing has learned" up to date
+ANALYST_PROBES = 3         # follow-up queries the analyst step may run before narrating; 0 turns it off
+DEFAULT_MODEL = "gpt-6-luna"
+
 ACRONYMS = {"nypd": "NYPD", "hpd": "HPD", "dsny": "DSNY", "dot": "DOT", "dep": "DEP"}
 LABELS = {
     "requests": "Requests",

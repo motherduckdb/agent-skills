@@ -31,7 +31,8 @@ def find_kit(explicit=None):
     """The directory holding assemble.py, components.json and kit/ from motherduck-dive-components."""
     candidates = [explicit, os.environ.get("MOTHERDUCK_DIVE_KIT"),
                   ROOT.parent.parent / "motherduck-dive-components" / "artifacts",  # skills installed side by side
-                  ROOT.parent / "dive-components"]                                    # a prototype checkout
+                  ROOT / "dive-components",                                           # vendored next to build.py
+                  ROOT.parent / "dive-components"]                                    # a sibling checkout
     for c in candidates:
         if c and (pathlib.Path(c) / "assemble.py").exists() and (pathlib.Path(c) / "components.json").exists():
             return pathlib.Path(c).resolve()

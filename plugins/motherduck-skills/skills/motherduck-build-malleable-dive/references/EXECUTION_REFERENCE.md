@@ -38,13 +38,26 @@ MODE=ask PROMPT="Which agencies take longest to close requests?" REQUEST_ID=t2 u
 MODE=investigate PARENT=<briefing spec id> PROMPT="<a question from the briefing's insights>" REQUEST_ID=t3 uv run --with duckdb python main.py
 ```
 
+Score the planner on the recipe's questions, then the full generation on a few of them:
+
+```bash
+python3 eval.py recipes/nyc-311 --out baseline.json
+python3 eval.py recipes/nyc-311 --narrate --only 1,3,9 --baseline baseline.json
+```
+
+Record viewer feedback the way the Dive does, to test the feedback path:
+
+```bash
+MODE=feedback FEEDBACK='[{"e":"rate_insight","s":"<spec id>","t":"<insight title>","v":"up"}]' uv run --with duckdb python main.py
+```
+
 Pin the `duckdb` version to the one `get_flight_guide` lists for the Flight runtime when you need local runs to match the cloud exactly.
 
 ## Deploy
 
 ```bash
 motherduck flight push recipes/<name>/flight --schedule-cron "0 6 * * *" \
-  --config '{"MODE":"briefing","PROMPT":"","REQUEST_ID":"","AS_OF":"","MODEL":"<model>","PARENT":""}' \
+  --config '{"MODE":"briefing","PROMPT":"","REQUEST_ID":"","AS_OF":"","MODEL":"<model>","PARENT":"","FEEDBACK":""}' \
   --max-runtime-sec 600
 ```
 

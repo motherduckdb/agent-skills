@@ -660,6 +660,33 @@
           "why": "Dive SQL is read-only; the drill-down page comes from a Flight run"
         }
       ]
+    },
+    {
+      "id": "malleable-dive-recipe-interview",
+      "prompt": "I want a generated daily briefing Dive for our sales team on MotherDuck that gets smarter as people use it. What do you need from me before you build it?",
+      "expect_skills": [
+        "motherduck-build-malleable-dive"
+      ],
+      "must": [
+        {
+          "pattern": "decide|decision",
+          "why": "the interview asks what readers decide"
+        },
+        {
+          "pattern": "target",
+          "why": "the interview asks for targets"
+        },
+        {
+          "pattern": "Guide",
+          "why": "answers go into a MotherDuck Guide the Flight reads"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "useSQLQuery\\([^)]{0,200}\\b(INSERT|UPDATE|CREATE TABLE)\\b",
+          "why": "Dive SQL is read-only; feedback goes through the Flight"
+        }
+      ]
     }
   ]
 }

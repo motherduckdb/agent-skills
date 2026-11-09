@@ -108,23 +108,28 @@
     ],
     "references": [
       "references/RECIPE_GUIDE.md",
+      "references/LEARNING_LOOP.md",
       "references/SPEC_CONTRACT.md",
       "references/EXECUTION_REFERENCE.md"
     ],
     "artifacts": [
       "artifacts/build.py",
+      "artifacts/eval.py",
       "artifacts/template/engine.py",
       "artifacts/template/app.tsx",
       "artifacts/template/chart.mmd",
       "artifacts/recipes/nyc-311/domain.py",
-      "artifacts/recipes/nyc-311/app.json"
+      "artifacts/recipes/nyc-311/app.json",
+      "artifacts/recipes/nyc-311/questions.json"
     ],
     "source_docs": [
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
       "https://motherduck.com/docs/key-tasks/dives/",
       "https://motherduck.com/docs/key-tasks/dives/run-flights-from-dives/",
       "https://motherduck.com/docs/key-tasks/flights/",
+      "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/"
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/guides/"
     ],
     "needs_live_discovery": true
   },

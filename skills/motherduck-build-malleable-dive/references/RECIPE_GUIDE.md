@@ -2,6 +2,7 @@
 
 ## Contents
 
+- Interview the owner
 - Write `domain.py`
 - Write `app.json`
 - Check the spec
@@ -9,6 +10,39 @@
 - Gotchas
 
 A recipe is two files in `recipes/<name>/`. Copy `artifacts/recipes/nyc-311` and replace its contents; you do not edit the template for a new domain. If a domain needs something the template lacks, change `artifacts/template/` so every recipe gets it.
+
+## Interview the owner
+
+Ask before writing the recipe, in one message, and only what the data, existing Dives and Guides do not already answer:
+
+1. Who reads the briefing, how often, and what do they decide after reading it?
+2. Which 3 to 5 numbers matter most, how exactly are they defined, and which are better when lower?
+3. What are the targets, and what size of change is worth reporting?
+4. Compare with what: the previous period, last year, or the target?
+5. Which breakdowns explain a change, and which should the briefing ignore?
+6. Which known patterns, events or data quirks matter: seasonality, launches, outages, late data?
+7. Who acts on which kind of insight, and what does a useful one look like?
+8. Which questions do you expect to ask it?
+
+Write the answers to three places:
+
+- **A Guide**, which the Flight reads before every analysis:
+
+  ```sql
+  SELECT id FROM MD_CREATE_GUIDE(
+    topic = 'briefings/<db>',
+    title = '<brand> briefing: business context',
+    content = '# <brand> briefing: business context …',
+    description = 'Audience, decisions, targets and known patterns for the <brand> briefing',
+    access = 'user'
+  );
+  ```
+
+  Make it organization-wide only after the user confirms.
+- **The recipe:** `DOMAIN_CONTEXT`, `PLANNER_HINTS`, `WATCH`, `BRIEFING_PLAN`, `LABELS` and the `"down"` flags.
+- **`questions.json`:** 8 to 12 questions with what a good plan uses, plus one off-topic question.
+
+After the first briefing, show it to the owner and ask three things: which insight would you act on, which is noise, and what is missing? Update the Guide and the recipe with the answers.
 
 ## Write `domain.py`
 
@@ -29,6 +63,7 @@ A recipe is two files in `recipes/<name>/`. Copy `artifacts/recipes/nyc-311` and
 | `DOMAIN_CONTEXT` | Facts the narrator may use only when the data supports them: definitions, seasonality, known data gaps. |
 | `PLANNER_HINTS` | How to answer typical questions, and which dimension explains a moved metric. |
 | `LABELS`, `ACRONYMS` | Optional display names. A qualified key such as `"assistant.sessions"` wins over a short one. |
+| `GUIDE_TOPICS`, `MEMORY_GUIDE`, `ANALYST_PROBES`, `DEFAULT_MODEL` | Learning-loop settings; see `LEARNING_LOOP.md`. |
 
 ### The catalog
 

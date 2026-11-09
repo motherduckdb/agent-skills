@@ -16,6 +16,9 @@ import { useDiveState, useFlightRun, useRunFlight, useSQLQuery } from '@motherdu
 import {
 	ArrowDown,
 	ArrowLeft,
+	BookOpen,
+	Brain,
+	ShieldCheck,
 	ArrowUp,
 	CalendarDays,
 	ChevronDown,
@@ -95,10 +98,11 @@ function useGenerator(onDone: (requestId: string) => void) {
 		const id = setInterval(() => setNow(Date.now()), 500);
 		return () => clearInterval(id);
 	}, [busy]);
-	const generate = (mode: 'ask' | 'briefing' | 'investigate', prompt: string, parent = '', asOf = '') => {
+	const generate = (mode: 'ask' | 'briefing' | 'investigate', prompt: string, parent = '', asOf = '', feedback = '') => {
 		const requestId = newRequestId();
 		setPending({ requestId, prompt, mode, parent, asOf, startedAt: Date.now() });
-		start.run({ MODE: mode, PROMPT: prompt, REQUEST_ID: requestId, PARENT: parent, AS_OF: asOf });
+		// Viewer events ride along: a Dive can't write, the Flight records them.
+		start.run({ MODE: mode, PROMPT: prompt, REQUEST_ID: requestId, PARENT: parent, AS_OF: asOf, FEEDBACK: feedback });
 	};
 	const startErr = start.error ? String(start.error.message || start.error) : null;
 	const friendlyStartErr =
@@ -333,12 +337,13 @@ function normalize(rows: Row[], ids: string[], hidden: string[]): Row[] {
 	return out;
 }
 
-function useLayout(specId: string | null, blocks: any[], kind = '') {
+function useLayout(specId: string | null, blocks: any[], kind = '', learned: Record<string, string> = {}, signal: (e: any) => void = () => {}) {
 	const [all, setAll] = useDiveState<Record<string, any>>('layout', {});
 	const mine = (specId && all?.[specId]) || {};
 	const ids = blocks.map((b) => b.id);
 	const hidden: string[] = (mine.hidden || []).filter((id: string) => ids.includes(id));
 	const rows = normalize(mine.rows || defaultRows(blocks, kind), ids, hidden);
+	const typeOf = (id: string) => blocks.find((b) => b.id === id)?.type || '';
 	const save = (patch: any) => {
 		if (!specId) return;
 		const next = { ...mine, rows, hidden, ...patch };
@@ -362,10 +367,15 @@ function useLayout(specId: string | null, blocks: any[], kind = '') {
 		rows,
 		hidden,
 		dirty: Object.keys(mine).length > 0,
-		variant: (b: any) => mine.variant?.[b.id] ?? b.type,
-		setVariant: (id: string, v: string) => save({ variant: { ...(mine.variant || {}), [id]: v } }),
+		// The viewer's choice wins; then what viewers chose most for this block type; then the generated type.
+		variant: (b: any) => mine.variant?.[b.id] ?? (learned[b.type] && variantsFor(b).includes(learned[b.type]) ? learned[b.type] : b.type),
+		setVariant: (id: string, v: string) => {
+			signal({ e: 'variant', t: typeOf(id), v });
+			save({ variant: { ...(mine.variant || {}), [id]: v } });
+		},
 		// Drop on a slot: move there; if it holds another block, swap the two.
 		moveTo: (id: string, r: number, s: number) => {
+			signal({ e: 'layout', t: typeOf(id), v: `row ${r + 1}` });
 			const rs = clone();
 			const from = locate(rs, id);
 			const other = rs[r]?.slots[s] ?? null;
@@ -377,6 +387,7 @@ function useLayout(specId: string | null, blocks: any[], kind = '') {
 		},
 		// Drop between rows: a new full-width row with this block.
 		newRow: (id: string, at: number) => {
+			signal({ e: 'layout', t: typeOf(id), v: `row ${at + 1}` });
 			const rs = clone();
 			const from = locate(rs, id);
 			if (from) rs[from[0]].slots[from[1]] = null;
@@ -399,7 +410,10 @@ function useLayout(specId: string | null, blocks: any[], kind = '') {
 			[rs[r], rs[j]] = [rs[j], rs[r]];
 			save({ rows: rs });
 		},
-		hide: (id: string) => save({ hidden: [...hidden, id] }),
+		hide: (id: string) => {
+			signal({ e: 'hide', t: typeOf(id) });
+			save({ hidden: [...hidden, id] });
+		},
 		show: (id: string) => {
 			save({ hidden: hidden.filter((h) => h !== id), rows: [...rows, { t: 'full', slots: [id] }] });
 		},
@@ -466,7 +480,139 @@ function BlockCard({ b, layout, arrange, flash, onDraft, jump, nav }: any) {
 			footer={!arrange && b.source ? <SourceFooter block={b} /> : null}
 		>
 			{arrange ? <div style={{ maxHeight: 150, overflow: 'hidden', pointerEvents: 'none', opacity: 0.55, maskImage: 'linear-gradient(black 60%, transparent)' }}>{body}</div> : body}
+			{!arrange && <BlockInsight block={b} />}
 		</Card>
+	);
+}
+
+// What this page drew on: memory, Guides, the analyst's follow-up queries, the number check.
+function ContextLine({ spec }: any) {
+	const t = useTheme();
+	const c = spec.context;
+	const k = spec.checks;
+	if (!c && !k) return null;
+	const item = (Icon: any, text: string, title: string) => (
+		<span className="inline-flex items-center gap-1" title={title}>
+			<Icon size={13} /> {text}
+		</span>
+	);
+	return (
+		<>
+			{c?.briefings_remembered > 0 && item(Brain, `Remembers ${c.briefings_remembered} earlier briefing${c.briefings_remembered > 1 ? 's' : ''}`, `${c.earlier_insights} earlier insights and ${c.feedback_used} viewer signals informed this page`)}
+			{c?.guides?.length > 0 && item(BookOpen, `${c.guides.length} Guide${c.guides.length > 1 ? 's' : ''}`, c.guides.join(', '))}
+			{c?.probes_run > 0 && item(SearchCheck, `${c.probes_run} follow-up quer${c.probes_run > 1 ? 'ies' : 'y'}`, `${c.probes_shown} shown on the page`)}
+			{k?.checked > 0 && (
+				<span className="inline-flex items-center gap-1" title={k.ungrounded?.length ? `Not found in the data: ${k.ungrounded.join(', ')}` : 'Every number in the text matches the data'} style={{ color: k.grounded === k.checked ? t.tones.positive.fg : t.tones.warning.fg }}>
+					<ShieldCheck size={13} /> {k.grounded}/{k.checked} numbers checked
+				</span>
+			)}
+		</>
+	);
+}
+
+// What the Dive has learned, read straight from the Flight's log tables.
+function MemoryPage({ db }: any) {
+	const t = useTheme();
+	const T = (name: string) => `"${db}"."main"."${name}"`;
+	const runs = useSQLQuery(`
+		SELECT count(*) FILTER (WHERE kind = 'briefing') AS briefings, count(*) FILTER (WHERE kind <> 'briefing') AS pages,
+		       sum(TRY_CAST(json_extract(checks, '$.grounded') AS INTEGER)) AS grounded, sum(TRY_CAST(json_extract(checks, '$.checked') AS INTEGER)) AS checked
+		FROM ${T('gen_runs')} WHERE status = 'ready'`);
+	const fb = useSQLQuery(`SELECT count(*) AS events FROM ${T('feedback')}`);
+	const ins = useSQLQuery(`
+		SELECT strftime(as_of, '%Y-%m-%d') AS as_of, title, body, tone, coalesce(continuity, 'new') AS continuity, times_seen
+		FROM ${T('insights')} WHERE kind = 'briefing' ORDER BY as_of DESC, rank LIMIT 40`);
+	const qs = useSQLQuery(`
+		SELECT prompt, count(*) AS asked, strftime(max(created_at), '%Y-%m-%d') AS last_asked
+		FROM ${T('gen_runs')} WHERE kind = 'question' AND status = 'ready' GROUP BY 1 ORDER BY 2 DESC, 3 DESC LIMIT 8`);
+	const prefs = useSQLQuery(`
+		SELECT event, target, value, count(*) AS n FROM ${T('feedback')}
+		WHERE event IN ('variant', 'hide', 'rate_insight', 'rate_page', 'investigate') GROUP BY ALL ORDER BY n DESC LIMIT 10`);
+	const versions = useSQLQuery(`
+		SELECT r.prompt_version, r.model, count(DISTINCT r.run_id) AS runs, round(avg(r.duration_s), 1) AS seconds,
+		       sum(TRY_CAST(json_extract(r.checks, '$.grounded') AS INTEGER)) / nullif(sum(TRY_CAST(json_extract(r.checks, '$.checked') AS INTEGER)), 0) AS grounded,
+		       count(f.event) FILTER (WHERE f.value = 'up') AS thumbs_up, count(f.event) FILTER (WHERE f.value = 'down') AS thumbs_down,
+		       any_value(e.plan_score) AS eval_plan, any_value(e.eval_grounded) AS eval_grounded
+		FROM ${T('gen_runs')} r LEFT JOIN ${T('feedback')} f ON f.spec_id = r.run_id AND f.event IN ('rate_page', 'rate_insight')
+		LEFT JOIN (SELECT prompt_version, model, avg(plan_score) AS plan_score, avg(grounded) AS eval_grounded FROM ${T('evals')} GROUP BY ALL) e
+		  ON e.prompt_version = r.prompt_version AND e.model = r.model
+		WHERE r.status = 'ready' GROUP BY 1, 2 ORDER BY max(r.created_at) DESC LIMIT 6`);
+	const rows = (q: any) => (Array.isArray(q.data) ? q.data : []);
+	const r0 = rows(runs)[0] || {};
+	const kpi = {
+		id: 'mem-kpi', type: 'kpi', title: 'Memory',
+		items: [
+			{ key: 'briefings', label: 'Briefings remembered', value: N(r0.briefings), format: 'count' },
+			{ key: 'pages', label: 'Questions and investigations', value: N(r0.pages), format: 'count' },
+			{ key: 'feedback', label: 'Viewer signals', value: N(rows(fb)[0]?.events), format: 'count' },
+			{ key: 'grounded', label: 'Numbers checked against data', value: N(r0.checked) ? N(r0.grounded)! / N(r0.checked)! : null, format: 'pct' },
+		],
+	};
+	const label: Record<string, string> = { new: 'New', ongoing: 'Ongoing', worsening: 'Worsening', improving: 'Improving', resolved: 'Resolved' };
+	const timeline = {
+		id: 'mem-timeline', type: 'timeline', title: 'Insights across briefings',
+		items: rows(ins).slice().reverse().map((r: any) => ({
+			date: String(r.as_of),
+			title: `${label[String(r.continuity)] || 'New'} · ${r.title}`,
+			body: String(r.body || ''),
+			tone: r.continuity === 'worsening' ? 'critical' : r.continuity === 'resolved' || r.continuity === 'improving' ? 'positive' : undefined,
+		})),
+	};
+	const table = (id: string, title: string, label: string, q: any, cols: [string, string, string][]) => ({
+		id, type: 'table', title, x: { key: 'x', kind: 'category', label },
+		series: cols.map(([key, l, format]) => ({ key, label: l, format })),
+		data: rows(q).map((r: any) => ({ x: String(r[cols.length ? Object.keys(r)[0] : 'x']), ...Object.fromEntries(cols.map(([k]) => [k, typeof r[k] === 'bigint' || typeof r[k] === 'number' ? N(r[k]) : String(r[k] ?? '')])) })),
+	});
+	const blocks = [
+		table('mem-questions', 'What viewers ask', 'question', qs, [['asked', 'Times asked', 'count'], ['last_asked', 'Last asked', 'text']]),
+		{ ...table('mem-prefs', 'What viewers did', 'event', prefs, [['target', 'On', 'text'], ['value', 'Value', 'text'], ['n', 'Times', 'count']]) },
+		table('mem-versions', 'Prompt versions', 'prompt version', versions, [['model', 'Model', 'text'], ['runs', 'Runs', 'count'], ['seconds', 'Seconds', 'number'], ['grounded', 'Numbers grounded', 'pct'], ['eval_plan', 'Eval: plan', 'pct'], ['eval_grounded', 'Eval: grounded', 'pct'], ['thumbs_up', 'Useful', 'count'], ['thumbs_down', 'Not useful', 'count']]),
+	];
+	const loading = runs.isLoading || ins.isLoading;
+	return (
+		<div className="space-y-10">
+			<header className="space-y-2">
+				<div className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: t.text }}>
+					<Brain size={13} /> Memory
+				</div>
+				<h1 className={`${t.flat ? 'text-4xl font-bold' : 'text-2xl font-semibold'} leading-tight`} style={{ fontFamily: t.heading, letterSpacing: t.flat ? -1.2 : -0.3 }}>
+					What this Dive has learned
+				</h1>
+				<p className="text-sm" style={{ color: t.muted, maxWidth: 760 }}>
+					Every briefing, question, insight and viewer signal is logged. The next analysis reads it back: insights continue or resolve, ratings steer what gets reported, and the chart types viewers prefer become the defaults.
+				</p>
+			</header>
+			{runs.isError || ins.isError ? (
+				<Callout tone="info" title="No memory yet">
+					The log tables appear after the first run of the updated Flight.
+				</Callout>
+			) : loading ? (
+				<Skeleton h={200} />
+			) : (
+				<>
+					<BlockView block={kpi} />
+					<Card title={timeline.title} icon={componentIcon('timeline')}>
+						<BlockView block={timeline} />
+					</Card>
+					<div className="grid gap-10 md:grid-cols-2">
+						{blocks.slice(0, 2).map((b) => (
+							<Card key={b.id} title={b.title} icon={componentIcon('table')}>
+								{b.data.length ? (
+									<BlockView block={b} />
+								) : (
+									<p className="text-sm" style={{ color: t.muted }}>
+										{b.id === 'mem-questions' ? 'No questions yet. They appear here once viewers use the ask bar.' : 'No viewer signals yet. Ratings, chart switches and hidden blocks appear here.'}
+									</p>
+								)}
+							</Card>
+						))}
+					</div>
+					<Card title={blocks[2].title} icon={componentIcon('table')} description="Compare prompt versions and models on speed, grounded numbers and viewer ratings before changing the default.">
+						<BlockView block={blocks[2]} />
+					</Card>
+				</>
+			)}
+		</div>
 	);
 }
 
@@ -476,7 +622,7 @@ function SpecPage({ spec, arrange, onDraft, nav }: any) {
 	const width = useWidth(ref);
 	const narrow = width < 760;
 	const blocks: any[] = spec.blocks || [];
-	const layout = useLayout(spec.id, blocks, spec.kind);
+	const layout = useLayout(spec.id, blocks, spec.kind, nav?.learned || {}, (e: any) => nav?.signal?.({ ...e, s: spec.id }));
 	const [flash, setFlash] = useState<string | null>(null);
 	const [showSummary, setShowSummary] = useState(false);
 	const [dragId, setDragId] = useState<string | null>(null);
@@ -565,6 +711,7 @@ function SpecPage({ spec, arrange, onDraft, nav }: any) {
 							<CalendarDays size={13} /> Data as of {spec.as_of}
 						</span>
 					)}
+					<ContextLine spec={spec} />
 					{spec.generated_at && (
 						<span className="inline-flex items-center gap-1">
 							<Clock size={13} /> Generated {since(spec.generated_at.replace('T', ' ').slice(0, 19))}
@@ -680,11 +827,10 @@ function SpecPage({ spec, arrange, onDraft, nav }: any) {
 				{arrange && gapZone(layout.rows.length)}
 			</div>
 
-			{(spec.problems || []).length > 0 && (
-				<p className="mt-4 text-xs" style={{ color: t.muted }}>
-					Skipped while generating: {spec.problems.join('; ')}
-				</p>
-			)}
+			<div className="mt-6 flex flex-wrap items-center gap-4 text-xs" style={{ color: t.muted }}>
+				<RateButtons nav={nav} kind="page" target="page" label="Was this page useful?" />
+				{(spec.problems || []).length > 0 && <span>Skipped while generating: {spec.problems.join('; ')}</span>}
+			</div>
 		</div>
 	);
 }
@@ -697,7 +843,24 @@ export default function GenerativeBriefing() {
 	const themeOptions = [...(brand ? [['brand', brand]] : []), ...Object.entries(THEMES)];
 	const [specId, setSpecId] = useDiveState<string | null>('spec', null);
 	const [arrange, setArrange] = useState(false);
+	const [view, setView] = useDiveState<string>('view', 'page');
 	const [draft, setDraft] = useState('');
+	// Viewer signals queue here until the next Flight run carries them (a Dive can't write).
+	const [signals, setSignals] = useState<any[]>([]);
+	const [ratings, setRatings] = useState<Record<string, string>>({});
+	const feedbackRun = useRunFlight(FLIGHT_ID);
+	const takeSignals = (extra: any[] = []) => {
+		const all = [...signals, ...extra].slice(-50);
+		setSignals([]);
+		return all.length ? JSON.stringify(all).slice(0, 6000) : '';
+	};
+	const sendFeedback = (extra: any[]) => {
+		try {
+			feedbackRun.run({ MODE: 'feedback', FEEDBACK: takeSignals(extra), PROMPT: '', REQUEST_ID: newRequestId(), PARENT: '', AS_OF: '' });
+		} catch {
+			/* viewers without run access still see the page */
+		}
+	};
 	const [waitingFor, setWaitingFor] = useState<string | null>(null);
 
 	const list = useSQLQuery(`
@@ -735,6 +898,16 @@ export default function GenerativeBriefing() {
 		}
 	}, [specQ.data]);
 
+	// Chart types viewers chose at least 3 times for a block type become its default.
+	const learnedQ = useSQLQuery(`SELECT target, value, count(*) AS n FROM "${APP.db}"."main"."feedback" WHERE event = 'variant' GROUP BY ALL HAVING count(*) >= 3 ORDER BY n DESC`);
+	const learned = useMemo(() => {
+		const out: Record<string, string> = {};
+		(Array.isArray(learnedQ.data) ? learnedQ.data : []).forEach((r: any) => {
+			if (!out[String(r.target)]) out[String(r.target)] = String(r.value);
+		});
+		return out;
+	}, [learnedQ.data]);
+
 	const gen = useGenerator((requestId) => {
 		setWaitingFor(requestId);
 		list.refetch();
@@ -757,7 +930,7 @@ export default function GenerativeBriefing() {
 		const text = q.trim();
 		if (!text || gen.busy) return;
 		setDraft(text);
-		gen.generate('ask', text);
+		gen.generate('ask', text, '', '', takeSignals());
 	};
 
 	// What AI chat sees: the open page's question, headline and components. Chat
@@ -784,7 +957,7 @@ export default function GenerativeBriefing() {
 		briefAsOf: (iso: string) => {
 			const have = rows.find((r) => r.kind === 'briefing' && r.status === 'ready' && r.as_of === iso);
 			if (have) return setSpecId(have.id);
-			if (!gen.busy) gen.generate('briefing', '', '', iso);
+			if (!gen.busy) gen.generate('briefing', '', '', iso, takeSignals());
 		},
 		open: (id: string) => {
 			setSpecId(id);
@@ -794,7 +967,14 @@ export default function GenerativeBriefing() {
 		running: (q: string) => gen.busy && gen.pending?.mode === 'investigate' && gen.pending?.prompt === q,
 		investigate: (item: any) => {
 			if (gen.busy || !currentId) return;
-			gen.generate('investigate', String(item.question).slice(0, 600), currentId);
+			gen.generate('investigate', String(item.question).slice(0, 600), currentId, '', takeSignals([{ e: 'investigate', s: currentId, t: String(item.title || '').slice(0, 120) }]));
+		},
+		learned,
+		signal: (e: any) => setSignals((prev) => [...prev, e].slice(-50)),
+		rating: (kind: string, target: string) => ratings[`${currentId}|${kind}|${target}`] || '',
+		rate: (kind: string, target: string, value: string) => {
+			setRatings({ ...ratings, [`${currentId}|${kind}|${target}`]: value });
+			if (value) sendFeedback([{ e: kind === 'page' ? 'rate_page' : 'rate_insight', s: currentId, t: String(target).slice(0, 120), v: value }]);
 		},
 	};
 
@@ -817,17 +997,22 @@ export default function GenerativeBriefing() {
 							</span>
 						</div>
 						<span className="flex-1" />
-						{rows.length > 0 && <PagesMenu rows={rows} selected={currentId} onSelect={setSpecId} />}
+						{rows.length > 0 && <PagesMenu rows={rows} selected={currentId} onSelect={(id: string) => { setView('page'); setSpecId(id); }} />}
 						<Segmented options={themeOptions.map(([k, v]: any) => ({ value: k, label: v.name, icon: !t.flat && k === themeKey ? <Palette size={11} /> : null }))} value={themeKey} onChange={setThemeKey} />
 						<Button variant={arrange ? 'primary' : 'outline'} size="sm" onClick={() => setArrange(!arrange)}>
 							<LayoutGrid size={13} /> {arrange ? 'Done' : 'Arrange'}
 						</Button>
-						<Button variant="ghost" size="sm" disabled={gen.busy} onClick={() => gen.generate('briefing', '')} title="Run the daily briefing Flight now">
+						<Button variant={view === 'memory' ? 'primary' : 'ghost'} size="sm" onClick={() => setView(view === 'memory' ? 'page' : 'memory')} title="What this Dive has learned">
+							<Brain size={13} /> Memory
+						</Button>
+						<Button variant="ghost" size="sm" disabled={gen.busy} onClick={() => gen.generate('briefing', '', '', '', takeSignals())} title="Run the daily briefing Flight now">
 							<RefreshCw size={13} /> New briefing
 						</Button>
 					</div>
 
-					{list.isError ? (
+					{view === 'memory' ? (
+						<MemoryPage db={APP.db} />
+					) : list.isError ? (
 						<Callout tone="critical" title="Couldn't load briefings">
 							{String(list.error)}
 						</Callout>

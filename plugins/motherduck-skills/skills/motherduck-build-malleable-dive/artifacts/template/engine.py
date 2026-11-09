@@ -7,20 +7,29 @@ Turns a question, or the domain's daily briefing plan, into a validated Dive spe
               CATALOG (strict JSON schema whose enums are the catalog ids).
               MODE=briefing: the recipe's fixed BRIEFING_PLAN.
     compile   validate the plan against CATALOG and compile it to SQL; run it
-    narrate   prompt() writes headline, callouts, captions, highlights and annotations;
-              every highlight/annotation is checked against the data
+    probe     prompt() proposes up to ANALYST_PROBES follow-up queries that test why
+              something moved; they compile like any block (catalog ids only)
+    narrate   prompt() writes headline, insights, captions, block insights and
+              annotations, with memory of earlier briefings, viewer feedback and the
+              recipe's Guides; every number is checked against the data
     publish   one JSON spec row in "<DB>".main.dive_specs; the Dive renders it
+    learn     logs the run (gen_runs, llm_calls, insights) and, after a briefing,
+              updates the recipe's memory Guide
 
 The spec holds data and presentation only, never SQL the Dive would execute.
 
 Config (strings; the Dive sends them through useRunFlight):
-    MODE        briefing | ask | investigate | refresh
+    MODE        briefing | ask | investigate | refresh | feedback
     PROMPT      the question, for MODE=ask and MODE=investigate
     PARENT      MODE=investigate: id of the spec whose insight is being investigated
     REQUEST_ID  opaque id from the Dive, so it can open the spec it asked for
     AS_OF       analysis date; empty means the recipe's AS_OF_DEFAULT
     MODEL       prompt() model
+    FEEDBACK    JSON list of viewer events from the Dive (any mode records them;
+                MODE=feedback only records them)
 """
+
+import hashlib
 
 import datetime as dt
 import json
@@ -725,17 +734,6 @@ def schema_arg(name, schema):
     return json.dumps({"name": name, "strict": True, "schema": schema})
 
 
-def llm(con, model, instructions, payload, name, schema):
-    text = instructions + "\n\n" + payload
-    row = con.execute(
-        "SELECT prompt(?, model := ?, json_schema := ?)::VARCHAR",
-        [text, model, schema_arg(name, schema)],
-    ).fetchone()
-    if not row or row[0] is None:
-        raise RuntimeError(f"prompt() returned NULL for {name}")
-    return json.loads(row[0])
-
-
 S = {"type": "string"}
 
 PLAN_SCHEMA = {
@@ -815,7 +813,7 @@ Catalog:
 NARRATE_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["headline", "summary", "callouts", "blocks", "follow_ups"],
+    "required": ["headline", "summary", "callouts", "blocks", "follow_ups", "promote"],
     "properties": {
         "headline": {"type": "string", "description": "One sentence, the single most important finding, with a number"},
         "summary": {"type": "string", "description": "2-3 plain sentences a manager can read in 15 seconds. Specific numbers. No hype words."},
@@ -825,11 +823,13 @@ NARRATE_SCHEMA = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["tone", "title", "body", "block_id", "question"],
+                "required": ["tone", "title", "body", "block_id", "question", "continuity", "refers_to"],
                 "properties": {
                     "tone": {"type": "string", "enum": ["critical", "warning", "positive", "info"]},
+                    "continuity": {"type": "string", "enum": ["new", "ongoing", "worsening", "improving", "resolved"], "description": "Against the previous briefings' insights in memory: new, or how a previous insight developed"},
+                    "refers_to": {"type": "string", "description": "Exact title of the previous insight this continues, or empty"},
                     "title": {"type": "string", "description": "max 8 words"},
-                    "body": {"type": "string", "description": "1-2 sentences with the evidence and a suggested action"},
+                    "body": {"type": "string", "description": "1-2 sentences, at most 45 words: the evidence and a suggested action"},
                     "block_id": {"type": "string", "description": "id of the component that shows the evidence, or empty"},
                     "question": {"type": "string", "description": "The investigation a reader would run next to find out WHY, as a short question naming the metric and segment, e.g. 'Why did Other-channel visitors jump in the last 4 weeks?'"},
                 },
@@ -840,10 +840,11 @@ NARRATE_SCHEMA = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["id", "caption", "highlight", "annotations"],
+                "required": ["id", "caption", "insight", "highlight", "annotations"],
                 "properties": {
                     "id": S,
                     "caption": {"type": "string", "description": "One sentence: what to notice in this component, with a number"},
+                    "insight": {"type": "string", "description": "Optional second sentence: what it means for the reader or what to do, using the Guides and memory when they apply. Empty when the caption says it all"},
                     "highlight": {"type": "array", "items": S, "description": "x values (category labels or period dates) to emphasise. Must be exact x values from the data"},
                     "annotations": {
                         "type": "array",
@@ -854,19 +855,60 @@ NARRATE_SCHEMA = {
             },
         },
         "follow_ups": {"type": "array", "items": S, "description": "3 short follow-up questions a manager would ask next, answerable with the catalog"},
+        "promote": {"type": "array", "items": S, "description": "0-2 probe ids (p1, p2, p3) whose result a reader should see on the page"},
     },
 }
 
 NARRATE_INSTRUCTIONS = """You are writing the narrative layer of an analytical page for a {audience}. The data below is the exact content of each component.
-Rules: state what the data shows, with specific numbers; percentages for rates. Do not invent numbers. Use only x values that appear in the data for highlight and annotations. Keep the headline under 25 words and each caption to one short sentence.
+Rules: state what the data shows, with specific numbers; percentages for rates. Do not invent numbers: every number you write must come from the data, the probes or memory. Use only x values that appear in the data for highlight and annotations. Keep the headline under 25 words and each caption to one short sentence.
 On an investigation page, the headline answers why, and the callouts separate what the data shows from what still needs checking.
+Probes are follow-up queries an analyst ran to test why things moved. Use their results as evidence, but refer to them by what they show ("a follow-up query shows ..."), never by id. List in promote the ids (at most 2) of probes a reader should see.
+Memory holds earlier briefings' insights and what viewers did with them. Set each callout's continuity against it: new, ongoing (still true, similar size), worsening, improving, or resolved (an earlier insight that no longer holds; at most one, with tone positive). Set refers_to to the earlier title when continuing it, and say how long an ongoing issue has lasted. Do not repeat an earlier insight unchanged unless it is critical. Avoid insights similar to ones viewers rated not useful.
+Business context from the recipe's Guides (definitions, targets, known events) decides what matters: cite a target when the data crosses it.
 Known context about {domain} (use only when the data supports it): {context}
+Business context from Guides:
+{guides}
 Question or brief: {question}
 Data as of {as_of}."""
+
+PROBE_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["probes"],
+    "properties": {
+        "probes": {
+            "type": "array",
+            "description": "0-3 follow-up queries that test why something moved",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["hypothesis", "type", "measure", "dimension", "filters", "window", "compare"],
+                "properties": {
+                    "hypothesis": {"type": "string", "description": "What this query tests, as a short title, e.g. 'Is the heat rise concentrated in the Bronx?'"},
+                    "type": {"type": "string", "enum": ["drivers", "bar"], "description": "drivers: rank which values of every other dimension moved the measure; bar: the measure by one dimension with a comparison"},
+                    "measure": {"type": "string", "enum": ALL_MEASURES},
+                    "dimension": {"type": "string", "enum": ALL_DIMS + [""], "description": "bar only; empty for drivers"},
+                    "filters": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["dimension", "values"], "properties": {"dimension": {"type": "string", "enum": ALL_DIMS}, "values": {"type": "array", "items": S}}}},
+                    "window": {"type": "string", "enum": WINDOWS},
+                    "compare": {"type": "string", "enum": COMPARES},
+                },
+            },
+        }
+    },
+}
+
+PROBE_INSTRUCTIONS = """You are a data analyst checking a page draft for a {audience} before it is written up. Below are the page's components with their data, the shifts a change detector found, and earlier briefings' insights.
+Propose up to {n} follow-up queries that would best explain WHY the most important numbers moved: which segment drives a change, whether a shift is concentrated in one value, whether an earlier insight still holds. Do not repeat what a component already shows. Use only catalog ids, and filter values that appear in the data or the catalog, matching case exactly. Return no probes when nothing needs explaining.
+Business context from Guides:
+{guides}
+Catalog:
+{catalog}"""
 
 
 def compact(block):
     out = {"id": block["id"], "type": block["type"], "title": block["title"]}
+    if block.get("hypothesis"):
+        out["hypothesis"] = block["hypothesis"]
     if block["type"] == "kpi":
         out["items"] = [{k: i[k] for k in ("label", "value", "prior", "format")} for i in block["items"]]
         out["compare"] = block["compare"]
@@ -910,9 +952,13 @@ def apply_narrative(spec, nar):
         if not b or b["type"] == "kpi":
             if b is not None:
                 b["caption"] = nb.get("caption", "")
+                if (nb.get("insight") or "").strip():
+                    b["insight"] = nb["insight"].strip()
             continue
         xs = {str(d.get("x")) for d in b.get("data", [])}
         b["caption"] = nb.get("caption", "")
+        if (nb.get("insight") or "").strip():
+            b["insight"] = nb["insight"].strip()
         b["highlight"] = [h for h in nb.get("highlight", []) if h in xs][:6]
         if b["type"] == "line":
             b["annotations"] = [a for a in nb.get("annotations", []) if a.get("x") in xs][:3]
@@ -922,7 +968,7 @@ def apply_narrative(spec, nar):
             for x in dict.fromkeys(b["highlight"] + [a["x"] for a in b["annotations"]]):
                 s = hinted.get(x)
                 b["points"].append({"x": x, "series": s if s in keys else biggest_mover(b["data"], keys, x)})
-    callouts = [c for c in nar.get("callouts", []) if c.get("tone") in ("critical", "warning", "positive", "info")][:4]
+    callouts = [c for c in nar.get("callouts", []) if c.get("tone") in ("critical", "warning", "positive", "info")][:5]
     for c in callouts:
         if c.get("block_id") not in by_id:
             c["block_id"] = ""
@@ -932,10 +978,488 @@ def apply_narrative(spec, nar):
     return callouts
 
 
+
 # --------------------------------------------------------------------------
-# Daily briefing template: a fixed plan, so the morning page is stable
+# Logging: every run, model call, insight and viewer event, in "<DB>".main
 # --------------------------------------------------------------------------
 
+LOG_DDL = [
+    f"""CREATE TABLE IF NOT EXISTS "{DB}".main.gen_runs (
+        run_id VARCHAR, request_id VARCHAR, mode VARCHAR, kind VARCHAR, parent VARCHAR, prompt VARCHAR,
+        as_of DATE, model VARCHAR, prompt_version VARCHAR, created_at TIMESTAMP, status VARCHAR, error VARCHAR,
+        duration_s DOUBLE, steps VARCHAR, plan VARCHAR, probes VARCHAR, narrative VARCHAR, checks VARCHAR,
+        context VARCHAR)""",
+    f"""CREATE TABLE IF NOT EXISTS "{DB}".main.llm_calls (
+        run_id VARCHAR, step VARCHAR, model VARCHAR, prompt_version VARCHAR, input_chars INTEGER,
+        output_chars INTEGER, latency_ms INTEGER, ok BOOLEAN, error VARCHAR, created_at TIMESTAMP)""",
+    f"""CREATE TABLE IF NOT EXISTS "{DB}".main.insights (
+        insight_id VARCHAR, run_id VARCHAR, kind VARCHAR, as_of DATE, created_at TIMESTAMP, rank INTEGER,
+        tone VARCHAR, title VARCHAR, body VARCHAR, question VARCHAR, block_id VARCHAR, continuity VARCHAR,
+        refers_to VARCHAR, first_seen DATE, times_seen INTEGER)""",
+    f"""CREATE TABLE IF NOT EXISTS "{DB}".main.evals (
+        run_at TIMESTAMP, prompt_version VARCHAR, model VARCHAR, narrate BOOLEAN, question VARCHAR,
+        plan_score DOUBLE, grounded DOUBLE, seconds DOUBLE, detail VARCHAR)""",
+    f"""CREATE TABLE IF NOT EXISTS "{DB}".main.feedback (
+        created_at TIMESTAMP, recorded_by VARCHAR, spec_id VARCHAR, event VARCHAR, target VARCHAR,
+        value VARCHAR, detail VARCHAR)""",
+]
+
+FEEDBACK_EVENTS = {"rate_page", "rate_insight", "variant", "hide", "show", "layout", "investigate", "ask", "open", "theme"}
+ANALYST_PROBES = int(globals().get("ANALYST_PROBES", 3))
+GUIDE_TOPICS = list(globals().get("GUIDE_TOPICS", []))
+MEMORY_GUIDE = globals().get("MEMORY_GUIDE", True)
+MEMORY_TOPIC = f"briefings/{DB}"
+MEMORY_TITLE = f"What the {DB} briefing has learned"
+DEFAULT_MODEL = globals().get("DEFAULT_MODEL", "gpt-6-luna")
+
+# Changes when any instruction or schema changes, so results can be compared per prompt version.
+PROMPT_VERSION = hashlib.sha1(
+    json.dumps([PLAN_INSTRUCTIONS, INVESTIGATE_INSTRUCTIONS, NARRATE_INSTRUCTIONS, PROBE_INSTRUCTIONS, PLAN_SCHEMA, NARRATE_SCHEMA, PROBE_SCHEMA], sort_keys=True).encode()
+).hexdigest()[:10]
+
+
+def utc_now():
+    return dt.datetime.now(dt.timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")
+
+
+class Run:
+    """Collects what one generation did: step timings and model calls."""
+
+    def __init__(self, run_id, model):
+        self.run_id, self.model = run_id, model
+        self.steps, self.calls = {}, []
+        self._t = {}
+
+    def start(self, step):
+        self._t[step] = time.time()
+        mark(step, "running")
+
+    def done(self, step, **fields):
+        self.steps[step] = int((time.time() - self._t.get(step, time.time())) * 1000)
+        mark(step, "ok", **fields)
+
+    def llm(self, con, step, instructions, payload, name, schema):
+        text = instructions + "\n\n" + payload
+        t0 = time.time()
+        try:
+            row = con.execute("SELECT prompt(?, model := ?, json_schema := ?)::VARCHAR", [text, self.model, schema_arg(name, schema)]).fetchone()
+            if not row or row[0] is None:
+                raise RuntimeError(f"prompt() returned NULL for {name}")
+            out = row[0]
+            self.calls.append((step, len(text), len(out), int((time.time() - t0) * 1000), True, None))
+            return json.loads(out)
+        except Exception as e:
+            self.calls.append((step, len(text), 0, int((time.time() - t0) * 1000), False, str(e)[:300]))
+            raise
+
+
+def llm(con, model, instructions, payload, name, schema):
+    """One prompt() call without logging (kept for recipes and scripts that call it)."""
+    return Run("adhoc", model).llm(con, name, instructions, payload, name, schema)
+
+
+def record_feedback(con, raw, recorded_by):
+    """Viewer events the Dive collected. A Dive can't write, so it sends them with a Flight run."""
+    try:
+        events = json.loads(raw or "[]")
+    except json.JSONDecodeError:
+        return 0
+    rows = []
+    for e in events[:60] if isinstance(events, list) else []:
+        if not isinstance(e, dict) or e.get("e") not in FEEDBACK_EVENTS:
+            continue
+        spec_id = str(e.get("s") or "")
+        if spec_id and not re.fullmatch(r"[0-9a-f-]{36}", spec_id):
+            continue
+        rows.append([utc_now(), recorded_by, spec_id, e["e"], str(e.get("t") or "")[:120], str(e.get("v") or "")[:200], str(e.get("d") or "")[:300]])
+    if rows:
+        con.executemany(f'INSERT INTO "{DB}".main.feedback VALUES (?::TIMESTAMP, ?, ?, ?, ?, ?, ?)', rows)
+    return len(rows)
+
+
+# --------------------------------------------------------------------------
+# Memory: earlier briefings, viewer feedback and questions, read back into prompts
+# --------------------------------------------------------------------------
+
+
+def load_memory(con, as_of):
+    m = {"previous_insights": [], "rated_useful": [], "rated_not_useful": [], "frequent_questions": [], "viewer_preferences": [], "briefings_remembered": 0}
+    q = lambda sql, p=None: con.execute(sql, p or []).fetchall()
+    briefings = q(f"""SELECT run_id, as_of FROM (
+            SELECT run_id, as_of, row_number() OVER (PARTITION BY as_of ORDER BY created_at DESC) AS n
+            FROM "{DB}".main.gen_runs WHERE kind = 'briefing' AND status = 'ready' AND as_of < ?)
+        WHERE n = 1 ORDER BY as_of DESC LIMIT 3""", [as_of.isoformat()])
+    m["briefings_remembered"] = len(briefings)
+    for run_id, b_as_of in briefings:
+        for title, body, tone, cont, first, times in q(
+            f'SELECT title, body, tone, continuity, first_seen, times_seen FROM "{DB}".main.insights WHERE run_id = ? ORDER BY rank', [run_id]
+        ):
+            m["previous_insights"].append({"briefing_as_of": str(b_as_of), "title": title, "body": body, "tone": tone, "continuity": cont, "first_seen": str(first), "times_seen": times})
+    for title, value in q(f"""SELECT i.title, f.value FROM "{DB}".main.feedback f JOIN "{DB}".main.insights i
+            ON i.run_id = f.spec_id AND i.title = f.target WHERE f.event = 'rate_insight' ORDER BY f.created_at DESC LIMIT 20"""):
+        m["rated_useful" if value == "up" else "rated_not_useful"].append(title)
+    m["frequent_questions"] = [r[0] for r in q(f"""SELECT prompt FROM "{DB}".main.gen_runs WHERE kind = 'question' AND status = 'ready'
+            GROUP BY prompt ORDER BY count(*) DESC, max(created_at) DESC LIMIT 8""")]
+    for event, target, value, n in q(f"""SELECT event, target, value, count(*) AS n FROM "{DB}".main.feedback
+            WHERE event IN ('variant', 'hide') GROUP BY ALL HAVING count(*) >= 2 ORDER BY n DESC LIMIT 8"""):
+        m["viewer_preferences"].append(f"viewers switched {target} blocks to {value} {n} times" if event == "variant" else f"viewers hid {target} blocks {n} times")
+    return m
+
+
+def read_guides(con):
+    """Business context the recipe's Guides hold: its own topic plus GUIDE_TOPICS."""
+    out, used, budget = [], [], 9000
+    for topic in [MEMORY_TOPIC] + GUIDE_TOPICS:
+        try:
+            rows = con.execute("SELECT id, title FROM MD_LIST_GUIDES(topic = ?) LIMIT 6", [topic]).fetchall()
+        except Exception:
+            return "", []
+        for gid, title in rows:
+            if budget <= 0:
+                break
+            content = con.execute("SELECT content FROM MD_GET_GUIDE(id = ?::UUID)", [str(gid)]).fetchone()[0] or ""
+            content = content[: min(3500, budget)]
+            budget -= len(content)
+            out.append(f"### {title}\n{content}")
+            used.append(title)
+    return "\n\n".join(out), used
+
+
+def write_memory_guide(con, memory, insights, as_of):
+    """After a briefing, keep a readable Guide of what the briefing has learned. People, the
+    Dive's AI Chat and other agents read it; the next briefing reads it back as context."""
+    if not MEMORY_GUIDE:
+        return None
+    lines = [f"# {MEMORY_TITLE}", "", f"Updated by the briefing Flight for data as of {as_of}. Edit freely: the Flight reads this Guide before every analysis.", ""]
+    lines.append("## Current insights")
+    for i in insights:
+        since = f", first seen {i['first_seen']}, seen {i['times_seen']} times" if i["times_seen"] > 1 else ""
+        lines.append(f"- **{i['title']}** ({i['continuity']}{since}): {i['body']}")
+    resolved = [p for p in memory["previous_insights"] if p["title"] not in {i.get("refers_to") for i in insights}]
+    if resolved:
+        lines += ["", "## Earlier insights not repeated"]
+        lines += [f"- {p['title']} (briefing of {p['briefing_as_of']})" for p in resolved[:8]]
+    if memory["frequent_questions"]:
+        lines += ["", "## What viewers ask"] + [f"- {q}" for q in memory["frequent_questions"]]
+    if memory["viewer_preferences"] or memory["rated_not_useful"]:
+        lines += ["", "## Viewer preferences"] + [f"- {p}" for p in memory["viewer_preferences"]]
+        lines += [f"- Rated not useful: {t}" for t in memory["rated_not_useful"][:5]]
+    content = "\n".join(lines)
+    try:
+        row = con.execute("SELECT id FROM MD_LIST_GUIDES(topic = ?) WHERE title = ? LIMIT 1", [MEMORY_TOPIC, MEMORY_TITLE]).fetchone()
+        if row:
+            con.execute("SELECT * FROM MD_UPDATE_GUIDE(id = ?::UUID, content = ?, change_comment = ?)", [str(row[0]), content, f"Briefing as of {as_of}"])
+        else:
+            con.execute(
+                "SELECT * FROM MD_CREATE_GUIDE(topic = ?, title = ?, content = ?, description = ?, access = 'user')",
+                [MEMORY_TOPIC, MEMORY_TITLE, content, f"Recurring insights, viewer questions and preferences the {DB} briefing has learned"],
+            )
+        return MEMORY_TITLE
+    except Exception as e:  # Guides are optional: the run still publishes
+        print(f"memory guide not written: {e}")
+        return None
+
+
+# --------------------------------------------------------------------------
+# Number check: every number in the narrative must come from the data
+# --------------------------------------------------------------------------
+
+TIME_WORD = re.compile(r"\s*\+?\s*-?(days?|weeks?|months?|years?|hours?|briefings?|times|straight)\b", re.I)
+NUM = re.compile(r"(?<![\w.-])(-?\d[\d,]*(?:\.\d+)?)\s*(%|K\b|k\b|M\b|million|thousand|percentage points|pp\b)?")
+
+
+def data_numbers(spec, extra=()):
+    vals = []
+    def add(v):
+        try:
+            f = float(v)
+        except (TypeError, ValueError):
+            return
+        if f == f:
+            vals.append(f)
+    def pair(a, b):
+        add(a), add(b)
+        try:
+            a, b = float(a), float(b)
+            add(a - b)
+            if b:
+                add((a - b) / abs(b))
+        except (TypeError, ValueError):
+            pass
+    for b in list(spec.get("blocks", [])) + list(extra):
+        for it in b.get("items", []) or []:
+            if isinstance(it, dict) and "value" in it:
+                pair(it.get("value"), it.get("prior"))
+        for row in b.get("data", []) or []:
+            for k, v in row.items():
+                if k.endswith("_prior"):
+                    pair(row.get(k[: -len("_prior")]), v)
+                elif not k.startswith("_"):
+                    add(v)
+            if "before" in row and "now" in row:
+                pair(row["now"], row["before"])
+            if "baseline" in row and "latest" in row:
+                pair(row["latest"], row["baseline"])
+        t = b.get("total") or {}
+        if t:
+            pair(t.get("now"), t.get("before"))
+        for link in b.get("links", []) or []:
+            add(link.get("value"))
+        for node in (b.get("tree") or {}).get("children", []) or []:
+            for leaf in node.get("children", []) or []:
+                add(leaf.get("value"))
+    return vals
+
+
+def text_numbers(text):
+    """Numbers stated in Guides and earlier insights, which the narrative may quote back (targets, last week's figures)."""
+    out = []
+    for raw, unit in NUM.findall(text or ""):
+        n = float(raw.replace(",", "")) * {"K": 1e3, "k": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}.get(unit or "", 1)
+        out += [n, n / 100] if unit == "%" else [n]
+    return out
+
+
+def check_numbers(spec, texts, extra=(), allowed=()):
+    """Share of numbers in the narrative that match a value, a difference or a change in the data,
+    or a number the Guides or earlier insights state."""
+    vals = data_numbers(spec, extra) + list(allowed)
+    pcts = [v * 100 for v in vals]
+    checked, missing = 0, []
+    for text in texts:
+        text = re.sub(r"\d{4}-\d{2}-\d{2}", " ", text or "")  # dates are not claims
+        for m in NUM.finditer(text):
+            raw, unit = m.group(1), m.group(2)
+            n = float(raw.replace(",", ""))
+            if (unit or "") == "" and (abs(n) <= 12 or 1990 <= n <= 2100):
+                continue  # small counts and years are not claims about the data
+            if not unit and TIME_WORD.match(text, m.end()):
+                continue  # "the last 28 days", "7+ days" describe a window, not a value
+            mult = {"K": 1e3, "k": 1e3, "thousand": 1e3, "M": 1e6, "million": 1e6}.get(unit or "", 1)
+            target = n * mult
+            checked += 1
+            if unit in ("%", "percentage points", "pp"):
+                ok = any(abs(abs(p) - abs(n)) <= max(0.06, abs(n) * 0.006) for p in pcts) or any(abs(abs(v) - abs(n)) <= 0.06 for v in vals)
+            else:
+                tol = 0.051 if abs(target) < 100 and mult == 1 else abs(target) * (0.006 if mult == 1 else 0.051)
+                ok = any(abs(abs(v) - abs(target)) <= tol for v in vals)
+            if not ok:
+                missing.append(raw + (unit or ""))
+    return {"checked": checked, "grounded": checked - len(missing), "ungrounded": missing[:12]}
+
+
+def narrative_texts(spec, callouts):
+    texts = [spec.get("headline", ""), spec.get("summary", "")]
+    texts += [c.get("title", "") + " " + c.get("body", "") for c in callouts]
+    texts += [b.get("caption", "") + " " + b.get("insight", "") for b in spec.get("blocks", [])]
+    return texts
+
+
+# --------------------------------------------------------------------------
+# One generation: plan -> compile -> probe -> narrate (also used by eval.py)
+# --------------------------------------------------------------------------
+
+
+def connect():
+    # Product analytics only: which agent harness and model built this Flight.
+    agent_harness = os.environ.get("MOTHERDUCK_AGENT_HARNESS") or "unknown"
+    agent_llm = os.environ.get("MOTHERDUCK_AGENT_LLM") or "unknown"
+    con = duckdb.connect("md:", config={"custom_user_agent": f"agent-skills/3.0.0(harness-{agent_harness};llm-{agent_llm})"})
+    con.execute(f'CREATE DATABASE IF NOT EXISTS "{DB}"')
+    for alias, path in ATTACH:
+        con.execute(f"ATTACH IF NOT EXISTS '{path}' AS {alias}")
+    con.execute(SPECS_DDL)
+    for ddl in LOG_DDL:
+        con.execute(ddl)
+    return con
+
+
+def resolve_as_of(con, as_of_env=""):
+    if as_of_env:
+        return dt.date.fromisoformat(as_of_env)
+    if AS_OF_DEFAULT == "yesterday":
+        return dt.date.today() - dt.timedelta(days=1)
+    return con.execute(f'SELECT max({ANCHOR[1]}) FROM "{DB}".main.{ANCHOR[0]}').fetchone()[0]
+
+
+def memory_text(memory):
+    parts = []
+    if memory["previous_insights"]:
+        parts.append("Recent briefing insights: " + "; ".join(f"{p['title']} ({p['briefing_as_of']})" for p in memory["previous_insights"][:8]))
+    if memory["viewer_preferences"]:
+        parts.append("Viewer preferences: " + "; ".join(memory["viewer_preferences"]))
+    if memory["frequent_questions"]:
+        parts.append("Questions viewers asked before: " + "; ".join(memory["frequent_questions"][:5]))
+    return "\n".join(parts)
+
+
+def make_plan(con, run, mode, question, parent, memory, guides_text, as_of):
+    if mode not in ("ask", "investigate"):
+        return BRIEFING_PLAN
+    template = INVESTIGATE_INSTRUCTIONS if mode == "investigate" else PLAN_INSTRUCTIONS
+    payload = f"Question: {question}"
+    if parent and parent.get("insight"):
+        ins = parent["insight"]
+        payload = f"Insight to investigate: {ins.get('title')}. {ins.get('body')}\n{payload}"
+    extra = memory_text(memory)
+    if guides_text:
+        extra += "\n\nBusiness context from Guides:\n" + guides_text[:4000]
+    if extra:
+        payload += "\n\nContext (use it to choose what to show; do not repeat it):\n" + extra
+    return run.llm(
+        con, "plan",
+        template.format(component_rules=COMPONENT_RULES, audience=AUDIENCE, domain=DOMAIN_DESCRIPTION, default_compare=DEFAULT_COMPARE, hints=PLANNER_HINTS, as_of=as_of.isoformat(), catalog=catalog_text(con)),
+        payload, "dive_plan", PLAN_SCHEMA,
+    )
+
+
+def compile_plan(compiler, plan, mode):
+    blocks, problems, seen = [], [], set()
+    for i, pb in enumerate(plan["blocks"][: 10 if mode in ("briefing", "refresh") else 7]):
+        try:
+            blk = compiler.compile(dict(pb), i + 1)
+            src = blk["source"]
+            sig = json.dumps([blk["type"] == "kpi", src.get("measures"), src.get("dimension"), src.get("filters"), src.get("window")], sort_keys=True, default=str)
+            if sig in seen:
+                problems.append(f"{pb.get('title')}: duplicate of an earlier component, dropped")
+                continue
+            seen.add(sig)
+            blocks.append(blk)
+        except Exception as e:  # keep the page if one block fails
+            problems.append(f"{pb.get('title')}: {e}")
+    return blocks, problems
+
+
+def about(block):
+    """Definitions for the measures and dimension a block shows, from the catalog."""
+    src = block.get("source") or {}
+    defs = []
+    for qm in src.get("measures") or []:
+        if "." in qm and qm in ALL_MEASURES:
+            ds, m, _, fmt, desc = measure_info(qm)
+            defs.append({"term": pretty(qm), "text": desc + (" Lower is better." if good_direction(qm) == "down" else "")})
+    ds = src.get("dataset")
+    dim = src.get("dimension")
+    if ds in CATALOG and dim in CATALOG[ds]["dims"]:
+        defs.append({"term": dim.replace("_", " ").capitalize(), "text": CATALOG[ds]["dims"][dim][1]})
+    return {"definitions": defs, "why": block.get("why", "")}
+
+
+def run_probes(con, run, compiler, blocks, changes, memory, guides_text, n_existing):
+    if ANALYST_PROBES <= 0:
+        return [], []
+    payload = json.dumps({"components": [compact(b) for b in blocks], "detected_shifts": changes[:7], "earlier_insights": memory["previous_insights"][:8]}, default=str)
+    out = run.llm(con, "probe", PROBE_INSTRUCTIONS.format(audience=AUDIENCE, n=ANALYST_PROBES, guides=guides_text[:3000] or "(none)", catalog=catalog_text(con)), payload, "dive_probes", PROBE_SCHEMA)
+    probes, results = out.get("probes", [])[:ANALYST_PROBES], []
+    for i, p in enumerate(probes):
+        pb = {"type": p["type"], "title": p["hypothesis"], "measures": [p["measure"]], "dimension": p.get("dimension", ""), "filters": p.get("filters", []), "window": p.get("window"), "compare": p.get("compare"), "limit": 8, "span": 6, "why": p["hypothesis"]}
+        try:
+            blk = compiler.compile(pb, n_existing + i + 1)
+            blk.update(id=f"p{i + 1}", hypothesis=p["hypothesis"], probe=True)
+            results.append(blk)
+        except Exception as e:
+            p["error"] = str(e)[:200]
+    return probes, results
+
+
+def narrate(con, run, spec, blocks, probe_blocks, changes, memory, guides_text, question, as_of):
+    payload = json.dumps({
+        "components": [compact(b) for b in blocks],
+        "probes": [compact(b) for b in probe_blocks],
+        "detected_shifts": changes[:7],
+        "memory": {k: memory[k] for k in ("previous_insights", "rated_useful", "rated_not_useful", "viewer_preferences")},
+    }, default=str)
+    instructions = NARRATE_INSTRUCTIONS.format(audience=AUDIENCE, domain=DOMAIN_DESCRIPTION, context=DOMAIN_CONTEXT, guides=guides_text[:5000] or "(none)", question=question, as_of=as_of.isoformat())
+    return run.llm(con, "narrate", instructions, payload, "dive_narrative", NARRATE_SCHEMA), instructions, payload
+
+
+def link_insights(callouts, memory, as_of):
+    """Carry first_seen and times_seen forward from the earlier insight a callout continues."""
+    prev = {p["title"].strip().lower(): p for p in memory["previous_insights"]}
+    for c in callouts:
+        p = prev.get((c.get("refers_to") or "").strip().lower())
+        if c.get("continuity") not in ("new", "ongoing", "worsening", "improving", "resolved"):
+            c["continuity"] = "new"
+        if p and c["continuity"] != "new":
+            c["first_seen"] = p.get("first_seen") if p.get("first_seen") not in (None, "None") else p["briefing_as_of"]
+            c["times_seen"] = int(p.get("times_seen") or 1) + 1
+        else:
+            c["first_seen"], c["times_seen"] = as_of.isoformat(), 1
+            if c["continuity"] != "resolved":
+                c["continuity"], c["refers_to"] = "new", ""
+    return callouts
+
+
+def generate(con, run, mode, question, parent, as_of):
+    """Everything but publishing: returns spec, plan, probes, narrative, checks, context."""
+    compiler = Compiler(con, as_of)
+    memory = load_memory(con, as_of)
+    guides_text, guides_used = read_guides(con)
+
+    run.start("plan")
+    plan = make_plan(con, run, mode, question, parent, memory, guides_text, as_of)
+    run.done("plan", rows=len(plan["blocks"]))
+
+    run.start("compile")
+    blocks, problems = compile_plan(compiler, plan, mode)
+    changes = detect_changes(con, as_of)
+    if mode in ("briefing", "refresh"):
+        blocks.insert(1, changes_block(changes, len(blocks) + 1))
+    if not blocks:
+        raise RuntimeError("no component compiled: " + "; ".join(problems))
+    for b in blocks:
+        b["about"] = about(b)
+    run.done("compile", rows=len(blocks))
+
+    run.start("probe")
+    try:
+        probes, probe_blocks = run_probes(con, run, compiler, blocks, changes, memory, guides_text, len(blocks))
+    except Exception as e:  # the page stands without probes
+        probes, probe_blocks = [{"error": str(e)[:200]}], []
+    run.done("probe", rows=len(probe_blocks))
+
+    spec = {
+        "version": SPEC_VERSION, "id": run.run_id, "kind": {"ask": "question", "investigate": "investigation"}.get(mode, "briefing"),
+        "prompt": question, "as_of": as_of.isoformat(), "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "model": run.model, "prompt_version": PROMPT_VERSION,
+        "title": plan.get("title") or "Generated Dive", "subtitle": plan.get("subtitle") or "", "blocks": blocks, "problems": problems,
+    }
+    if parent:
+        spec.update(parent=parent["id"], parent_title=parent["title"], insight=parent.get("insight"))
+
+    run.start("narrate")
+    brief = question
+    if parent and parent.get("insight"):
+        brief = f"{question} (investigating: {parent['insight'].get('title')}. {parent['insight'].get('body')})"
+    nar, _, _ = narrate(con, run, spec, blocks, probe_blocks, changes, memory, guides_text, brief, as_of)
+    # Promote the probes the narrator chose, then check every number against the data.
+    promoted = [b for b in probe_blocks if b["id"] in (nar.get("promote") or [])[:2]]
+    for b in promoted:
+        b["about"] = about(b)
+    spec["blocks"] = blocks + promoted
+    callouts = apply_narrative(spec, nar)
+    allowed = text_numbers(guides_text) + text_numbers(" ".join(p["body"] or "" for p in memory["previous_insights"]))
+    checks = check_numbers(spec, narrative_texts(spec, callouts), probe_blocks, allowed)
+    if checks["checked"] and checks["grounded"] / checks["checked"] < 0.85:
+        # One retry with the ungrounded numbers named; keep whichever result checks better.
+        retry_q = brief + f"\nThe previous draft used numbers that are not in the data: {', '.join(checks['ungrounded'])}. Use only numbers from the data."
+        nar2, _, _ = narrate(con, run, spec, blocks, probe_blocks, changes, memory, guides_text, retry_q, as_of)
+        spec2 = dict(spec, blocks=[dict(b) for b in blocks + [b for b in probe_blocks if b["id"] in (nar2.get("promote") or [])[:2]]])
+        callouts2 = apply_narrative(spec2, nar2)
+        checks2 = check_numbers(spec2, narrative_texts(spec2, callouts2), probe_blocks, allowed)
+        if checks2["checked"] == 0 or checks2["grounded"] / max(1, checks2["checked"]) >= checks["grounded"] / checks["checked"]:
+            spec, nar, callouts, checks = spec2, nar2, callouts2, dict(checks2, retried=True)
+    callouts = link_insights(callouts, memory, as_of)
+    if callouts:
+        spec["blocks"].insert(1, {"id": "callouts", "type": "callouts", "title": "Insights" if spec["kind"] == "briefing" else "Findings", "span": 12, "items": callouts})
+    context = {
+        "briefings_remembered": memory["briefings_remembered"], "earlier_insights": len(memory["previous_insights"]),
+        "feedback_used": len(memory["rated_useful"]) + len(memory["rated_not_useful"]) + len(memory["viewer_preferences"]),
+        "guides": guides_used, "probes_run": len(probe_blocks), "probes_shown": len(promoted),
+    }
+    spec["checks"], spec["context"] = checks, context
+    run.done("narrate", rows=len(callouts))
+    return spec, plan, probes, nar, callouts, memory
 
 
 # --------------------------------------------------------------------------
@@ -948,9 +1472,9 @@ def main():
     mode = (os.environ.get("MODE") or "briefing").strip().lower()
     prompt_text = (os.environ.get("PROMPT") or "").strip()[:600]
     request_id = re.sub(r"[^A-Za-z0-9_-]", "", os.environ.get("REQUEST_ID") or "")[:64] or str(uuid.uuid4())
-    model = os.environ.get("MODEL") or "gpt-6-luna"
+    model = os.environ.get("MODEL") or DEFAULT_MODEL
     parent_id = (os.environ.get("PARENT") or "").strip()
-    if mode not in ("briefing", "ask", "investigate", "refresh"):
+    if mode not in ("briefing", "ask", "investigate", "refresh", "feedback"):
         raise SystemExit(f"unknown MODE {mode!r}")
     if mode in ("ask", "investigate") and not prompt_text:
         raise SystemExit(f"MODE={mode} needs a PROMPT")
@@ -958,31 +1482,22 @@ def main():
         raise SystemExit("PARENT must be a spec id")
 
     mark("@flight", "running")
-    # Product analytics only: which agent harness and model built this Flight.
-    agent_harness = os.environ.get("MOTHERDUCK_AGENT_HARNESS") or "unknown"
-    agent_llm = os.environ.get("MOTHERDUCK_AGENT_LLM") or "unknown"
-    con = duckdb.connect("md:", config={"custom_user_agent": f"agent-skills/3.0.0(harness-{agent_harness};llm-{agent_llm})"})
-    con.execute(f'CREATE DATABASE IF NOT EXISTS "{DB}"')
-    for alias, path in ATTACH:
-        con.execute(f"ATTACH IF NOT EXISTS '{path}' AS {alias}")
-    con.execute(SPECS_DDL)
+    con = connect()
+    spec_id = str(uuid.uuid4())
+    events = record_feedback(con, os.environ.get("FEEDBACK"), spec_id)
+    if mode == "feedback":
+        mark("publish", "ok", rows=events, effect=f"table:{DB}.main.feedback")
+        print(json.dumps({"request_id": request_id, "status": "recorded", "events": events}))
+        mark("@flight", "ok")
+        return
 
     mark("marts", "running")
     built = build_marts(con, force=mode == "refresh", refresh_ok=mode in ("briefing", "refresh"))
     mark("marts", "ok", rows=built)
+    as_of = resolve_as_of(con, (os.environ.get("AS_OF") or "").strip())
 
-    as_of_env = (os.environ.get("AS_OF") or "").strip()
-    if as_of_env:
-        as_of = dt.date.fromisoformat(as_of_env)
-    elif AS_OF_DEFAULT == "yesterday":
-        as_of = dt.date.today() - dt.timedelta(days=1)
-    else:
-        as_of = con.execute(f'SELECT max({ANCHOR[1]}) FROM "{DB}".main.{ANCHOR[0]}').fetchone()[0]
-
-    spec_id = str(uuid.uuid4())
     kind = {"ask": "question", "investigate": "investigation"}.get(mode, "briefing")
     question = prompt_text if mode in ("ask", "investigate") else BRIEFING_QUESTION
-    # The insight being investigated, from the parent spec's callouts
     parent = None
     if parent_id:
         row = con.execute(f'SELECT spec FROM "{DB}".main.dive_specs WHERE id = ?', [parent_id]).fetchone()
@@ -991,79 +1506,12 @@ def main():
             items = [c for b in ps.get("blocks", []) if b.get("type") == "callouts" for c in b.get("items", [])]
             hit = next((c for c in items if c.get("question") == prompt_text), None)
             parent = {"id": parent_id, "title": ps.get("prompt") if ps.get("kind") != "briefing" else ps.get("title"), "insight": hit}
+
+    run = Run(spec_id, model)
+    plan = probes = nar = None
+    callouts, memory = [], None
     try:
-        compiler = Compiler(con, as_of)
-        mark("plan", "running")
-        if mode in ("ask", "investigate"):
-            template = INVESTIGATE_INSTRUCTIONS if mode == "investigate" else PLAN_INSTRUCTIONS
-            payload = f"Question: {prompt_text}"
-            if parent and parent.get("insight"):
-                ins = parent["insight"]
-                payload = f"Insight to investigate: {ins.get('title')}. {ins.get('body')}\n{payload}"
-            plan = llm(
-                con,
-                model,
-                template.format(component_rules=COMPONENT_RULES, audience=AUDIENCE, domain=DOMAIN_DESCRIPTION, default_compare=DEFAULT_COMPARE, hints=PLANNER_HINTS, as_of=as_of.isoformat(), catalog=catalog_text(con)),
-                payload,
-                "dive_plan",
-                PLAN_SCHEMA,
-            )
-        else:
-            plan = BRIEFING_PLAN
-        mark("plan", "ok", rows=len(plan["blocks"]))
-
-        mark("compile", "running")
-        blocks, problems, seen = [], [], set()
-        for i, pb in enumerate(plan["blocks"][: 10 if mode == "briefing" else 7]):
-            try:
-                blk = compiler.compile(dict(pb), i + 1)
-                src = blk["source"]
-                sig = json.dumps([blk["type"] == "kpi", src.get("measures"), src.get("dimension"), src.get("filters"), src.get("window")], sort_keys=True, default=str)
-                if sig in seen:
-                    problems.append(f"{pb.get('title')}: duplicate of an earlier component, dropped")
-                    continue
-                seen.add(sig)
-                blocks.append(blk)
-            except Exception as e:  # keep the page if one block fails
-                problems.append(f"{pb.get('title')}: {e}")
-        changes = detect_changes(con, as_of)
-        if mode in ("briefing", "refresh"):
-            blocks.insert(1, changes_block(changes, len(blocks) + 1))
-        if not blocks:
-            raise RuntimeError("no component compiled: " + "; ".join(problems))
-        mark("compile", "ok", rows=len(blocks))
-
-        spec = {
-            "version": SPEC_VERSION,
-            "id": spec_id,
-            "kind": kind,
-            "prompt": question,
-            "as_of": as_of.isoformat(),
-            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-            "model": model,
-            "title": plan.get("title") or "Generated Dive",
-            "subtitle": plan.get("subtitle") or "",
-            "blocks": blocks,
-            "problems": problems,
-        }
-        if parent:
-            spec["parent"] = parent["id"]
-            spec["parent_title"] = parent["title"]
-            spec["insight"] = parent.get("insight")
-
-        mark("narrate", "running")
-        payload = json.dumps({"components": [compact(b) for b in blocks], "detected_shifts": changes[:7]}, default=str)
-        brief = question
-        if parent and parent.get("insight"):
-            brief = f"{question} (investigating: {parent['insight'].get('title')}. {parent['insight'].get('body')})"
-        nar = llm(con, model, NARRATE_INSTRUCTIONS.format(audience=AUDIENCE, domain=DOMAIN_DESCRIPTION, context=DOMAIN_CONTEXT, question=brief, as_of=as_of.isoformat()), payload, "dive_narrative", NARRATE_SCHEMA)
-        callouts = apply_narrative(spec, nar)
-        if callouts:
-            spec["blocks"].insert(
-                1,
-                {"id": "callouts", "type": "callouts", "title": "Insights" if kind == "briefing" else "Findings", "span": 12, "items": callouts},
-            )
-        mark("narrate", "ok", rows=len(callouts))
+        spec, plan, probes, nar, callouts, memory = generate(con, run, mode, question, parent, as_of)
         status, error = "ready", None
     except Exception as e:
         traceback.print_exc()
@@ -1071,12 +1519,35 @@ def main():
         status, error = "failed", str(e)[:500]
 
     mark("publish", "running")
+    now = utc_now()
+    duration = round(time.time() - t0, 1)
     con.execute(
         f'INSERT INTO "{DB}".main.dive_specs VALUES (?, ?, ?, ?, ?, ?::TIMESTAMP, ?, ?, ?, ?, ?, ?)',
-        [spec_id, request_id, kind, question, spec.get("title"), dt.datetime.now(dt.timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds"), as_of, model, status, error, round(time.time() - t0, 1), json.dumps(spec, default=str)],
+        [spec_id, request_id, kind, question, spec.get("title"), now, as_of, model, status, error, duration, json.dumps(spec, default=str)],
     )
+    con.execute(
+        f'INSERT INTO "{DB}".main.gen_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [spec_id, request_id, mode, kind, parent_id or None, question, as_of, model, PROMPT_VERSION, now, status, error, duration,
+         json.dumps(run.steps), json.dumps(plan, default=str), json.dumps(probes, default=str), json.dumps(nar, default=str),
+         json.dumps(spec.get("checks"), default=str), json.dumps(spec.get("context"), default=str)],
+    )
+    if run.calls:
+        con.executemany(
+            f'INSERT INTO "{DB}".main.llm_calls VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::TIMESTAMP)',
+            [[spec_id, step, model, PROMPT_VERSION, i, o, ms, ok, err, now] for step, i, o, ms, ok, err in run.calls],
+        )
+    if callouts:
+        con.executemany(
+            f'INSERT INTO "{DB}".main.insights VALUES (?, ?, ?, ?, ?::TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [[str(uuid.uuid4()), spec_id, kind, as_of, now, r, c.get("tone"), c.get("title"), c.get("body"), c.get("question"), c.get("block_id"),
+              c.get("continuity"), c.get("refers_to") or None, c.get("first_seen"), c.get("times_seen")] for r, c in enumerate(callouts)],
+        )
     mark("publish", "ok", effect=f"table:{DB}.main.dive_specs")
-    print(json.dumps({"spec_id": spec_id, "request_id": request_id, "status": status, "error": error, "seconds": round(time.time() - t0, 1)}))
+    if status == "ready" and kind == "briefing" and memory is not None:
+        mark("learn", "running")
+        guide = write_memory_guide(con, memory, callouts, as_of)
+        mark("learn", "ok", effect=f"guide:{MEMORY_TOPIC}" if guide else "")
+    print(json.dumps({"spec_id": spec_id, "request_id": request_id, "status": status, "error": error, "seconds": duration, "prompt_version": PROMPT_VERSION, "checks": spec.get("checks"), "context": spec.get("context")}, default=str))
     if status != "ready":
         mark("@flight", "failed")
         raise SystemExit(1)
