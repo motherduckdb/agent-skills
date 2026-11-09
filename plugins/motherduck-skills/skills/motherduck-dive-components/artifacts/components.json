@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"about": "The MotherDuck Dive component catalog. Agents read it to pick components; a Flight that plans pages from components (motherduck-build-malleable-dive) builds its planner rules from the entries that have plan_rule. Order is assembly order.",
+	"common_fields": "Every block may also carry: caption (one sentence), insight (a 'so what' line, rendered by BlockInsight), about ({ definitions: [{ term, text }], why }, rendered with the source by SourceFooter), probe and hypothesis (a follow-up query an analyst step ran), highlight (x values to emphasise).",
 	"files": {
 		"core": "kit/core.tsx",
 		"blocks": "kit/blocks.tsx"
@@ -136,8 +137,8 @@
 			"label": "Callouts",
 			"file": "kit/blocks.tsx",
 			"kind": "block",
-			"data": "{ items: [{ tone: critical|warning|positive|info, title, body, block_id?, question? }] }",
-			"when": "Findings that need attention. With a nav prop, each item with a question gets an Investigate button."
+			"data": "{ items: [{ tone: critical|warning|positive|info, title, body, block_id?, question?, continuity?: new|ongoing|worsening|improving|resolved, first_seen?, times_seen?, refers_to? }] }",
+			"when": "Findings that need attention. continuity shows how each relates to earlier insights. With a nav prop, items with a question get an Investigate button, and nav.rate/nav.rating add thumbs up and down."
 		},
 		{
 			"type": "text",

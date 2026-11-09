@@ -74,6 +74,10 @@ const LINE = {
 	series: CHANNELS.map((c) => ({ key: c, label: c, format: 'count' })),
 	data: WEEKLY,
 	annotations: [{ x: WEEKS[4], label: 'Google spike', series: 'Google' }, { x: WEEKS[14], label: 'Other surges', series: 'Other' }],
+	insight: 'Other now brings more visitors than Google; check where it comes from before counting it as growth.',
+	why: 'Shows where readers come from and how that is shifting.',
+	about: { definitions: [{ term: 'Docs visitors', text: 'Unique people with at least one docs pageview in the week.' }, { term: 'Channel', text: "The entry referrer's channel: Google, Direct, AI Chat, GitHub, Other." }], why: 'Shows where readers come from and how that is shifting.' },
+	source: { dataset: 'docs', measures: ['docs.visitors'], dimension: 'channel', window: 'last_6_months', filters: [], sql: ['SELECT week, channel, count(DISTINCT person_id) FROM docs_events GROUP BY ALL'] },
 	points: [{ x: WEEKS[4], series: 'Google' }, { x: WEEKS[14], series: 'Other' }],
 };
 
@@ -169,9 +173,9 @@ const CALLOUTS = {
 	type: 'callouts',
 	title: 'Insights',
 	items: [
-		{ tone: 'critical', title: 'Traffic up, conversion down', body: 'Visitors rose 40% while conversion fell from 0.98% to 0.72%.', question: 'Why did conversion fall?' },
-		{ tone: 'warning', title: 'One referrer drives Other', body: 'partner-site.example sent 4,100 of 4,400 Other sessions, all Chrome desktop.', question: 'Is the partner-site.example traffic real?' },
-		{ tone: 'positive', title: 'Fewer unanswered questions', body: 'The assistant left 8.2% unanswered, down from 11%.' },
+		{ tone: 'critical', title: 'Traffic up, conversion down', body: 'Visitors rose 40% while conversion fell from 0.98% to 0.72%.', question: 'Why did conversion fall?', continuity: 'worsening', first_seen: '2026-10-19', times_seen: 3 },
+		{ tone: 'warning', title: 'One referrer drives Other', body: 'partner-site.example sent 4,100 of 4,400 Other sessions, all Chrome desktop.', question: 'Is the partner-site.example traffic real?', continuity: 'new', first_seen: '2026-11-08', times_seen: 1 },
+		{ tone: 'positive', title: 'Fewer unanswered questions', body: 'The assistant left 8.2% unanswered, down from 11%.', continuity: 'improving', first_seen: '2026-10-26', times_seen: 2 },
 	],
 };
 
@@ -191,6 +195,13 @@ function Section({ type, title, block, wide, children, variants = true }: any) {
 	const narrow = useContext(NarrowCtx);
 	const [v, setV] = useState(block?.type);
 	const [showData, setShowData] = useState(false);
+	const [ratings, setRatings] = useState<Record<string, string>>({});
+	// A stand-in for the Dive's page actions: Investigate does nothing here; ratings are kept locally.
+	const nav = {
+		busy: false, investigate: () => {}, existing: () => null, running: () => false, open: () => {},
+		rate: (kind: string, target: string, value: string) => setRatings({ ...ratings, [`${kind}|${target}`]: value }),
+		rating: (kind: string, target: string) => ratings[`${kind}|${target}`] || '',
+	};
 	const opts = block ? variantsFor(block) : [];
 	const entry = (MANIFEST as any)[type];
 	return (
@@ -211,7 +222,13 @@ function Section({ type, title, block, wide, children, variants = true }: any) {
 				}
 				style={{ height: '100%' }}
 			>
-				{children || <BlockView block={block} variant={v} nav={{ busy: false, investigate: () => {}, existing: () => null, running: () => false, open: () => {} }} />}
+				{children || <BlockView block={block} variant={v} nav={nav} />}
+				{!children && <BlockInsight block={block} />}
+				{!children && block?.source && (
+					<div className="mt-3 text-xs" style={{ color: t.muted }}>
+						<SourceFooter block={block} />
+					</div>
+				)}
 				{showData && (
 					<pre className="mt-3 overflow-x-auto p-2 text-xs" style={{ maxHeight: 220, background: t.bg === '#ffffff' ? '#f7f7f7' : t.bg, border: `1px solid ${t.line}`, color: t.text }}>
 						{JSON.stringify(block, (k, val) => (Array.isArray(val) && val.length > 6 ? [...val.slice(0, 6), `… ${val.length - 6} more`] : val), 2)}
@@ -229,14 +246,14 @@ function Section({ type, title, block, wide, children, variants = true }: any) {
 const MANIFEST: Record<string, { when: string }> = {
 	gauge: { when: 'A rate against a bounded scale, with a tick at the previous value.' },
 	kpi: { when: 'Headline numbers with change and sparkline. Switch to cards, compact stats or gauges.' },
-	line: { when: 'A trend over time. Markers sit on the series they describe. Switch to area, bar, heatmap or table.' },
+	line: { when: 'A trend over time, with a "so what" line and an About panel (definitions, why it is here, source). Markers sit on the series they describe.' },
 	heatmap: { when: 'Patterns by day: a calendar of daily activity, or a category against weeks.' },
 	sankey: { when: 'How a count flows from one set of categories into another.' },
 	treemap: { when: 'Part-to-whole of one additive measure. Click a group to zoom in.' },
 	timeline: { when: 'Events in order. Here: the shifts the change detector found.' },
 	bar: { when: 'A measure across categories against the previous period.' },
 	funnel: { when: 'A custom component, registered from examples/funnel.tsx.' },
-	callouts: { when: 'Findings that need attention, with Investigate buttons in a malleable Dive.' },
+	callouts: { when: 'Findings that need attention: how each relates to earlier ones (new, ongoing, worsening, improving, resolved), an Investigate button and a rating.' },
 	datepicker: { when: 'A date or range for the viewer to choose. Here it filters the chart below.' },
 };
 

@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 // @imports
+import { Lightbulb, ThumbsDown, ThumbsUp } from 'lucide-react';
 // @imports-end
 
 // ---- Blocks -------------------------------------------------------------------
@@ -275,6 +276,61 @@ function InvestigateButton({ nav, item }: any) {
 	);
 }
 
+// How an insight relates to earlier ones: new, ongoing since a date, worsening, improving, resolved.
+function Continuity({ item }: any) {
+	const t = useTheme();
+	const c = item?.continuity;
+	if (!c) return null;
+	const since = item.first_seen && c !== 'new' && c !== 'resolved' ? ` since ${fmtPeriod(item.first_seen)}` : '';
+	const nth = item.times_seen > 1 && c !== 'resolved' ? ` · ${item.times_seen} briefings` : '';
+	const tone = c === 'worsening' ? 'critical' : c === 'improving' || c === 'resolved' ? 'positive' : 'neutral';
+	const label = { new: 'New', ongoing: 'Ongoing', worsening: 'Worsening', improving: 'Improving', resolved: 'Resolved' }[c as string] || c;
+	return (
+		<span className="inline-flex items-center gap-1 text-xs" style={{ color: t.tones[tone].fg, fontWeight: c === 'new' ? 600 : 500 }} title={item.refers_to ? `Continues: ${item.refers_to}` : undefined}>
+			{c === 'new' && <span style={{ width: 6, height: 6, borderRadius: t.flat ? 0 : 999, background: t.accent, display: 'inline-block' }} />}
+			{label}
+			{since}
+			{nth}
+		</span>
+	);
+}
+
+// Thumbs up/down. nav.rate(kind, target, value) sends it; nav.rating(kind, target) reads it back.
+function RateButtons({ nav, kind, target, label }: any) {
+	const t = useTheme();
+	if (!nav?.rate) return null;
+	const cur = nav.rating?.(kind, target);
+	const btn = (v: 'up' | 'down', Icon: any) => (
+		<button
+			onClick={() => nav.rate(kind, target, cur === v ? '' : v)}
+			title={v === 'up' ? 'Useful' : 'Not useful'}
+			aria-pressed={cur === v}
+			style={{ cursor: 'pointer', color: cur === v ? (v === 'up' ? t.tones.positive.fg : t.tones.critical.fg) : t.muted, padding: 2 }}
+		>
+			<Icon size={13} fill={cur === v ? 'currentColor' : 'none'} />
+		</button>
+	);
+	return (
+		<span className="inline-flex items-center gap-0.5 text-xs" style={{ color: t.muted }}>
+			{label && <span className="mr-1">{label}</span>}
+			{btn('up', ThumbsUp)}
+			{btn('down', ThumbsDown)}
+		</span>
+	);
+}
+
+// The "so what" line a narrator can add under any block.
+function BlockInsight({ block }: any) {
+	const t = useTheme();
+	if (!block?.insight) return null;
+	return (
+		<p className="mt-2 flex gap-1.5 text-sm leading-snug" style={{ color: t.text }}>
+			<Lightbulb size={14} style={{ color: t.mono ? t.text : t.accent, flexShrink: 0, marginTop: 2 }} />
+			<span>{block.insight}</span>
+		</p>
+	);
+}
+
 function Callout({ tone = 'info', title, children, onJump, item, nav }: any) {
 	const t = useTheme();
 	const c = t.tones[tone] || t.tones.info;
@@ -282,9 +338,12 @@ function Callout({ tone = 'info', title, children, onJump, item, nav }: any) {
 	if (t.flat) {
 		return (
 			<div className="pt-3" style={{ borderTop: `${tone === 'critical' ? 3 : 1}px solid ${c.line}`, color: t.text }}>
-				<div className="flex items-center gap-1.5 text-xs font-medium uppercase" style={{ color: c.fg, letterSpacing: 0.8 }}>
-					<Icon size={13} />
-					{tone === 'critical' ? 'Act now' : tone === 'warning' ? 'Watch' : tone === 'positive' ? 'Going well' : 'Note'}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+					<span className="flex items-center gap-1.5 text-xs font-medium uppercase" style={{ color: c.fg, letterSpacing: 0.8 }}>
+						<Icon size={13} />
+						{tone === 'critical' ? 'Act now' : tone === 'warning' ? 'Watch' : tone === 'positive' ? 'Going well' : 'Note'}
+					</span>
+					<Continuity item={item} />
 				</div>
 				<div className="mt-1 text-base font-bold leading-snug" style={{ fontFamily: t.heading }}>
 					{title}
@@ -295,10 +354,13 @@ function Callout({ tone = 'info', title, children, onJump, item, nav }: any) {
 				<div className="flex flex-wrap items-center gap-3">
 					<InvestigateButton nav={nav} item={item} />
 					{onJump && (
-						<button className="mt-2 inline-flex items-center gap-1 text-xs font-medium" style={{ color: t.text, cursor: 'pointer', borderBottom: '1px solid #111111' }} onClick={onJump}>
+						<button className="mt-2 inline-flex items-center gap-1 text-xs font-medium" style={{ color: t.text, cursor: 'pointer', borderBottom: `1px solid ${t.text}` }} onClick={onJump}>
 							See evidence
 						</button>
 					)}
+					<span className="mt-2 ml-auto">
+						<RateButtons nav={nav} kind="insight" target={title} />
+					</span>
 				</div>
 			</div>
 		);
@@ -307,8 +369,11 @@ function Callout({ tone = 'info', title, children, onJump, item, nav }: any) {
 		<div className="flex gap-2.5 p-3" style={{ background: c.bg, border: `${t.name === 'Duck' ? 2 : 1}px solid ${c.line}`, borderRadius: t.radius, color: t.text, boxShadow: t.name === 'Duck' ? '-3px 3px 0 #383838' : 'none' }}>
 			<Icon size={18} style={{ color: c.fg, flexShrink: 0, marginTop: 1 }} />
 			<div className="min-w-0">
-				<div className="text-sm font-semibold" style={{ color: t.name === 'Duck' ? t.text : c.fg }}>
-					{title}
+				<div className="flex flex-wrap items-baseline justify-between gap-x-3">
+					<span className="text-sm font-semibold" style={{ color: t.name === 'Duck' ? t.text : c.fg }}>
+						{title}
+					</span>
+					<Continuity item={item} />
 				</div>
 				<div className="mt-0.5 text-sm leading-snug">{children}</div>
 				<div className="flex flex-wrap items-center gap-3">
@@ -318,6 +383,9 @@ function Callout({ tone = 'info', title, children, onJump, item, nav }: any) {
 							See evidence <ChevronRight size={12} />
 						</button>
 					)}
+					<span className="mt-1.5 ml-auto">
+						<RateButtons nav={nav} kind="insight" target={title} />
+					</span>
 				</div>
 			</div>
 		</div>
@@ -350,26 +418,40 @@ function TextBlock({ block }: any) {
 	return <p className="text-sm leading-relaxed" style={{ color: t.text }}>{block.body}</p>;
 }
 
+// "About" under a block: definitions, why it is on the page, and where the numbers come from.
 function SourceFooter({ block }: any) {
 	const t = useTheme();
 	const [open, setOpen] = useState(false);
 	const s = block.source;
 	if (!s) return null;
+	const about = block.about || {};
 	const ds = s.dataset || (s.datasets || []).join(', ');
 	const filters = (s.filters || []).map((f: any) => `${f.dimension} = ${f.values.join(', ')}`).join('; ');
 	return (
 		<div>
 			<button className="inline-flex items-center gap-1" style={{ color: t.muted, cursor: 'pointer' }} onClick={() => setOpen(!open)}>
-				<Database size={12} /> Source {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+				<Database size={12} /> {about.definitions?.length ? 'About' : 'Source'} {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
 			</button>
+			{block.probe && (
+				<span className="ml-3 inline-flex items-center gap-1" style={{ color: t.muted }} title="The analyst step ran this query to test a hypothesis">
+					<SearchCheck size={12} /> Follow-up query
+				</span>
+			)}
 			{open && (
 				<div className="mt-2 space-y-1.5">
-					<p style={{ color: t.text }}>
-						{ds} · {(s.measures || []).map((m: string) => humanize(m.split('.').pop() || m)).join(', ')}
+					{(about.definitions || []).map((d: any) => (
+						<p key={d.term} style={{ color: t.text }}>
+							<span className="font-semibold">{d.term}</span>
+							<span style={{ color: t.muted }}> · {d.text}</span>
+						</p>
+					))}
+					{block.hypothesis && <p style={{ color: t.muted }}>Tests: {block.hypothesis}</p>}
+					<p style={{ color: t.muted }}>
+						Source: {ds} · {(s.measures || []).map((m: string) => humanize(m.split('.').pop() || m)).join(', ')}
 						{s.dimension && s.dimension !== 'time' ? ` by ${humanize(s.dimension)}` : ''} · {humanize(s.window || '')}
 						{filters ? ` · ${filters}` : ''}
 					</p>
-					{block.why && <p style={{ color: t.muted }}>{block.why}</p>}
+					{block.why && !block.hypothesis && <p style={{ color: t.muted }}>Why it is here: {block.why}</p>}
 					{(s.sql || []).map((q: string, i: number) => (
 						<pre key={i} className="overflow-x-auto p-2 text-xs" style={{ background: t.bg === '#ffffff' ? '#f7f7f7' : t.bg, border: `1px solid ${t.name === 'Duck' ? '#e9e2da' : t.line}`, borderRadius: Math.min(t.radius, 6), whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: t.text }}>
 							{q}
