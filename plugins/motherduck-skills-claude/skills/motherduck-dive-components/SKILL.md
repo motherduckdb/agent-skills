@@ -64,6 +64,13 @@ export default function DailyVisits() {
 }
 ```
 
+Any block can also carry narrative and context:
+- `insight`: a "so what" line, rendered by `<BlockInsight>`.
+- `about`: `{ definitions: [{ term, text }], why }`, which `<SourceFooter>` shows with the source.
+- `probe` and `hypothesis`: mark a follow-up query.
+
+Callout items can carry `continuity` (`new`, `ongoing`, `worsening`, `improving`, `resolved`) with `first_seen` and `times_seen`. Pass a `nav` with `rate` and `rating` to add thumbs up and down.
+
 Formats are `count`, `currency`, `pct` (a fraction), `number`, `delta_pct`, `text`, and `row` (read `_format` per row). Set `good: 'down'` on measures where lower is better, so deltas colour by meaning rather than direction.
 
 Assemble and preview with the MotherDuck CLI:
