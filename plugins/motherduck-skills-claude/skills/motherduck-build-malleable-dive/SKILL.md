@@ -48,11 +48,13 @@ Every mode runs the same steps:
    - It reads the follow-up results, the recipe's Guides, the last briefings' insights and viewer ratings.
    - It marks each insight new, ongoing, worsening, improving or resolved.
    - Every number is checked against the data, and if too many don't match, the narrator retries once.
+   - It may ask viewers up to two questions about a date or segment the data can't explain. Their answers become notes on the charts and context for every later analysis.
 7. **Publish:** one spec row in `<db>.main.dive_specs`. The run, its model calls, its insights and any viewer feedback go to the log tables. After a briefing, the Flight updates a memory Guide.
 
 The Dive learns from use:
 - Viewer ratings and chart-type switches reach the Flight with the next run, because a Dive can't write.
 - The chart types viewers keep choosing become the defaults.
+- Viewers answer the briefing's questions or pin a note to any chart; notes explain later movements and appear on every chart that shows that date or value.
 - A Memory page shows the insight timeline, questions, viewer actions and prompt versions.
 
 `references/LEARNING_LOOP.md` covers the tables, Guides, feedback and `eval.py`.

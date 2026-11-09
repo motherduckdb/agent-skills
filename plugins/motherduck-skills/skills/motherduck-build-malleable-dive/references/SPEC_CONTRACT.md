@@ -59,6 +59,7 @@ query the analyst step ran and the narrator promoted has `probe: true`, an id
 | `sankey` | `nodes[]` (`name`, `side`), `links[]` (`source`, `target`, `value`), `format`, `source_label`, `target_label`, plus the flows in the bar shape | `highlight[]` | bar, table |
 | `treemap` | `tree` (`name`, `children[]`) and `format`, or the bar shape; plus the groups in the bar shape | `highlight[]` | bar, table |
 | `callouts` | `items[]`: `tone` (critical, warning, positive, info), `title`, `body`, `block_id`, `question` (the investigation behind the Investigate button), `continuity` (new, ongoing, worsening, improving, resolved), `refers_to`, `first_seen`, `times_seen` | — | — |
+| `questions` | `items[]`: `id`, `kind` (`date` or `topic`), `x`, `grain` (dates), `dimension` and `value` (topics), `label`, `question`, `options[]` (likely explanations), `carried` (still open from an earlier briefing) | — | — |
 | `text` | `body` | — | — |
 
 `series[]` entries are `{key, label, format, good?, muted?}`. A key ending in
@@ -68,6 +69,9 @@ muted colour and tables show it as a delta badge.
 The full component catalog, with every renderer a block can switch to, is
 `artifacts/components.json` in `motherduck-dive-components`. The changes table also carries
 `timeline: { date: 'since', title: 'x' }`, so it can render as a timeline.
+
+The Dive adds `notes` to a block from the live `annotations` table with the kit's
+`withNotes()`: the viewer notes on a period or value the block shows. They are not stored in the spec.
 
 Formats: `currency` (USD), `pct` (a fraction, 0.071 → 7.1%), `count`,
 `number`, `delta_pct`, `text`, `row`.
