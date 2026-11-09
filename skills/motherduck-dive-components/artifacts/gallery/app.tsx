@@ -100,6 +100,18 @@ const BAR = {
 		['concepts', 0.0035, 0.0032],
 	].map(([x, a, b]) => ({ x, conversion_rate: a, conversion_rate_prior: b })),
 	highlight: ['getting-started'],
+	source: { dataset: 'docs', measures: ['docs.conversion_rate'], dimension: 'section', window: 'last_28_days', filters: [], sql: ['SELECT section, avg(converted) FROM docs_sessions GROUP BY 1'] },
+};
+
+// Questions a generated page asks its viewers. Answers become notes on every chart that shows the date or value.
+const QUESTIONS = {
+	id: 'questions',
+	type: 'questions',
+	title: 'Questions for you',
+	items: [
+		{ id: 'q1', kind: 'date', x: WEEKS[14], grain: 'week', label: `the week of ${fmtPeriod(WEEKS[14], 'week')}`, question: `What happened in the week of ${fmtPeriod(WEEKS[14], 'week')}? Other-channel visitors jumped twentyfold.`, options: ['Partner mention', 'Newsletter', 'Bot traffic', 'Tracking change'] },
+		{ id: 'q2', kind: 'topic', dimension: 'section', value: 'getting-started', label: 'section getting-started', question: 'Why did getting-started convert fewer readers than last period?', options: ['Page redesign', 'New traffic source', 'Signup flow change'] },
+	],
 };
 
 const PAGES = ['getting-started/connect', 'key-tasks/dives', 'key-tasks/flights', 'sql-reference/functions', 'integrations/dbt', 'integrations/python', 'concepts/hybrid-execution', 'key-tasks/sharing', 'sql-reference/attach', 'getting-started/cli'];
@@ -189,6 +201,8 @@ const BRAND_FONTS: Record<string, string> = {
 };
 
 const NarrowCtx = createContext(false);
+// Notes viewers saved in the gallery, shared by every section (a Dive sends them to its Flight).
+const NotesCtx = createContext<any>({ notes: [], annotate: () => {} });
 
 function Section({ type, title, block, wide, children, variants = true }: any) {
 	const t = useTheme();
@@ -196,8 +210,13 @@ function Section({ type, title, block, wide, children, variants = true }: any) {
 	const [v, setV] = useState(block?.type);
 	const [showData, setShowData] = useState(false);
 	const [ratings, setRatings] = useState<Record<string, string>>({});
-	// A stand-in for the Dive's page actions: Investigate does nothing here; ratings are kept locally.
+	const { notes, annotate } = useContext(NotesCtx);
+	const shown = block ? withNotes(block, notes) : block;
+	// A stand-in for the Dive's page actions: Investigate does nothing here; ratings and notes are kept locally.
 	const nav = {
+		notes,
+		annotate,
+		noteFor: (item: any) => notes.find((n: any) => n.kind === item.kind && (item.kind === 'date' ? n.x === item.x : n.dimension === item.dimension && n.value === item.value)) || null,
 		busy: false, investigate: () => {}, existing: () => null, running: () => false, open: () => {},
 		rate: (kind: string, target: string, value: string) => setRatings({ ...ratings, [`${kind}|${target}`]: value }),
 		rating: (kind: string, target: string) => ratings[`${kind}|${target}`] || '',
@@ -222,8 +241,9 @@ function Section({ type, title, block, wide, children, variants = true }: any) {
 				}
 				style={{ height: '100%' }}
 			>
-				{children || <BlockView block={block} variant={v} nav={nav} />}
+				{children || <BlockView block={shown} variant={v} nav={nav} />}
 				{!children && <BlockInsight block={block} />}
+				{!children && <NotesLine block={shown} />}
 				{!children && block?.source && (
 					<div className="mt-3 text-xs" style={{ color: t.muted }}>
 						<SourceFooter block={block} />
@@ -263,6 +283,8 @@ export default function ComponentGallery() {
 	const [range, setRange] = useDiveState<any>('range', { from: dayIso(89), to: END });
 	const theme = useMemo(() => makeTheme(brand ? { base, ...brand } : base), [base, brand]);
 	const t = theme;
+	const [notes, setNotes] = useState<any[]>([]);
+	const notesCtx = useMemo(() => ({ notes, annotate: (n: any) => setNotes((prev) => [{ ...n, x: n.kind === 'date' ? n.x : n.value }, ...prev]) }), [notes]);
 	const pageRef = useRef<HTMLDivElement>(null);
 	const narrow = useWidth(pageRef) < 760;
 	const daily = DAILY.filter((d) => d.x >= range.from && d.x <= range.to);
@@ -272,6 +294,7 @@ export default function ComponentGallery() {
 		<ThemeCtx.Provider value={theme}>
 			<div style={{ background: t.bg, color: t.text, fontFamily: t.font, minHeight: '100vh' }}>
 				<NarrowCtx.Provider value={narrow}>
+				<NotesCtx.Provider value={notesCtx}>
 				<div ref={pageRef} className="mx-auto px-4 pb-16 pt-6 md:px-8" style={{ maxWidth: 1360 }}>
 					<header className="mb-8 flex flex-wrap items-end justify-between gap-4">
 						<div>
@@ -318,6 +341,7 @@ export default function ComponentGallery() {
 						<Section type="kpi" title="Stats, metric cards, gauges" block={KPI} wide />
 						<Section type="gauge" title="Gauges" block={RATES} wide />
 						<Section type="callouts" title="Callouts" block={CALLOUTS} wide variants={false} />
+						<Section type="questions" title="Questions and viewer notes" block={QUESTIONS} wide variants={false} />
 						<Section type="line" title="Line" block={LINE} />
 						<Section type="heatmap" title="Activity heatmap" block={CALENDAR} />
 						<Section type="datepicker" title="Date picker + area chart" block={AREA} wide variants={false}>
@@ -334,6 +358,7 @@ export default function ComponentGallery() {
 						<Section type="funnel" title="Custom: funnel" block={FUNNEL} wide />
 					</div>
 				</div>
+				</NotesCtx.Provider>
 				</NarrowCtx.Provider>
 			</div>
 		</ThemeCtx.Provider>
