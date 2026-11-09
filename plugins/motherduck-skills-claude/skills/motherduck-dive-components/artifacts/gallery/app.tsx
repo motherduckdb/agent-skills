@@ -103,6 +103,21 @@ const BAR = {
 	source: { dataset: 'docs', measures: ['docs.conversion_rate'], dimension: 'section', window: 'last_28_days', filters: [], sql: ['SELECT section, avg(converted) FROM docs_sessions GROUP BY 1'] },
 };
 
+// A form from a spec, on the shadcn-style fields: choice cards, chips, a select and a textarea.
+const FORM = {
+	id: 'form',
+	type: 'form',
+	title: 'Tune this briefing',
+	description: 'Answers go to the Flight with the next run and steer what the briefing reports.',
+	fields: [
+		{ id: 'cadence', kind: 'choice', label: 'How often do you read it?', required: true, options: [{ value: 'daily', label: 'Every morning', description: 'Lead with what changed since yesterday.' }, { value: 'weekly', label: 'Once a week', description: 'Summarise the week and the trend.' }] },
+		{ id: 'focus', kind: 'multi', layout: 'chips', label: 'What should it focus on?', options: ['Conversion', 'Search', 'AI traffic', 'Assistant'] },
+		{ id: 'role', kind: 'select', label: 'Your role', options: ['Docs lead', 'Developer relations', 'Product', 'Leadership'] },
+		{ id: 'missing', kind: 'textarea', label: 'What is missing?', description: 'A number, a breakdown or a question you keep asking.', placeholder: 'e.g. which pages send people to sign up' },
+	],
+	submit_label: 'Send',
+};
+
 // Questions a generated page asks its viewers. Answers become notes on every chart that shows the date or value.
 const QUESTIONS = {
 	id: 'questions',
@@ -342,6 +357,7 @@ export default function ComponentGallery() {
 						<Section type="gauge" title="Gauges" block={RATES} wide />
 						<Section type="callouts" title="Callouts" block={CALLOUTS} wide variants={false} />
 						<Section type="questions" title="Questions and viewer notes" block={QUESTIONS} wide variants={false} />
+						<Section type="form" title="Form fields" block={FORM} wide variants={false} />
 						<Section type="line" title="Line" block={LINE} />
 						<Section type="heatmap" title="Activity heatmap" block={CALENDAR} />
 						<Section type="datepicker" title="Date picker + area chart" block={AREA} wide variants={false}>

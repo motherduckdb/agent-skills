@@ -70,7 +70,13 @@ Any block can also carry narrative and context:
 
 Callout items can carry `continuity` (`new`, `ongoing`, `worsening`, `improving`, `resolved`) with `first_seen` and `times_seen`. Pass a `nav` with `rate` and `rating` to add thumbs up and down.
 
-A `questions` block asks viewers about a date or a segment the data can't explain. Each answer is a note: `{ kind: 'date' | 'topic', x, grain?, dimension?, value?, category, note }`. Pass a `nav` with `annotate` and `noteFor` to take answers. `withNotes(block, notes)` pins notes to every block that shows that date or value, as markers on line and area charts. `<NotesLine>` lists them under a block, and `<NoteForm>` adds one from any chart.
+For any input, use the form fields in `kit/field.tsx`, modelled on shadcn/ui Field:
+- **Layout:** `FieldSet` and `FieldLegend` group fields; `FieldGroup` stacks them.
+- **One field:** `Field` (orientation `vertical`, `horizontal` or `responsive`, plus `invalid`) wraps a `FieldLabel`, the control, a `FieldDescription` and a `FieldError`.
+- **Controls:** `Input`, `Textarea`, `Select` and `ChoiceGroup` (radio or checkbox choice cards, or chips).
+- **From a spec:** a `form` block renders a whole form and sends the answers to `nav.submit(blockId, values)`. Use native controls: they work in every Dive.
+
+A `questions` block asks viewers about a date or a segment the data can't explain. Each answer is a note: `{ kind: 'date' | 'topic', x, grain?, dimension?, value?, category, note }`. Pass a `nav` with `annotate` and `noteFor` to take answers. `withNotes(block, notes)` pins notes to every block that shows that date or value, as markers on line and area charts. `<NotesLine>` lists them under a block, and `<NoteForm>`, built on the form fields, adds one from any chart.
 
 Formats are `count`, `currency`, `pct` (a fraction), `number`, `delta_pct`, `text`, and `row` (read `_format` per row). Set `good: 'down'` on measures where lower is better, so deltas colour by meaning rather than direction.
 
