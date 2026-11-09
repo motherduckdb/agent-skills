@@ -65,6 +65,7 @@ Start with the skill that matches the task. Reuse established connection and sch
 | `motherduck-manage-guides` | Workflow | Business definitions and reusable warehouse context |
 | `motherduck-share-data` | Workflow | Share audiences, grants, table filters, and refresh policy |
 | `motherduck-create-dive` | Workflow | Creating, editing, designing, publishing, sharing, or embedding Dives |
+| `motherduck-dive-components` | Workflow | Building Dive UIs from a component kit: stat cards, gauges, heatmaps, Sankey, treemaps, timelines, date pickers, brand themes, and custom components |
 | `motherduck-create-flight` | Workflow | Running and scheduling Python jobs on MotherDuck |
 | `motherduck-ducklake` | Workflow | DuckLake storage choices and operations |
 | `motherduck-security-governance` | Workflow | Permissions, isolation, residency, and compliance |
