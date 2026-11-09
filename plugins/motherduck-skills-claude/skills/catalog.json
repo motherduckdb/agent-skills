@@ -94,6 +94,40 @@
     ],
     "needs_live_discovery": true
   },
+  "motherduck-build-malleable-dive": {
+    "name": "motherduck-build-malleable-dive",
+    "description": "Build a generative MotherDuck Dive where a Flight writes a daily briefing and question-to-page specs from a semantic catalog, and viewers ask, investigate, and rearrange it.",
+    "layer": "use-case",
+    "depends_on": [
+      "motherduck-explore",
+      "motherduck-query",
+      "motherduck-cli",
+      "motherduck-create-dive",
+      "motherduck-create-flight",
+      "motherduck-dive-components"
+    ],
+    "references": [
+      "references/RECIPE_GUIDE.md",
+      "references/SPEC_CONTRACT.md",
+      "references/EXECUTION_REFERENCE.md"
+    ],
+    "artifacts": [
+      "artifacts/build.py",
+      "artifacts/template/engine.py",
+      "artifacts/template/app.tsx",
+      "artifacts/template/chart.mmd",
+      "artifacts/recipes/nyc-311/domain.py",
+      "artifacts/recipes/nyc-311/app.json"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/run-flights-from-dives/",
+      "https://motherduck.com/docs/key-tasks/flights/",
+      "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/"
+    ],
+    "needs_live_discovery": true
+  },
   "motherduck-cli": {
     "name": "motherduck-cli",
     "description": "Use the MotherDuck CLI for terminal queries, authentication, and file-based Dive or Flight workflows.",

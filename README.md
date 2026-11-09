@@ -72,6 +72,7 @@ Start with the skill that matches the task. Reuse established connection and sch
 | `motherduck-pricing-roi` | Workflow | Costs, plan fit, and ROI |
 | `motherduck-build-cfa-app` | Use-case | Customer-facing analytics with tenant isolation |
 | `motherduck-build-dashboard` | Use-case | A dashboard's analytical story, metrics, and section queries |
+| `motherduck-build-malleable-dive` | Use-case | A generated Dive: daily briefing with insights to investigate, and question-to-page answers that viewers can rearrange |
 | `motherduck-build-data-pipeline` | Use-case | Ingestion-to-serving pipelines |
 | `motherduck-migrate-to-motherduck` | Use-case | Migration, reconciliation, cutover, and rollback |
 | `motherduck-enable-self-serve-analytics` | Use-case | Governed analytics for internal teams |

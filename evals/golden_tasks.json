@@ -606,6 +606,60 @@
           "why": "Dives import only the runtime libraries; the kit is copied in as source"
         }
       ]
+    },
+    {
+      "id": "malleable-dive-daily-briefing",
+      "prompt": "Build a MotherDuck Dive for our support team that shows a daily briefing of tickets from support.main.tickets, highlights what changed, and lets people type a question and get a new page with charts for it.",
+      "expect_skills": [
+        "motherduck-build-malleable-dive"
+      ],
+      "must": [
+        {
+          "pattern": "Flight",
+          "why": "a Flight generates the briefing and the answer pages"
+        },
+        {
+          "pattern": "useRunFlight|(runs?|starts?|triggers?) (the|a) (generator )?Flight",
+          "why": "the Dive starts the generator Flight when someone asks"
+        },
+        {
+          "pattern": "catalog|CATALOG",
+          "why": "the planner chooses from a semantic catalog"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "useSQLQuery\\([^)]{0,200}\\b(INSERT|UPDATE|CREATE TABLE)\\b",
+          "why": "Dive SQL is read-only"
+        },
+        {
+          "pattern": "model (writes|generates) (the )?SQL",
+          "why": "Python compiles plans to SQL; the model never writes it"
+        }
+      ]
+    },
+    {
+      "id": "malleable-dive-investigate-insight",
+      "prompt": "In my generated MotherDuck briefing Dive, each insight should have a button that opens a drill-down page explaining why the number moved. How should that work?",
+      "expect_skills": [
+        "motherduck-build-malleable-dive"
+      ],
+      "must": [
+        {
+          "pattern": "investigat",
+          "why": "the drill-down is an investigation run of the Flight"
+        },
+        {
+          "pattern": "PARENT|parent",
+          "why": "the drill-down page links back to the page the insight came from"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "useSQLQuery\\([^)]{0,200}\\b(INSERT|UPDATE|CREATE TABLE)\\b",
+          "why": "Dive SQL is read-only; the drill-down page comes from a Flight run"
+        }
+      ]
     }
   ]
 }
