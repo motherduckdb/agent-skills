@@ -44,7 +44,7 @@ Ask for the task directly, or name a skill from the catalog:
 
 > Plan a migration to MotherDuck with validation and rollback steps.
 
-For live work, configure [MotherDuck MCP](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-setup/) or an authenticated database client. Supply credentials through your normal secret or environment setup, never in prompts or committed files.
+For live work, configure [MotherDuck MCP](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/) or an authenticated database client. Supply credentials through your normal secret or environment setup, never in prompts or committed files.
 
 Start with the skill that matches the task. Reuse established connection and schema context; load supporting references only when needed. The skills favor DuckDB SQL, live schema discovery, native MotherDuck storage by default, and backend credentials for customer-facing apps.
 
