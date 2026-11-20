@@ -40,6 +40,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - Repo-only skill graph data lives in `skills/catalog.json`, not in SKILL frontmatter.
 - The README catalog, `CLAUDE.md` catalog, Gemini extension surfaces (`gemini-extension.json`, `GEMINI.md`, `commands/`), Claude marketplace manifest, packaged Claude plugin manifest, Codex plugin manifest, Codex marketplace entry, and Cursor plugin manifests must stay in sync with the `skills/` directory.
 - The Codex marketplace must point at the packaged plugin under `plugins/motherduck-skills`, not the repo root.
+- The Copilot marketplace (`.github/plugin/marketplace.json`) must point at `plugins/motherduck-skills-copilot`, an Agent Plugins 1.0 package: root `plugin.json` limited to the fields that schema allows, root `mcp.json` with the remote MotherDuck MCP server, and a generated `skills/` copy.
 - Gemini release archives must keep `gemini-extension.json` at the archive root and include the bundled `skills/` and Gemini-specific discovery surfaces.
 - `skills/catalog.json` must stay in sync with actual `references/` and `artifacts/` paths.
 - The repo stays opinionated; it is not a neutral encyclopedia of all possible MotherDuck patterns.
@@ -81,6 +82,7 @@ The repo-level machine-readable index is `skills/catalog.json`, which maps skill
 - packaged Claude plugin sync and metadata
 - Codex marketplace wiring
 - packaged Codex plugin sync and non-symlink packaging
+- Copilot plugin manifest, MCP config, and marketplace wiring
 
 `scripts/package_gemini_extension.py` is the packaging layer for:
 

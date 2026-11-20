@@ -39,6 +39,8 @@ Important source-of-truth files:
 - `plugins/motherduck-skills-claude/.claude-plugin/plugin.json`
 - `.codex-plugin/plugin.json`
 - `.agents/plugins/marketplace.json`
+- `.github/plugin/marketplace.json`
+- `plugins/motherduck-skills-copilot/plugin.json`
 
 ## Repo Shape
 

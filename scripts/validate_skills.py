@@ -25,6 +25,7 @@ from _lib.claude_plugin import (
     CLAUDE_PACKAGED_PLUGIN_SKILLS,
     CLAUDE_SKILL_ARGUMENT_HINTS,
 )
+from _lib import copilot_plugin
 from _lib.evals import EvalError, load_tasks
 from _lib.repo import ROOT, read_json_file
 
@@ -47,6 +48,7 @@ GEMINI_CATALOG_HEADINGS = {
     "use-case": "### Use-case",
 }
 SUPPORTED_HARNESSES = [
+    "GitHub Copilot CLI",
     "Claude Code",
     "Codex",
     "Gemini CLI",
@@ -84,6 +86,10 @@ def parse_frontmatter(path: Path) -> dict[str, object]:
         if key not in allowed_keys:
             raise ValidationError(
                 f"{path}: unsupported frontmatter key {key!r}; keep SKILL.md frontmatter portable"
+            )
+        if ": " in value and not value.startswith(('"', "'")):
+            raise ValidationError(
+                f"{path}: {key} contains ': ', which strict YAML parsers reject in an unquoted value; reword it"
             )
         data[key] = value
 
@@ -389,6 +395,84 @@ def validate_codex_marketplace(expected_plugin_name: str) -> None:
         raise ValidationError(f"{CODEX_MARKETPLACE}: category is required on each plugin entry")
 
 
+def validate_copilot_plugin(skills: list[str]) -> str:
+    plugin_path = copilot_plugin.PACKAGED_PLUGIN
+    if not plugin_path.exists():
+        raise ValidationError(f"Missing required Copilot plugin manifest: {plugin_path}")
+
+    payload = read_json_file(plugin_path)
+    if payload.get("$schema") != copilot_plugin.PLUGIN_SCHEMA:
+        raise ValidationError(f"{plugin_path}: $schema must be {copilot_plugin.PLUGIN_SCHEMA!r}")
+    unknown_fields = sorted(set(payload) - copilot_plugin.ALLOWED_PLUGIN_FIELDS)
+    if unknown_fields:
+        raise ValidationError(
+            f"{plugin_path}: fields not allowed by Agent Plugins 1.0: {unknown_fields}"
+        )
+    plugin_name = payload.get("name")
+    if not plugin_name:
+        raise ValidationError(f"{plugin_path}: missing name")
+    for field in ("version", "description", "license"):
+        if not payload.get(field):
+            raise ValidationError(f"{plugin_path}: missing {field}")
+
+    mcp_path = copilot_plugin.PACKAGED_MCP
+    if not mcp_path.exists():
+        raise ValidationError(f"Missing required Copilot plugin MCP config: {mcp_path}")
+    mcp_payload = read_json_file(mcp_path)
+    if mcp_payload.get("$schema") != copilot_plugin.MCP_SCHEMA:
+        raise ValidationError(f"{mcp_path}: $schema must be {copilot_plugin.MCP_SCHEMA!r}")
+    expected_servers = {
+        "motherduck": {"type": "streamable-http", "url": copilot_plugin.MCP_SERVER_URL}
+    }
+    if mcp_payload.get("mcpServers") != expected_servers:
+        raise ValidationError(f"{mcp_path}: mcpServers must be exactly {expected_servers}")
+
+    packaged_skills = sorted(
+        p.parent.name for p in copilot_plugin.PACKAGED_SKILLS.glob("*/SKILL.md")
+    )
+    if packaged_skills != skills:
+        raise ValidationError(
+            f"{plugin_path}: skills directory mismatch\nexpected: {skills}\nfound:    {packaged_skills}"
+        )
+
+    return plugin_name
+
+
+def validate_copilot_marketplace(expected_plugin_name: str) -> None:
+    marketplace_path = copilot_plugin.MARKETPLACE
+    if not marketplace_path.exists():
+        raise ValidationError(f"Missing required Copilot marketplace: {marketplace_path}")
+
+    payload = read_json_file(marketplace_path)
+    if not payload.get("name"):
+        raise ValidationError(f"{marketplace_path}: missing top-level name")
+    owner = payload.get("owner")
+    if not isinstance(owner, dict) or not owner.get("name"):
+        raise ValidationError(f"{marketplace_path}: missing owner.name")
+
+    plugins = payload.get("plugins")
+    if not isinstance(plugins, list) or not plugins:
+        raise ValidationError(f"{marketplace_path}: plugins must be a non-empty list")
+    entry = next((plugin for plugin in plugins if plugin.get("name") == expected_plugin_name), None)
+    if entry is None:
+        raise ValidationError(f"{marketplace_path}: missing plugin entry for {expected_plugin_name!r}")
+
+    source = entry.get("source")
+    if not isinstance(source, str) or not source.startswith("./"):
+        raise ValidationError(f"{marketplace_path}: plugin source must be a './' relative path")
+    if (ROOT / source).resolve() != copilot_plugin.PACKAGED_ROOT.resolve():
+        raise ValidationError(
+            f"{marketplace_path}: plugin source must resolve to {copilot_plugin.PACKAGED_ROOT}"
+        )
+
+    plugin_payload = read_json_file(copilot_plugin.PACKAGED_PLUGIN)
+    for field in ("version", "description"):
+        if entry.get(field) != plugin_payload.get(field):
+            raise ValidationError(
+                f"{marketplace_path}: plugin {field} does not match {copilot_plugin.PACKAGED_PLUGIN}"
+            )
+
+
 def validate_cursor_plugin(skills: list[str]) -> str:
     if not CURSOR_PLUGIN.exists():
         raise ValidationError(f"Missing required Cursor plugin manifest: {CURSOR_PLUGIN}")
@@ -654,6 +738,8 @@ def main() -> int:
 
     codex_plugin_name = validate_codex_plugin(skills)
     validate_codex_marketplace(codex_plugin_name)
+    copilot_plugin_name = validate_copilot_plugin(skills)
+    validate_copilot_marketplace(copilot_plugin_name)
     cursor_plugin_name = validate_cursor_plugin(skills)
     validate_cursor_marketplace(cursor_plugin_name)
     validate_gemini_extension()

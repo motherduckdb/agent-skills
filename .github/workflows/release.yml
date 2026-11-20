@@ -36,6 +36,7 @@ jobs:
         run: |
           uv run scripts/validate_skills.py
           uv run scripts/check_claude_plugin_sync.py
+          uv run scripts/check_copilot_plugin_sync.py
           uv run --with duckdb --with pyyaml python tests/validate_snippets.py
           python3 scripts/package_gemini_extension.py
 
@@ -89,6 +90,7 @@ jobs:
         run: |
           uv run scripts/validate_skills.py
           uv run scripts/check_claude_plugin_sync.py
+          uv run scripts/check_copilot_plugin_sync.py
 
       - name: Build Gemini extension archive
         run: python3 scripts/package_gemini_extension.py

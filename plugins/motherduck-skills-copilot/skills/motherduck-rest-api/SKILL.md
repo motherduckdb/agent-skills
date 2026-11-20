@@ -1,0 +1,58 @@
+---
+name: motherduck-rest-api
+description: Administer MotherDuck service accounts, tokens, Ducklings, and Dive embed sessions through the control-plane REST API.
+license: MIT
+---
+
+# REST API Administration
+
+## Source Of Truth
+
+- Prefer current MotherDuck REST API documentation, the public OpenAPI spec at `https://api.motherduck.com/docs/specs`, or an explicit OpenAPI spec supplied by the user.
+- For token scope and embed behavior, cross-check the REST API docs and the Embedded Dives docs because they include operational constraints not obvious from the raw schema.
+- If the MotherDuck MCP `ask_docs_question` feature is available, use it to check whether public REST API guidance has changed.
+- Treat endpoint availability, preview status, token fields, and role requirements as current only when backed by the supplied spec or current docs.
+
+## Default Posture
+
+- Treat the REST API as the control plane; SQL and data-plane queries go through a database connection, not the REST API.
+- Use `https://api.motherduck.com` as the base URL unless the user provides another environment.
+- Authenticate with `Authorization: Bearer ${MOTHERDUCK_ADMIN_TOKEN}` and keep admin read-write tokens in backend-managed secrets.
+- Never use read-scaling tokens for REST API administration.
+- Prefer read-before-write flows for configuration changes so the current account, service account, Duckling config, or Dive metadata is known before mutation.
+- Treat `POST /v1/users` as service-account creation unless current docs explicitly broaden the API. `GET /v1/users` lists every user and service account in the org; filter with `is_service_account` and `is_deprovisioned` and page with `limit`/`offset`. Use it for access reviews and to find a service account before creating a duplicate.
+- Service accounts and access tokens accept an optional, searchable description. Set one that names the workload and owner; check the current API spec for the field name.
+- For the Terraform resources, state rules, and setup archetypes, read `references/ACCESS_CONTROL_SETUPS.md` in `motherduck-security-governance`.
+- For repeatable provisioning (environments, partner or per-customer setups), prefer the Terraform provider `motherduckdb/motherduck` over scripted REST calls. It authenticates with `MOTHERDUCK_TOKEN`, plus `MOTHERDUCK_ADMIN_TOKEN` for service accounts, tokens, and Duckling configuration.
+- Assume active-account, Duckling configuration, service-account creation, service-account token creation, and Dive embed-session endpoints require an organization admin bearer token unless current docs say otherwise.
+- Never expose generated access tokens in logs, browser code, client bundles, or committed files.
+- Confirm destructive deletes with the user. Deleting a user permanently deletes that user and all of their data.
+- Treat agent/account signup (`motherduck new` or the public signup flow) as separate from the organization Admin REST API. Never create an account because an admin token is unavailable.
+- For Dive embed sessions, keep `initial_state` JSON-serializable and within the documented size limits; validate iframe state, navigation, and export messages in the host application.
+
+## Workflow
+
+1. Identify whether the task is service-account provisioning, token management, Duckling sizing, active-account inspection, or Dive embedding.
+2. Resolve the admin token from the existing environment and identify the target `username` or `dive_id`; ask only when a required value cannot be discovered, and never invent production identifiers.
+3. Check token scope before calling token endpoints: users can create tokens for themselves, and admins can create tokens for service accounts, but admins cannot create tokens for other non-service-account members through the API.
+4. For Duckling config changes, read the current config first, then update both `read_write` and `read_scaling` because the `PUT` payload requires both.
+5. Preserve response fields that are only returned once, especially newly created token strings and embed session strings.
+6. Surface API errors by status and response body; do not hide `400`, `401`, `403`, `404`, or `500` responses behind success-shaped fallbacks.
+7. If the connected MotherDuck MCP server lists user-admin tools (such as `create_service_account`), prefer them over raw HTTP and call `get_user_admin_guide` first when it is listed. Many MCP setups do not expose them; then use the REST API directly. The MCP column in `references/REST_API_GUIDE.md` maps the names.
+
+For answer, review, or planning requests, inspect and report without mutating the control plane. For create or update requests, perform the requested in-scope operation and verify the response; retain confirmation for destructive deletes or broader administrative changes.
+
+## References
+
+Read only the reference sections needed for the current task.
+
+- Read `references/REST_API_GUIDE.md` for endpoint summaries, MCP tool mapping, curl examples, validation limits, and operational gotchas.
+
+## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
+
+- `motherduck-query` for SQL and data-plane query work
+- `motherduck-connect` for connection tokens and application connection posture
+- `motherduck-security-governance` for admin-token handling, service-account posture, and access-boundary questions
+- `motherduck-create-dive` for designing Dives before minting embed sessions
