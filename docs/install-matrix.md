@@ -9,7 +9,7 @@ The packaged installs below are harness-specific convenience paths for runtimes 
 
 | Harness | Install |
 |-------|-------|
-| `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
+| `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck@motherduck-skills` |
 | `Claude Code` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
 | `Codex` | `codex plugin marketplace add motherduckdb/agent-skills`, then install **MotherDuck Skills** from `/plugins` |
 | `Cursor` | `npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global`; this repo also includes `.cursor-plugin/plugin.json` for Cursor plugin ingestion |
@@ -69,7 +69,8 @@ See [HARNESSES.md](../HARNESSES.md) for agent-specific discovery paths.
 
 ## Updates
 
-- Claude Code / GitHub Copilot CLI: `/plugin update motherduck-skills@motherduck-skills`
+- Claude Code: `/plugin update motherduck-skills@motherduck-skills`
+- GitHub Copilot CLI: `/plugin update motherduck@motherduck-skills`
 - Codex: manage the installed plugin from `/plugins`.
 - Gemini CLI: `gemini extensions update motherduck-skills`, then restart the session.
 - Skills CLI: `npx -y skills update -g` for global skills, or `npx -y skills update -p` for project skills. These update the installed skills in that scope.
@@ -80,7 +81,7 @@ For Gemini automation, `--consent` skips the installation confirmation; it is op
 
 ## Verification
 
-- `GitHub Copilot CLI`: `/plugin list` shows `motherduck-skills`, and `/mcp` lists the `motherduck` server
+- `GitHub Copilot CLI`: `/plugin list` shows `motherduck`, and `/mcp` lists the `motherduck` server
 - `Claude Code`: plugin shows up and can be invoked on a MotherDuck task
 - `Codex`: plugin appears in `/plugins`
 - `Cursor`: installed skills appear after reload and can be invoked on a MotherDuck task
