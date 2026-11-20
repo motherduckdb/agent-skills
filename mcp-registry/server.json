@@ -7,7 +7,7 @@
   "icons": [
     {
       "src": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://motherduck.com&size=64",
-      "mimeType": "image/png",
+      "mimeType": "image/jpeg",
       "sizes": [
         "64x64"
       ]
