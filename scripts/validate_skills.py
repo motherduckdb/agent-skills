@@ -409,8 +409,8 @@ def validate_copilot_plugin(skills: list[str]) -> str:
             f"{plugin_path}: fields not allowed by Agent Plugins 1.0: {unknown_fields}"
         )
     plugin_name = payload.get("name")
-    if not plugin_name:
-        raise ValidationError(f"{plugin_path}: missing name")
+    if plugin_name != copilot_plugin.PLUGIN_NAME:
+        raise ValidationError(f"{plugin_path}: name must be {copilot_plugin.PLUGIN_NAME!r}")
     for field in ("version", "description", "license"):
         if not payload.get(field):
             raise ValidationError(f"{plugin_path}: missing {field}")

@@ -14,6 +14,8 @@ from _lib.repo import ROOT, file_digest, iter_files
 PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json"
 MCP_SERVER_URL = "https://api.motherduck.com/mcp"
+# The plugin shares its name with the MCP server it carries.
+PLUGIN_NAME = "motherduck"
 
 # Agent Plugins 1.0 uses a closed plugin.json schema; other fields are ignored.
 ALLOWED_PLUGIN_FIELDS = {

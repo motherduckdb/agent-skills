@@ -9,7 +9,7 @@
   },
   "plugins": [
     {
-      "name": "motherduck-skills",
+      "name": "motherduck",
       "source": "./plugins/motherduck-skills-copilot",
       "description": "MotherDuck skills and the MotherDuck MCP server for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
       "version": "3.1.0",

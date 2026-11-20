@@ -13,7 +13,8 @@ Choose one route for your agent. Run commands beginning with `/` inside the agen
 
 | Agent | Install |
 | --- | --- |
-| Claude Code / GitHub Copilot CLI | `/plugin marketplace add motherduckdb/agent-skills`, then `/plugin install motherduck-skills@motherduck-skills` |
+| Claude Code | `/plugin marketplace add motherduckdb/agent-skills`, then `/plugin install motherduck-skills@motherduck-skills` |
+| GitHub Copilot CLI | `/plugin marketplace add motherduckdb/agent-skills`, then `/plugin install motherduck@motherduck-skills` |
 | Codex | `codex plugin marketplace add motherduckdb/agent-skills`, then open `/plugins` and install **MotherDuck Skills** |
 | Gemini CLI | `gemini extensions install https://github.com/motherduckdb/agent-skills` |
 | Cursor / VS Code / other supported agents | Use the Skills CLI below |

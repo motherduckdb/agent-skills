@@ -1,4 +1,4 @@
-# MotherDuck Skills for GitHub Copilot
+# MotherDuck for GitHub Copilot
 
 An [Agent Plugins 1.0](https://agent-plugins.org) package for GitHub Copilot CLI and VS Code. It bundles:
 
@@ -11,7 +11,7 @@ The MCP server uses OAuth. Copilot opens a browser sign-in the first time the se
 
 ```text
 /plugin marketplace add motherduckdb/agent-skills
-/plugin install motherduck-skills@motherduck-skills
+/plugin install motherduck@motherduck-skills
 ```
 
 ## Maintenance
