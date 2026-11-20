@@ -2,6 +2,30 @@
 
 Customer-facing release notes for MotherDuck Skills. Each section becomes the GitHub release notes for its tag, and editing a published section updates that release when the change merges to `main`.
 
+## 3.2.0
+
+### Highlights
+
+- **The GitHub Copilot plugin is now named `motherduck`.** It has the same name as the MotherDuck MCP server it adds, so the plugin and the server are found under one name.
+- **The hosted MotherDuck MCP server has an MCP Registry entry**, `io.github.motherduckdb/motherduck`, so MCP clients and registries that read the official MCP Registry can list it.
+
+### Changed
+
+- **Breaking for GitHub Copilot CLI:** the plugin `motherduck-skills` is renamed to `motherduck`. The skills and the MCP server are unchanged.
+- The Claude Code, Codex, and Cursor plugins keep the name `motherduck-skills`. The Gemini CLI extension is unchanged.
+
+### Upgrade notes
+
+- GitHub Copilot CLI users replace the old plugin with the renamed one:
+
+  ```text
+  /plugin marketplace update motherduck-skills
+  /plugin uninstall motherduck-skills
+  /plugin install motherduck@motherduck-skills
+  ```
+
+- No action is needed for Claude Code, Codex, Cursor, or Gemini CLI.
+
 ## 3.1.0
 
 ### Highlights
