@@ -5,7 +5,7 @@
 
 21 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, query real data with DuckDB SQL, build Dives and Flights, and deliver analytics pipelines and apps.
 
-Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection or MCP server.
+Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection. The GitHub Copilot CLI plugin also adds the remote MotherDuck MCP server; other installs leave MCP setup to you.
 
 ## Install
 

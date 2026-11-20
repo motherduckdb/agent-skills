@@ -17,6 +17,8 @@ on:
       - 'skills/**'
       - 'plugins/motherduck-skills-claude/**'
       - 'plugins/motherduck-skills/**'
+      - 'plugins/motherduck-skills-copilot/**'
+      - '.github/plugin/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
       - '.agents/plugins/**'
@@ -39,6 +41,8 @@ on:
       - 'skills/**'
       - 'plugins/motherduck-skills-claude/**'
       - 'plugins/motherduck-skills/**'
+      - 'plugins/motherduck-skills-copilot/**'
+      - '.github/plugin/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
       - '.agents/plugins/**'
@@ -89,6 +93,9 @@ jobs:
 
       - name: Verify packaged Codex plugin matches source skills
         run: uv run scripts/check_codex_plugin_sync.py
+
+      - name: Verify packaged Copilot plugin matches source skills
+        run: uv run scripts/check_copilot_plugin_sync.py
 
       - name: Build Gemini extension archive
         run: python3 scripts/package_gemini_extension.py

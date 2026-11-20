@@ -74,11 +74,13 @@ See [HARNESSES.md](../HARNESSES.md) for agent-specific discovery paths.
 - Gemini CLI: `gemini extensions update motherduck-skills`, then restart the session.
 - Skills CLI: `npx -y skills update -g` for global skills, or `npx -y skills update -p` for project skills. These update the installed skills in that scope.
 
+The GitHub Copilot CLI plugin also adds the remote MotherDuck MCP server. Copilot opens a browser sign-in the first time the server is used; no token is needed.
+
 For Gemini automation, `--consent` skips the installation confirmation; it is optional for interactive installs.
 
 ## Verification
 
-- `GitHub Copilot CLI`: `/plugin list` shows `motherduck-skills`
+- `GitHub Copilot CLI`: `/plugin list` shows `motherduck-skills`, and `/mcp` lists the `motherduck` server
 - `Claude Code`: plugin shows up and can be invoked on a MotherDuck task
 - `Codex`: plugin appears in `/plugins`
 - `Cursor`: installed skills appear after reload and can be invoked on a MotherDuck task

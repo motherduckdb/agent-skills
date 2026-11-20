@@ -25,12 +25,14 @@ MANIFEST_PATHS = [
     "package-lock.json",
     ".claude-plugin/marketplace.json",
     ".codex-plugin/plugin.json",
+    ".github/plugin/marketplace.json",
     ".cursor-plugin/plugin.json",
     ".cursor-plugin/marketplace.json",
     ".agents/plugins/marketplace.json",
     "gemini-extension.json",
     "plugins/motherduck-skills-claude/.claude-plugin/plugin.json",
     "plugins/motherduck-skills/.codex-plugin/plugin.json",
+    "plugins/motherduck-skills-copilot/plugin.json",
 ]
 
 USER_AGENT_MODULE = "scripts/_lib/motherduck_user_agent.py"

@@ -1,0 +1,35 @@
+{
+  "name": "motherduck-skills",
+  "owner": {
+    "name": "MotherDuck"
+  },
+  "metadata": {
+    "description": "MotherDuck skills and the MotherDuck MCP server for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
+    "version": "3.0.0"
+  },
+  "plugins": [
+    {
+      "name": "motherduck-skills",
+      "source": "./plugins/motherduck-skills-copilot",
+      "description": "MotherDuck skills and the MotherDuck MCP server for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
+      "version": "3.0.0",
+      "author": {
+        "name": "MotherDuck",
+        "url": "https://motherduck.com"
+      },
+      "homepage": "https://motherduck.com",
+      "repository": "https://github.com/motherduckdb/agent-skills",
+      "license": "MIT",
+      "keywords": [
+        "motherduck",
+        "duckdb",
+        "data-warehouse",
+        "analytics",
+        "sql",
+        "mcp",
+        "dives",
+        "flights"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: motherduck-security-governance
-description: Assess or configure MotherDuck access control: roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.
+description: Assess or configure MotherDuck access control, including roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.
 license: MIT
 ---
 
