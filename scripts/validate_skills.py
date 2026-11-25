@@ -519,6 +519,12 @@ def validate_antigravity_plugin(skills: list[str]) -> str:
     if not antigravity_plugin.PACKAGED_RULES.exists():
         raise ValidationError(f"Missing required Antigravity plugin rules: {antigravity_plugin.PACKAGED_RULES}")
 
+    if not antigravity_plugin.REQUIRED_AGENT.exists():
+        raise ValidationError(f"Missing required Antigravity plugin agent: {antigravity_plugin.REQUIRED_AGENT}")
+    agent_text = antigravity_plugin.REQUIRED_AGENT.read_text()
+    if "name: motherduck-analyst" not in agent_text:
+        raise ValidationError(f"{antigravity_plugin.REQUIRED_AGENT}: missing 'name: motherduck-analyst' frontmatter")
+
     packaged_skills = sorted(
         p.parent.name for p in antigravity_plugin.PACKAGED_SKILLS.glob("*/SKILL.md")
     )
@@ -767,6 +773,12 @@ def main() -> int:
     if sorted(readme_skills) != skills:
         raise ValidationError(
             f"README.md: skill catalog mismatch\nexpected: {skills}\nfound:    {readme_skills}"
+        )
+    readme_count_match = re.search(r"^(\d+) skills\b", README.read_text(), re.MULTILINE)
+    if not readme_count_match or int(readme_count_match.group(1)) != len(skills):
+        found_count = readme_count_match.group(1) if readme_count_match else "none"
+        raise ValidationError(
+            f"README.md: intro skill count ({found_count}) does not match catalog size ({len(skills)})"
         )
 
     claude_skills = read_claude_context_skills()

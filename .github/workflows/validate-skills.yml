@@ -11,8 +11,10 @@ on:
       - 'GEMINI.md'
       - 'HARNESSES.md'
       - 'README.md'
+      - 'package.json'
       - 'commands/**'
       - 'docs/**'
+      - 'evals/**'
       - 'gemini-extension.json'
       - 'skills/**'
       - 'plugins/motherduck-skills-claude/**'
@@ -22,6 +24,7 @@ on:
       - '.github/plugin/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
+      - '.cursor-plugin/**'
       - '.agents/plugins/**'
       - 'scripts/_lib/**'
       - 'scripts/*.py'
@@ -36,8 +39,10 @@ on:
       - 'GEMINI.md'
       - 'HARNESSES.md'
       - 'README.md'
+      - 'package.json'
       - 'commands/**'
       - 'docs/**'
+      - 'evals/**'
       - 'gemini-extension.json'
       - 'skills/**'
       - 'plugins/motherduck-skills-claude/**'
@@ -47,6 +52,7 @@ on:
       - '.github/plugin/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
+      - '.cursor-plugin/**'
       - '.agents/plugins/**'
       - 'scripts/_lib/**'
       - 'scripts/*.py'
@@ -71,7 +77,7 @@ jobs:
           python-version: '3.12'
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -81,8 +87,11 @@ jobs:
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Validate skills plus Claude and Codex plugin wiring
+      - name: Validate skills, catalogs, and plugin manifests
         run: uv run scripts/validate_skills.py
+
+      - name: Verify version surfaces and watermarks match package.json
+        run: uv run scripts/bump_version.py --check "$(node -p "require('./package.json').version")"
 
       - name: Validate Claude marketplace manifest
         run: claude plugin validate ./.claude-plugin/marketplace.json
@@ -90,17 +99,20 @@ jobs:
       - name: Validate packaged Claude plugin
         run: claude plugin validate ./plugins/motherduck-skills-claude
 
-      - name: Verify packaged Claude plugin matches source skills
+      - name: Verify Claude plugin matches source skills
         run: uv run scripts/check_claude_plugin_sync.py
 
-      - name: Verify packaged Codex plugin matches source skills
+      - name: Verify Codex plugin matches source skills
         run: uv run scripts/check_codex_plugin_sync.py
 
-      - name: Verify packaged Copilot plugin matches source skills
+      - name: Verify Copilot plugin matches source skills
         run: uv run scripts/check_copilot_plugin_sync.py
 
-      - name: Verify packaged Antigravity plugin matches source skills
+      - name: Verify Antigravity plugin matches source skills
         run: uv run scripts/check_antigravity_plugin_sync.py
 
-      - name: Build Gemini extension archive
+      - name: Validate TypeScript companion artifacts
+        run: uv run scripts/test_typescript_artifacts.py
+
+      - name: Build Gemini CLI extension archive
         run: python3 scripts/package_gemini_extension.py

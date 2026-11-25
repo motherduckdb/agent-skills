@@ -28,9 +28,10 @@ ALLOWED_PLUGIN_FIELDS = {
     "repository",
     "license",
     "logo",
-    "category",
     "keywords",
     "suggestedPrompts",
+    "skills",
+    "extensions",
     "disabled",
 }
 
@@ -39,6 +40,8 @@ PACKAGED_ROOT = ROOT / "plugins" / "motherduck-skills-antigravity"
 PACKAGED_PLUGIN = PACKAGED_ROOT / "plugin.json"
 PACKAGED_MCP = PACKAGED_ROOT / "mcp_config.json"
 PACKAGED_RULES = PACKAGED_ROOT / "rules" / "AGENTS.md"
+PACKAGED_AGENTS = PACKAGED_ROOT / "agents"
+REQUIRED_AGENT = PACKAGED_AGENTS / "motherduck-analyst.md"
 PACKAGED_SKILLS = PACKAGED_ROOT / "skills"
 
 

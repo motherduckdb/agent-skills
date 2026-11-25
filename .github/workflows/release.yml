@@ -32,10 +32,11 @@ jobs:
       - name: Bump all version surfaces
         run: uv run scripts/bump_version.py "${{ inputs.version }}"
 
-      - name: Validate skills and manifests
+      - name: Validate skills, plugin sync, and snippets
         run: |
           uv run scripts/validate_skills.py
           uv run scripts/check_claude_plugin_sync.py
+          uv run scripts/check_codex_plugin_sync.py
           uv run scripts/check_copilot_plugin_sync.py
           uv run scripts/check_antigravity_plugin_sync.py
           uv run --with duckdb --with pyyaml python tests/validate_snippets.py
@@ -87,10 +88,11 @@ jobs:
       - name: Verify tag matches repo version surfaces
         run: uv run scripts/bump_version.py --check "${TAG#v}"
 
-      - name: Validate skills and manifests
+      - name: Validate skills and plugin sync
         run: |
           uv run scripts/validate_skills.py
           uv run scripts/check_claude_plugin_sync.py
+          uv run scripts/check_codex_plugin_sync.py
           uv run scripts/check_copilot_plugin_sync.py
           uv run scripts/check_antigravity_plugin_sync.py
 

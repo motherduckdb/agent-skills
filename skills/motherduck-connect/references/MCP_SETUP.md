@@ -50,6 +50,18 @@ Gemini CLI, in `~/.gemini/settings.json` or a project's `.gemini/settings.json`,
 }
 ```
 
+Google Antigravity: install the MotherDuck plugin (`agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity`) and sign in via OAuth in **Agent settings → Customizations**, or configure the server standalone in `~/.gemini/config/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "motherduck": {
+      "serverUrl": "https://api.motherduck.com/mcp"
+    }
+  }
+}
+```
+
 - Claude web and desktop: add the MotherDuck connector from the connectors settings. On Team and Enterprise plans an organization owner enables it first.
 - ChatGPT and Codex: install the MotherDuck app or plugin and connect the account.
 - Copilot Studio: add a Model Context Protocol tool with the server URL; choose OAuth for per-user sign-in, or an `Authorization` header with a service-account token (queries are then attributed to that service account).
