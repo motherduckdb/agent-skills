@@ -39,6 +39,7 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 
 - `motherduck-build-cfa-app`: build customer-facing analytics products on MotherDuck.
 - `motherduck-build-dashboard`: compose a coherent Dive-backed analytics dashboard.
+- `motherduck-build-malleable-dive`: build a generated briefing Dive where a Flight plans pages from a semantic catalog and viewers ask, investigate, and rearrange them.
 - `motherduck-build-data-pipeline`: design ingestion-to-serving workflows on MotherDuck.
 - `motherduck-migrate-to-motherduck`: move workloads from legacy warehouses or Postgres estates.
 - `motherduck-enable-self-serve-analytics`: roll out governed self-serve analytics for internal teams.
