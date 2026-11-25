@@ -144,10 +144,8 @@ Run these when changing skills, catalogs, manifests, or docs:
 uv run scripts/validate_skills.py
 claude plugin validate ./.claude-plugin/marketplace.json
 claude plugin validate ./plugins/motherduck-skills-claude
-uv run scripts/sync_claude_plugin.py
-uv run scripts/check_claude_plugin_sync.py
-uv run scripts/sync_antigravity_plugin.py
-uv run scripts/check_antigravity_plugin_sync.py
+uv run scripts/sync_all_plugins.py
+uv run scripts/sync_all_plugins.py --check
 agy plugin validate ./plugins/motherduck-skills-antigravity --strict
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
 ```

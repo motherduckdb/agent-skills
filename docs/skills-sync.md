@@ -36,7 +36,7 @@ The intended review loop is:
 4. update the skill and references
 5. run the artifacts that represent the use case
 6. run any deeper reference project if that skill ships one
-7. sync the dedicated Claude plugin when the shared skill content changed
+7. sync all packaged plugins (`uv run scripts/sync_all_plugins.py`) when shared skill content changed
 8. run repo validation
 
 This is deliberately simple. It is a review path, not a content-generation pipeline.
@@ -63,8 +63,8 @@ When updating a skill, treat `skills/catalog.json` as the first stop:
 - rerun `scripts/test_typescript_artifacts.py` when the skill ships TS companion artifacts
 - rerun any bundled reference project that represents the use case more completely
 - rerun the MotherDuck-backed artifact suite when the change affects real MotherDuck behavior
-- rerun `uv run scripts/sync_claude_plugin.py` when the shared catalog changed
-- rerun `uv run scripts/check_claude_plugin_sync.py` before you consider the Claude package done
+- rerun `uv run scripts/sync_all_plugins.py` when the shared catalog changed
+- rerun `uv run scripts/sync_all_plugins.py --check` before you consider packaged plugins done
 - keep Skills CLI examples on `npx -y skills` and verify runtime prerequisites against the current package
 
 That is the docs-to-skills sync path in this repo.

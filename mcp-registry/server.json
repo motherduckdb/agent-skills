@@ -3,7 +3,7 @@
   "name": "io.github.motherduckdb/motherduck",
   "title": "MotherDuck",
   "description": "Hosted MotherDuck MCP server: explore data, run DuckDB SQL, and build Dives and Flights.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icons": [
     {
       "src": "https://motherduck.com/apple-touch-icon.png",
