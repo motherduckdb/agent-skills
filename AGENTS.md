@@ -35,6 +35,7 @@ Primary source-of-truth files:
 - `.codex-plugin/plugin.json`: Codex plugin manifest
 - `.github/plugin/marketplace.json`: GitHub Copilot marketplace manifest
 - `plugins/motherduck-skills-copilot/plugin.json` and `mcp.json`: packaged Copilot plugin (Agent Plugins 1.0) and its MotherDuck MCP server
+- `plugins/motherduck-skills-antigravity/plugin.json`, `mcp_config.json`, and `rules/AGENTS.md`: packaged Antigravity plugin and its MotherDuck MCP server
 - `.agents/plugins/marketplace.json`: repo-local Codex marketplace wiring
 
 Important supporting surfaces:
@@ -105,6 +106,9 @@ uv run scripts/check_claude_plugin_sync.py
 uv run scripts/sync_codex_plugin.py
 uv run scripts/sync_copilot_plugin.py
 uv run scripts/check_copilot_plugin_sync.py
+uv run scripts/sync_antigravity_plugin.py
+uv run scripts/check_antigravity_plugin_sync.py
+agy plugin validate ./plugins/motherduck-skills-antigravity --strict
 ```
 
 Run this when editing markdown examples or code fences:

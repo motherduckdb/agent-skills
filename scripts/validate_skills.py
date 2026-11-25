@@ -25,7 +25,7 @@ from _lib.claude_plugin import (
     CLAUDE_PACKAGED_PLUGIN_SKILLS,
     CLAUDE_SKILL_ARGUMENT_HINTS,
 )
-from _lib import copilot_plugin
+from _lib import antigravity_plugin, copilot_plugin
 from _lib.evals import EvalError, load_tasks
 from _lib.repo import ROOT, read_json_file
 
@@ -52,6 +52,7 @@ SUPPORTED_HARNESSES = [
     "Claude Code",
     "Codex",
     "Gemini CLI",
+    "Antigravity",
 ]
 
 
@@ -473,6 +474,62 @@ def validate_copilot_marketplace(expected_plugin_name: str) -> None:
             )
 
 
+def validate_antigravity_plugin(skills: list[str]) -> str:
+    plugin_path = antigravity_plugin.PACKAGED_PLUGIN
+    if not plugin_path.exists():
+        raise ValidationError(f"Missing required Antigravity plugin manifest: {plugin_path}")
+
+    payload = read_json_file(plugin_path)
+    if payload.get("$schema") != antigravity_plugin.PLUGIN_SCHEMA:
+        raise ValidationError(f"{plugin_path}: $schema must be {antigravity_plugin.PLUGIN_SCHEMA!r}")
+    unknown_fields = sorted(set(payload) - antigravity_plugin.ALLOWED_PLUGIN_FIELDS)
+    if unknown_fields:
+        raise ValidationError(
+            f"{plugin_path}: fields not allowed in Antigravity plugin.json: {unknown_fields}"
+        )
+    plugin_name = payload.get("name")
+    if plugin_name != antigravity_plugin.PLUGIN_NAME:
+        raise ValidationError(f"{plugin_path}: name must be {antigravity_plugin.PLUGIN_NAME!r}")
+    for field in ("displayName", "version", "description", "license", "logo"):
+        if not payload.get(field):
+            raise ValidationError(f"{plugin_path}: missing {field}")
+
+    logo_path = payload.get("logo")
+    if not isinstance(logo_path, str) or not (antigravity_plugin.PACKAGED_ROOT / logo_path).exists():
+        raise ValidationError(f"{plugin_path}: logo must point at an existing file inside {antigravity_plugin.PACKAGED_ROOT}")
+
+    prompts = payload.get("suggestedPrompts")
+    if (
+        not isinstance(prompts, list)
+        or not (1 <= len(prompts) <= 3)
+        or not all(isinstance(p, str) and p.strip() for p in prompts)
+    ):
+        raise ValidationError(f"{plugin_path}: suggestedPrompts must be 1 to 3 non-empty strings")
+
+    mcp_path = antigravity_plugin.PACKAGED_MCP
+    if not mcp_path.exists():
+        raise ValidationError(f"Missing required Antigravity plugin MCP config: {mcp_path}")
+    mcp_payload = read_json_file(mcp_path)
+    expected_servers = {
+        "motherduck": {"serverUrl": antigravity_plugin.MCP_SERVER_URL}
+    }
+    if mcp_payload.get("mcpServers") != expected_servers:
+        raise ValidationError(f"{mcp_path}: mcpServers must be exactly {expected_servers}")
+
+    if not antigravity_plugin.PACKAGED_RULES.exists():
+        raise ValidationError(f"Missing required Antigravity plugin rules: {antigravity_plugin.PACKAGED_RULES}")
+
+    packaged_skills = sorted(
+        p.parent.name for p in antigravity_plugin.PACKAGED_SKILLS.glob("*/SKILL.md")
+    )
+    if packaged_skills != skills:
+        raise ValidationError(
+            f"{plugin_path}: skills directory mismatch\nexpected: {skills}\nfound:    {packaged_skills}"
+        )
+
+    return plugin_name
+
+
 def validate_cursor_plugin(skills: list[str]) -> str:
     if not CURSOR_PLUGIN.exists():
         raise ValidationError(f"Missing required Cursor plugin manifest: {CURSOR_PLUGIN}")
@@ -740,6 +797,7 @@ def main() -> int:
     validate_codex_marketplace(codex_plugin_name)
     copilot_plugin_name = validate_copilot_plugin(skills)
     validate_copilot_marketplace(copilot_plugin_name)
+    validate_antigravity_plugin(skills)
     cursor_plugin_name = validate_cursor_plugin(skills)
     validate_cursor_marketplace(cursor_plugin_name)
     validate_gemini_extension()

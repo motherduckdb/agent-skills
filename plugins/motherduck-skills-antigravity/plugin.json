@@ -1,0 +1,31 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "motherduck",
+  "displayName": "MotherDuck",
+  "version": "3.2.0",
+  "description": "MotherDuck skills and the hosted MotherDuck MCP server for Antigravity: explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
+  "author": {
+    "name": "MotherDuck",
+    "url": "https://motherduck.com"
+  },
+  "homepage": "https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/",
+  "repository": "https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "category": "Data & Analytics",
+  "keywords": [
+    "motherduck",
+    "duckdb",
+    "data-warehouse",
+    "analytics",
+    "sql",
+    "mcp",
+    "dives",
+    "flights"
+  ],
+  "suggestedPrompts": [
+    "List my MotherDuck databases and summarize the main tables and schemas.",
+    "Explore my MotherDuck workspace and build a dashboard as a Dive.",
+    "Use motherduck-connect to choose the best connection path for this app."
+  ]
+}

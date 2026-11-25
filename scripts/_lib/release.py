@@ -33,6 +33,7 @@ MANIFEST_PATHS = [
     "plugins/motherduck-skills-claude/.claude-plugin/plugin.json",
     "plugins/motherduck-skills/.codex-plugin/plugin.json",
     "plugins/motherduck-skills-copilot/plugin.json",
+    "plugins/motherduck-skills-antigravity/plugin.json",
 ]
 
 USER_AGENT_MODULE = "scripts/_lib/motherduck_user_agent.py"

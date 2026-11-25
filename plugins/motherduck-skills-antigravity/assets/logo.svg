@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="MotherDuck">
+  <rect x="26" y="26" width="204" height="204" rx="44" fill="#FFDE00" stroke="#1E1E1E" stroke-width="10"/>
+  <path d="M98 184c-24 0-40-15-40-36 0-17 11-31 28-36-2-6-3-12-3-18 0-26 20-44 45-44 23 0 40 16 42 38l26 5c8 2 13 8 12 15-1 8-8 13-16 12l-24-3c-4 12-12 22-24 27 8 4 14 11 14 20 0 12-10 20-26 20H98z" fill="#FFFFFF" stroke="#1E1E1E" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M168 88l28 5c8 2 13 8 12 15-1 8-8 13-16 12l-25-3c2-9 2-19 1-29z" fill="#FF9500" stroke="#1E1E1E" stroke-width="9" stroke-linejoin="round"/>
+  <circle cx="132" cy="88" r="8" fill="#1E1E1E"/>
+</svg>

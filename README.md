@@ -5,7 +5,7 @@
 
 21 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, query real data with DuckDB SQL, build Dives and Flights, and deliver analytics pipelines and apps.
 
-Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection. The GitHub Copilot CLI plugin also adds the remote MotherDuck MCP server; other installs leave MCP setup to you.
+Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection. The GitHub Copilot CLI and Google Antigravity plugins also add the remote MotherDuck MCP server; other installs leave MCP setup to you.
 
 ## Install
 
@@ -15,6 +15,7 @@ Choose one route for your agent. Run commands beginning with `/` inside the agen
 | --- | --- |
 | Claude Code | `/plugin marketplace add motherduckdb/agent-skills`, then `/plugin install motherduck-skills@motherduck-skills` |
 | GitHub Copilot CLI | `/plugin marketplace add motherduckdb/agent-skills`, then `/plugin install motherduck@motherduck-skills` |
+| Google Antigravity | `agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` |
 | Codex | `codex plugin marketplace add motherduckdb/agent-skills`, then open `/plugins` and install **MotherDuck Skills** |
 | Gemini CLI | `gemini extensions install https://github.com/motherduckdb/agent-skills` |
 | Cursor / VS Code / other supported agents | Use the Skills CLI below |
