@@ -57,6 +57,5 @@ agy plugin validate ./plugins/motherduck-skills-antigravity --strict
 Before submitting to the Antigravity Partner Marketplace (`antigravity-plugins-partners`):
 
 1. Confirm `agy plugin validate ./plugins/motherduck-skills-antigravity --strict` passes with zero errors and zero warnings.
-2. Swap `assets/logo.svg` with the official MotherDuck brand SVG if required by brand review (1:1 square, `>= 128x128`, ~10% transparent padding, legible on light and dark themes).
-3. Verify fresh OAuth sign-in (allowlisting `https://antigravity.google.com/oauth/callback` if required by the OAuth provider), tool discovery (`motherduck_motherduck`), read-only query execution, and token refresh across an Antigravity restart.
-4. Submit `https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` via the [Antigravity Marketplace partner intake form](https://forms.gle/2EX5RFYPoJe1UgxR9).
+2. Verify fresh OAuth sign-in (allowlisting `https://antigravity.google.com/oauth/callback` if required by the OAuth provider), tool discovery (`motherduck_motherduck`), read-only query execution, and token refresh across an Antigravity restart.
+3. Submit `https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` via the [Antigravity Marketplace partner intake form](https://forms.gle/2EX5RFYPoJe1UgxR9).

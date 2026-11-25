@@ -6,10 +6,10 @@
   "version": "1.0.0",
   "icons": [
     {
-      "src": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://motherduck.com&size=64",
-      "mimeType": "image/jpeg",
+      "src": "https://motherduck.com/apple-touch-icon.png",
+      "mimeType": "image/png",
       "sizes": [
-        "64x64"
+        "180x180"
       ]
     }
   ],
