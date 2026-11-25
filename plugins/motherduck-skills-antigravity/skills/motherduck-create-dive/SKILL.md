@@ -1,0 +1,82 @@
+---
+name: motherduck-create-dive
+description: Create, edit, design, publish, share, or embed MotherDuck Dives, including responsive layout, light/dark themes, and buttons that write back through Flights.
+license: MIT
+---
+
+# Create and Manage MotherDuck Dives
+
+## Source Of Truth
+
+- Prefer current MotherDuck Dive docs first.
+- **Non-negotiable ordering:** when MotherDuck MCP is available, call `get_dive_guide` before writing Dive code and before every `save_dive`, `update_dive`, or `edit_dive_content`. The guide defines the current component API and runtime libraries.
+- `get_dive_guide` also surfaces relevant conventions from the reserved `dives` Guide topic. Apply those conventions when they do not conflict with the user's explicit requirements.
+- Use the blessed Dives example repo as the reference implementation for local preview, Dives-as-code layout, metadata, CI previews, and deploy scripts.
+- Use Dives SQL functions when the user wants a scriptable SQL-native create/read/update/delete workflow instead of MCP tools.
+- Treat ordinary Dives and embedded Dives separately. Verify current plan entitlements before promising an embed rollout; do not preserve plan names or availability claims from memory.
+
+## Default Posture
+
+- First classify the job: new Dive, existing Dive edit, Dives-as-code workflow, team sharing, or embedding.
+- Validate the underlying SQL and schema first with `motherduck-explore` and `motherduck-query`; a good Dive starts with a correct query.
+- Keep Dive queries fully qualified and SQL-heavy; let React handle presentation, not data reshaping.
+- Treat the component contract as React + `useSQLQuery`, a default export, supported runtime libraries, explicit loading/empty/error states, and no browser-side secrets.
+- New Dives start as Draft. Promote a validated Dive to Ready only when the requested delivery includes publication. Only an admin can mark a Dive Endorsed; never self-endorse an agent-created Dive.
+- When reusing existing work, prefer Endorsed and then Ready Dives. Archived Dives are retired and excluded from default agent listings unless explicitly requested.
+- When local preview uses `REQUIRED_DATABASES`, keep the export on one line and mirror the real share dependencies in metadata or save/update inputs. Avoid aliases that collide with existing database names.
+- Preserve an existing Dive’s visual system for scoped edits. For a new Dive, choose a concrete theme direction that fits its audience.
+- Prefer one query per visual section or interaction surface rather than one giant cross-purpose query.
+- Preview locally before saving when the environment supports it.
+- For existing Dives, read the current content and version metadata before overwriting anything. MCP `list_dives` returns `current_version`, and `read_dive` can fetch historical versions. Use `edit_dive_content` (exact text replacements) for focused edits and `update_dive` for a full rewrite. Use `view_dive` to show the user a saved Dive, and `delete_dive` only after explicit confirmation; deletion is permanent.
+- Add export controls only when the use case calls for them: `exportAs` on a query result or the `useExport` hook (CSV, JSON, Parquet, XLSX), started from a click. Do not build Blob URLs, hidden anchors, or `COPY TO` exports.
+- Dive SQL is read-only. For actions such as approving a record, submitting a form, or refreshing a pipeline, have a button start a Flight the Dive owner controls with `useRunFlight` and track it with `useFlightRun` (from `@motherduck/react-sql-query`). Hardcode the Flight ID, pass only string config values, disable the control while a run is pending, render the hook's `error`, and rerun the affected queries when the run succeeds. Viewers need a `run` grant: recommend the grantees and grant only after the user confirms. Embedded Dives cannot run Flights.
+- Viewers can open **AI Chat** in the Dive header. It sees the Dive's queries, data, and current filters, and can edit the Dive with each change kept in version history. Clear section titles, query names, and the Dive description make its answers better.
+- Treat embedded Dives as the first-choice path when a product needs a live read-only Dive surface with a backend-created embed session. Move to `motherduck-build-cfa-app` when the app needs custom API contracts, writes, non-Dive routing, tenant policy enforcement, or richer authorization.
+- For shared repos or CI/CD, use a service-account token so Dive ownership is not tied to one human user.
+
+## Feature-Complete Defaults
+
+`get_dive_guide` owns the runtime contract and the MotherDuck visual rules (palette, chart sizing, no card chrome, static Tailwind only); do not restate them. A new Dive or full redesign should also ship with these on the first save. Start from `artifacts/feature_complete_dive.tsx`, which implements all of them, and delete what the Dive does not need. For a scoped edit, preserve the existing design and check only the affected states.
+
+- Reflows from about 320 px to wide panes: breakpoint grids (2x2 KPIs on narrow, one row on wide), `ResponsiveContainer width="100%"`, no fixed widths or page-level horizontal scroll.
+- Light and dark themes from one token object per theme, applied with inline `style`, starting from the viewer's system preference.
+- Filters, sort, and selected view in `useDiveState` so they survive refresh and travel with a shared link.
+- Every section has its own loading skeleton, empty message, and `role="alert"` error.
+- A "data as of" freshness line and plain-language titles with units, so viewers and AI Chat can read the Dive.
+- Export with `exportAs` when people will take the data elsewhere.
+- When the Dive should change data, a write-back control backed by a Flight instrumented for the Flight Explainer.
+- Styled controls (the runtime strips button styles) with 44 px targets, visible focus, and non-color status cues.
+- Do not call a Dive mobile-friendly from responsive CSS alone; report the viewports and states you checked.
+
+## Workflow
+
+1. Choose the requested delivery path: workspace Dive, existing edit, Dives-as-code, write-back actions, sharing, or embedding. Follow only that path; a chart request does not itself authorize sharing, embedding, or write-back.
+2. Explore the live schema and validate the core SQL first.
+3. Call `get_dive_guide` if MCP is available, then design the story, sections, interactions, and theme.
+4. Build or edit the Dive component, using local preview/hot reload when possible.
+5. Call `save_dive`, `update_dive`, or deploy only after queries, loading states, required resources, and visual behavior are correct.
+6. Read the resulting URL, version, and status back. If the requested delivery includes publication, promote a validated Draft to Ready through the write-capable path.
+7. If teammates or application users need access, check three things: they can view the Dive, every `REQUIRED_DATABASES` entry is a share they can read, and they hold a `run` grant on each Flight the Dive runs. Prefer an existing share of an owned database (`MD_INFORMATION_SCHEMA.OWNED_SHARES`). When the user asks to share the Dive's data with the whole organization, `share_dive_data` creates org-scoped shares and updates the Dive in one call; use `motherduck-share-data` for restricted audiences, and the embed-session flow for application users.
+
+For answer, review, or planning requests, stop at the requested design or code artifact. For create, update, or deploy requests, carry the requested in-scope operation through preview and validation; ask before destructive replacement or a broader external rollout that the request did not authorize. Before `save_dive` or `update_dive`, follow the review step that `get_dive_guide` sets for your client: when it asks you to show the final source or preview and get the user's go-ahead, do that once, unless the user already said to save without review.
+
+## References
+
+Read only the reference sections needed for the current task.
+
+- Copy and adapt `artifacts/feature_complete_dive.tsx` as the starting component for a new Dive.
+- Read `references/RESPONSIVE_DIVE_DESIGN_SYSTEM.md` for the layout grid, component anatomy, theme tokens, filter model, and design anti-patterns of a new Dive or redesign.
+- Read `references/VISUAL_QA_PLAYBOOK.md` for the screenshot and review loop when a full design handoff or evidence is requested.
+- Read `references/DIVE_DESIGN_GUIDE.md` for authoring workflows, `useSQLQuery` mechanics, Dives-as-code, editing/version history, sharing, embedding, write-back with Flights, Agent Chat, SQL functions, theming prompts, chart-selection rules, loading/error states, layout patterns, and implementation gotchas
+
+## Related Skills
+
+Load related skills only for missing capabilities; reuse established context.
+
+- `motherduck-explore` for discovering the real tables, views, and dimensions before visualizing them
+- `motherduck-query` for validating the SQL each Dive section will run
+- `motherduck-build-dashboard` when the work is really a multi-section dashboard composition problem
+- `motherduck-build-cfa-app` when the requirement is a fuller product surface with per-customer isolation or backend policy control
+- `motherduck-cli` when the agent has a shell and should keep Dive source in local files
+- `motherduck-create-flight` for the Flight a write-back button runs
+- `motherduck-manage-guides` for reusable personal or organization Dive conventions

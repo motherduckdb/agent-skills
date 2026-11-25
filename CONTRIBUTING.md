@@ -39,6 +39,9 @@ Important source-of-truth files:
 - `plugins/motherduck-skills-claude/.claude-plugin/plugin.json`
 - `.codex-plugin/plugin.json`
 - `.agents/plugins/marketplace.json`
+- `.github/plugin/marketplace.json`
+- `plugins/motherduck-skills-copilot/plugin.json`
+- `plugins/motherduck-skills-antigravity/plugin.json`
 
 ## Repo Shape
 
@@ -143,6 +146,9 @@ claude plugin validate ./.claude-plugin/marketplace.json
 claude plugin validate ./plugins/motherduck-skills-claude
 uv run scripts/sync_claude_plugin.py
 uv run scripts/check_claude_plugin_sync.py
+uv run scripts/sync_antigravity_plugin.py
+uv run scripts/check_antigravity_plugin_sync.py
+agy plugin validate ./plugins/motherduck-skills-antigravity --strict
 uv run --with duckdb --with pyyaml python tests/validate_snippets.py
 ```
 
