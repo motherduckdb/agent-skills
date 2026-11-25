@@ -2,6 +2,46 @@
 
 Customer-facing release notes for MotherDuck Skills. Each section becomes the GitHub release notes for its tag, and editing a published section updates that release when the change merges to `main`.
 
+## 3.3.0
+
+### Highlights
+
+- **Native Google Antigravity plugin (`motherduck`).** Install MotherDuck in Google Antigravity with one command to get all 23 skills, the hosted remote MotherDuck MCP server (`https://api.motherduck.com/mcp`, OAuth sign-in), the `motherduck-analyst` specialist agent, and DuckDB SQL/Guide guardrails.
+- **Reusable Dive UI component kit (`motherduck-dive-components`).** Build consistent, multi-theme Dive UIs with KPI rows, gauges, area/line/bar charts, heatmaps, Sankey diagrams, treemaps, timelines, date pickers, narrative context blocks, and custom component registration — plus a standalone offline gallery and single-file `index.tsx` assembler.
+- **Generative briefing Dives (`motherduck-build-malleable-dive`).** Build Dives where a MotherDuck Flight generates daily or monthly briefings from a semantic catalog and viewers can ask follow-up questions, investigate insights, rate pages, and rearrange blocks.
+
+### Added
+
+- `plugins/motherduck-skills-antigravity`: native Google Antigravity plugin bundling all 23 skills, `mcp_config.json` for the hosted MotherDuck MCP server, `agents/motherduck-analyst.md`, `rules/AGENTS.md`, and the official MotherDuck logo.
+- `motherduck-dive-components` (workflow skill): component kit, themes (`motherduck`, `swiss`, `paper`, `duck`, `night`, plus `makeTheme`), custom component examples, and `assemble.py` bundler.
+- `motherduck-build-malleable-dive` (use-case skill): Flight + Dive templates, learning-loop and spec-contract references, and an end-to-end `nyc-311` recipe.
+- Google Antigravity client setup instructions in `motherduck-connect` (`references/MCP_SETUP.md`).
+
+### Changed
+
+- Updated the MCP Registry entry (`mcp-registry/server.json`) and Antigravity plugin to use MotherDuck's official logo and canonical MCP setup documentation URL.
+- Added `get_flight_guide` and `motherduck-cli` defaults to Gemini CLI (`GEMINI.md`) and Antigravity (`rules/AGENTS.md`) guidelines.
+- Refreshed transitive dependencies in the `dlt + dbt + MotherDuck` reference pipeline lockfile.
+
+### Fixed
+
+- Fixed a syntax issue in the `motherduck-build-malleable-dive` `RECIPE_GUIDE.md` Python boards example and updated a redirected `agent-chat` documentation link in `skills/catalog.json`.
+
+### Upgrade notes
+
+- **Google Antigravity:** install or update with:
+
+  ```bash
+  agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity
+  ```
+
+  Then sign in to the `motherduck` MCP server under **Agent settings → Customizations**.
+- **Claude Code:** `/plugin update motherduck-skills@motherduck-skills`
+- **GitHub Copilot CLI:** `/plugin update motherduck@motherduck-skills`
+- **Codex:** update **MotherDuck Skills** from `/plugins`.
+- **Gemini CLI:** `gemini extensions update motherduck-skills`
+- **Skills CLI:** `npx -y skills update -g` (or `-p` for project installs).
+
 ## 3.2.0
 
 ### Highlights
