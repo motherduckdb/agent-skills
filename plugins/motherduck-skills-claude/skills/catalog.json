@@ -205,6 +205,45 @@
     ],
     "needs_live_discovery": false
   },
+  "motherduck-dive-components": {
+    "name": "motherduck-dive-components",
+    "description": "Build Dive UIs from a reusable React component kit (stat cards, gauges, area, heatmap, Sankey, treemap, timeline, date picker), brand themes, and custom components.",
+    "layer": "workflow",
+    "depends_on": [
+      "motherduck-cli",
+      "motherduck-query"
+    ],
+    "references": [
+      "references/THEMING.md",
+      "references/CUSTOM_COMPONENTS.md"
+    ],
+    "artifacts": [
+      "artifacts/components.json",
+      "artifacts/assemble.py",
+      "artifacts/kit/core.tsx",
+      "artifacts/kit/blocks.tsx",
+      "artifacts/kit/stats.tsx",
+      "artifacts/kit/area.tsx",
+      "artifacts/kit/heatmap.tsx",
+      "artifacts/kit/sankey.tsx",
+      "artifacts/kit/treemap.tsx",
+      "artifacts/kit/timeline.tsx",
+      "artifacts/kit/datepicker.tsx",
+      "artifacts/kit/field.tsx",
+      "artifacts/kit/notes.tsx",
+      "artifacts/examples/funnel.tsx",
+      "artifacts/gallery/app.tsx",
+      "artifacts/gallery/build_page.py",
+      "artifacts/gallery/index.html"
+    ],
+    "source_docs": [
+      "https://motherduck.com/docs/key-tasks/dives/",
+      "https://motherduck.com/docs/key-tasks/dives/theming-and-styling-dives/",
+      "https://motherduck.com/docs/key-tasks/dives/managing-dives-as-code/",
+      "https://motherduck.com/dive-gallery/"
+    ],
+    "needs_live_discovery": false
+  },
   "motherduck-duckdb-sql": {
     "name": "motherduck-duckdb-sql",
     "description": "Look up or repair DuckDB SQL syntax and verify MotherDuck-specific command and feature support.",

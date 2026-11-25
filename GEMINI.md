@@ -29,6 +29,7 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 - `motherduck-manage-guides`: create, discover, version, and govern durable agent context.
 - `motherduck-share-data`: publish, consume, and govern MotherDuck shares safely.
 - `motherduck-create-dive`: build, design, theme, preview, save, and update Dives, including responsive layout and light/dark themes.
+- `motherduck-dive-components`: build Dive UIs from a reusable component kit (stat cards, gauges, heatmaps, Sankey, treemaps, timelines, date pickers), brand themes, and custom components.
 - `motherduck-create-flight`: create, schedule, run, and debug Flights (Python jobs on MotherDuck compute).
 - `motherduck-ducklake`: decide whether DuckLake fits and how to apply it safely.
 - `motherduck-security-governance`: answer security, access, governance, and residency questions.

@@ -555,6 +555,57 @@
           "why": "never row-by-row"
         }
       ]
+    },
+    {
+      "id": "dive-components-heatmap-brand",
+      "prompt": "Add a calendar heatmap of daily signups from analytics.main.signups to my MotherDuck Dive, and style the whole Dive in our brand teal #0f766e.",
+      "expect_skills": [
+        "motherduck-dive-components",
+        "motherduck-create-dive"
+      ],
+      "must": [
+        {
+          "pattern": "heatmap",
+          "why": "the kit's heatmap component renders daily activity"
+        },
+        {
+          "pattern": "makeTheme|#0f766e",
+          "why": "a brand theme comes from makeTheme with the brand accent"
+        },
+        {
+          "pattern": "\"analytics\"\\.\"main\"\\.\"signups\"",
+          "why": "Dive SQL uses fully qualified table names"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "fonts\\.googleapis|@import url",
+          "why": "Dives cannot load web fonts or external stylesheets"
+        }
+      ]
+    },
+    {
+      "id": "dive-components-custom-funnel",
+      "prompt": "My MotherDuck Dive needs a funnel chart of onboarding steps and none of the standard charts fit. How do I add it so it matches the rest of the Dive's components?",
+      "expect_skills": [
+        "motherduck-dive-components"
+      ],
+      "must": [
+        {
+          "pattern": "registerComponent",
+          "why": "custom components register like built-ins"
+        },
+        {
+          "pattern": "useTheme|theme token",
+          "why": "custom components take colours from theme tokens"
+        }
+      ],
+      "must_not": [
+        {
+          "pattern": "npm install|import .* from ['\\\"](?!react|recharts|d3|lucide-react|@motherduck)",
+          "why": "Dives import only the runtime libraries; the kit is copied in as source"
+        }
+      ]
     }
   ]
 }
