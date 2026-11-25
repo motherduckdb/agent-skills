@@ -10,6 +10,7 @@ The packaged installs below are harness-specific convenience paths for runtimes 
 | Harness | Install |
 |-------|-------|
 | `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck@motherduck-skills` |
+| `Google Antigravity` | `agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` |
 | `Claude Code` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck-skills@motherduck-skills` |
 | `Codex` | `codex plugin marketplace add motherduckdb/agent-skills`, then install **MotherDuck Skills** from `/plugins` |
 | `Cursor` | `npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global`; this repo also includes `.cursor-plugin/plugin.json` for Cursor plugin ingestion |
@@ -71,25 +72,29 @@ See [HARNESSES.md](../HARNESSES.md) for agent-specific discovery paths.
 
 - Claude Code: `/plugin update motherduck-skills@motherduck-skills`
 - GitHub Copilot CLI: `/plugin update motherduck@motherduck-skills`
+- Google Antigravity: reinstall from GitHub with `agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` (or update from Customizations once listed in the Marketplace).
 - Codex: manage the installed plugin from `/plugins`.
 - Gemini CLI: `gemini extensions update motherduck-skills`, then restart the session.
 - Skills CLI: `npx -y skills update -g` for global skills, or `npx -y skills update -p` for project skills. These update the installed skills in that scope.
 
-The GitHub Copilot CLI plugin also adds the remote MotherDuck MCP server. Copilot opens a browser sign-in the first time the server is used; no token is needed.
+The GitHub Copilot CLI and Google Antigravity plugins also add the remote MotherDuck MCP server (`https://api.motherduck.com/mcp`). Both use OAuth sign-in; no API token is needed.
 
 For Gemini automation, `--consent` skips the installation confirmation; it is optional for interactive installs.
 
 ## Verification
 
 - `GitHub Copilot CLI`: `/plugin list` shows `motherduck`, and `/mcp` lists the `motherduck` server
+- `Google Antigravity`: `agy plugin list` shows `motherduck`, and **Agent settings → Customizations** lists the `motherduck` MCP server ready to authenticate
 - `Claude Code`: plugin shows up and can be invoked on a MotherDuck task
 - `Codex`: plugin appears in `/plugins`
 - `Cursor`: installed skills appear after reload and can be invoked on a MotherDuck task
 - `Gemini CLI`: `gemini extensions list` or `gemini skills list`
 
-For local Claude plugin development, validate the dedicated package directly:
+For local Claude or Antigravity plugin development, validate the dedicated packages directly:
 
 ```bash
 claude plugin validate ./plugins/motherduck-skills-claude
 claude --plugin-dir ./plugins/motherduck-skills-claude
+agy plugin validate ./plugins/motherduck-skills-antigravity --strict
+agy plugin install ./plugins/motherduck-skills-antigravity
 ```

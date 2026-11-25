@@ -13,6 +13,7 @@ Use this file to answer two questions quickly:
 | Harness | Best install path | Native surface in this repo | Verify it worked |
 |-------|-------|-------|-------|
 | `GitHub Copilot CLI` | `/plugin marketplace add motherduckdb/agent-skills` then `/plugin install motherduck@motherduck-skills` | `.github/plugin/marketplace.json`, `plugins/motherduck-skills-copilot` (Agent Plugins 1.0: `plugin.json`, `mcp.json`, `skills/`) | run `/plugin list`, check `/mcp` for the `motherduck` server, and ask Copilot to use `motherduck-connect` |
+| `Google Antigravity` | `agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` | `plugins/motherduck-skills-antigravity` (`plugin.json`, `mcp_config.json`, `rules/AGENTS.md`, `assets/logo.svg`, `skills/`) | run `agy plugin list`, authenticate the `motherduck` MCP server in **Agent settings → Customizations**, and ask Antigravity to use `motherduck-connect` |
 | `VS Code / GitHub Copilot` | `npx -y skills add motherduckdb/agent-skills --agent github-copilot --skill '*' --yes --global` | shared `skills/` catalog | ask Copilot to use a MotherDuck skill in agent mode |
 | `Claude Code` | Claude plugin install or Skills CLI | `.claude-plugin/marketplace.json`, `plugins/motherduck-skills-claude/.claude-plugin/plugin.json` | ask Claude Code to use `motherduck-connect`, inspect the plugin list, or run `claude --plugin-dir ./plugins/motherduck-skills-claude` |
 | `Codex` | Codex plugin install or Skills CLI | `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `plugins/motherduck-skills` | open `/plugins` or run the Codex plugin smoke test |
@@ -28,7 +29,7 @@ For end-to-end product work, start with the matching use-case skill and load low
 ## Maintainer Notes
 
 - run `uv run scripts/validate_skills.py` after changing harness docs or packaged surfaces
-- the Copilot plugin is named `motherduck`, like its MCP server; the Claude Code, Codex, and Cursor plugins keep the name `motherduck-skills`
+- the Copilot and Antigravity plugins are named `motherduck`, like their MCP server; the Claude Code, Codex, and Cursor plugins keep the name `motherduck-skills`
 - the hosted MotherDuck MCP server is published to the MCP Registry from `mcp-registry/server.json` by the **Publish MCP Registry entry** workflow
-- the Copilot package also bundles the remote MotherDuck MCP server (`https://api.motherduck.com/mcp`, OAuth sign-in); run `uv run scripts/sync_copilot_plugin.py` after changing `skills/`
+- the Copilot and Antigravity packages also bundle the remote MotherDuck MCP server (`https://api.motherduck.com/mcp`, OAuth sign-in); run `uv run scripts/sync_copilot_plugin.py` and `uv run scripts/sync_antigravity_plugin.py` after changing `skills/`
 - keep `README.md`, `docs/install-matrix.md`, and this file aligned on the same harness list and install story
