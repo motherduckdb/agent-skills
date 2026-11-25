@@ -3,17 +3,17 @@
   "name": "io.github.motherduckdb/motherduck",
   "title": "MotherDuck",
   "description": "Hosted MotherDuck MCP server: explore data, run DuckDB SQL, and build Dives and Flights.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icons": [
     {
-      "src": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://motherduck.com&size=64",
-      "mimeType": "image/jpeg",
+      "src": "https://motherduck.com/apple-touch-icon.png",
+      "mimeType": "image/png",
       "sizes": [
-        "64x64"
+        "180x180"
       ]
     }
   ],
-  "websiteUrl": "https://motherduck.com/docs/sql-reference/mcp/",
+  "websiteUrl": "https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/",
   "repository": {
     "url": "https://github.com/motherduckdb/agent-skills",
     "source": "github",

@@ -4,9 +4,9 @@ The hosted MotherDuck MCP server connects AI assistants and coding agents to [Mo
 
 - **Endpoint:** `https://api.motherduck.com/mcp` (Streamable HTTP)
 - **Sign-in:** OAuth in the browser. Access follows your MotherDuck permissions. No API key is needed.
-- **Documentation:** [MotherDuck MCP server](https://motherduck.com/docs/sql-reference/mcp/)
+- **Documentation:** [MotherDuck MCP server](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/)
 
-Add the endpoint as a remote MCP server in your client, then sign in when prompted. GitHub Copilot CLI users can install the `motherduck` plugin from this repository instead, which adds the server and the MotherDuck skills together.
+Add the endpoint as a remote MCP server in your client, then sign in when prompted. GitHub Copilot CLI and Google Antigravity users can install the `motherduck` plugin from this repository instead, which adds the server and the MotherDuck skills together.
 
 To run a server on your own machine against local DuckDB files, use [mcp-server-motherduck](https://github.com/motherduckdb/mcp-server-motherduck).
 

@@ -3,13 +3,13 @@
 [![Latest release](https://img.shields.io/github/v/release/motherduckdb/agent-skills)](https://github.com/motherduckdb/agent-skills/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-21 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, query real data with DuckDB SQL, build Dives and Flights, and deliver analytics pipelines and apps.
+23 skills for coding agents working with [MotherDuck](https://motherduck.com): connect applications, explore live schemas, write DuckDB SQL, build Dives and Flights, and ship analytics pipelines and apps.
 
-Each skill includes focused instructions and, where useful, detailed references and runnable examples. Installing the skills does not configure a MotherDuck connection. The GitHub Copilot CLI and Google Antigravity plugins also add the remote MotherDuck MCP server; other installs leave MCP setup to you.
+Each skill pairs concise, opinionated instructions with deep references and runnable examples. The **GitHub Copilot CLI** and **Google Antigravity** plugins also bundle the hosted remote [MotherDuck MCP server](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/) with OAuth sign-in; other installs ship skills only and leave connection setup to you.
 
 ## Install
 
-Choose one route for your agent. Run commands beginning with `/` inside the agent; run the others in your terminal.
+Choose the install route for your agent. Commands starting with `/` run inside the agent; all others run in your terminal.
 
 | Agent | Install |
 | --- | --- |
@@ -18,27 +18,27 @@ Choose one route for your agent. Run commands beginning with `/` inside the agen
 | Google Antigravity | `agy plugin install https://github.com/motherduckdb/agent-skills/tree/main/plugins/motherduck-skills-antigravity` |
 | Codex | `codex plugin marketplace add motherduckdb/agent-skills`, then open `/plugins` and install **MotherDuck Skills** |
 | Gemini CLI | `gemini extensions install https://github.com/motherduckdb/agent-skills` |
-| Cursor / VS Code / other supported agents | Use the Skills CLI below |
+| Cursor / VS Code / other agents | Use the Skills CLI below |
 
-The [Skills CLI](https://github.com/vercel-labs/skills) needs Git and Node.js 22.20+ ([package requirements](https://github.com/vercel-labs/skills/blob/main/package.json)). No global CLI installation is needed:
+The [Skills CLI](https://github.com/vercel-labs/skills) requires Git and Node.js 22.20+ ([package requirements](https://github.com/vercel-labs/skills/blob/main/package.json)) — no global install needed:
 
 ```bash
 npx -y skills add motherduckdb/agent-skills
 ```
 
-Select the skills and agents interactively. To install the whole catalog for Cursor:
+Pick skills and target agents interactively, or install the full catalog in one command (for example, Cursor):
 
 ```bash
 npx -y skills add motherduckdb/agent-skills --agent cursor --skill '*' --yes --global
 ```
 
-Use `--agent github-copilot` for VS Code/GitHub Copilot, or another supported agent name. Omit `--global` for a project-scoped install.
+Swap `--agent cursor` for `--agent github-copilot` (VS Code / GitHub Copilot) or another supported agent, and omit `--global` for a project-scoped install.
 
-See the [install matrix](docs/install-matrix.md) for alternatives, updates, verification, and manual installation. [Harness support](HARNESSES.md) documents the discovery paths and plugin manifests.
+See the [install matrix](docs/install-matrix.md) for updates, verification, and manual installs, and [HARNESSES.md](HARNESSES.md) for native plugin surfaces and discovery paths.
 
 ## Use the Skills
 
-Ask for the task directly, or name a skill from the catalog:
+Describe your goal directly, or invoke a skill by name:
 
 > Use motherduck-connect to choose the connection path for this app.
 
@@ -46,9 +46,9 @@ Ask for the task directly, or name a skill from the catalog:
 
 > Plan a migration to MotherDuck with validation and rollback steps.
 
-For live work, configure [MotherDuck MCP](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/) or an authenticated database client. Supply credentials through your normal secret or environment setup, never in prompts or committed files.
+For live warehouse work, sign in through the bundled MCP server (Copilot CLI / Antigravity), configure [MotherDuck MCP](https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/), or export credentials via your environment (`MOTHERDUCK_TOKEN`). Never paste tokens into prompts or committed files.
 
-Start with the skill that matches the task. Reuse established connection and schema context; load supporting references only when needed. The skills favor DuckDB SQL, live schema discovery, native MotherDuck storage by default, and backend credentials for customer-facing apps.
+Start with the skill that matches your task — agents load references and lower-layer skills on demand. The catalog defaults to DuckDB SQL, live schema discovery, native MotherDuck storage, and backend credentials for customer-facing apps.
 
 ## Skills Overview
 

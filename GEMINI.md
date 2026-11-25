@@ -53,7 +53,8 @@ Use it when the task involves connecting to MotherDuck, exploring a live workspa
 - Lead with the Postgres endpoint for thin-client and PostgreSQL-driver interoperability.
 - Use the native DuckDB `md:` path when local files, hybrid execution, or direct DuckDB control matter.
 - For multi-database exploration, bootstrap flows, and temporary validation environments, prefer a native `md:` workspace connection.
-- Call `get_dive_guide` before save or update Dive flows when MCP is available.
+- Call `get_dive_guide` before `save_dive`, `update_dive`, or `edit_dive_content` when MCP is available.
+- Call `get_flight_guide` before `create_flight`, `update_flight`, or `edit_flight_source` when MCP is available.
 - Call `get_query_guide` before business-semantic queries and traverse relevant Guide topics.
 - Prefer the MotherDuck CLI for file-shaped Dive/Flight work when a shell is available; prefer MCP for chat-only exploration.
 - Treat DuckLake as opt-in, not the default storage posture.

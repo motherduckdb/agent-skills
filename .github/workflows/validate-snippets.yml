@@ -1,10 +1,13 @@
 name: Validate Code Snippets
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
       - '**/*.md'
+      - 'package.json'
+      - 'package-lock.json'
       - 'tests/validate_snippets.py'
       - 'tests/_lib/**'
       - 'tests/ts_syntax_check.js'
@@ -28,23 +31,24 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Install Python dependencies
-        run: pip install duckdb pyyaml
+          cache: 'npm'
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run snippet validation
+      - name: Validate markdown code snippets
         id: validate
-        run: python tests/validate_snippets.py
+        run: uv run --with duckdb --with pyyaml python tests/validate_snippets.py
         continue-on-error: true
 
-      - name: Comment on PR with results
+      - name: Post validation summary on PR
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v8
         with:
@@ -58,9 +62,9 @@ jobs:
               const errors = JSON.parse(fs.readFileSync(errorsFile, 'utf8'));
 
               if (errors.length === 0) {
-                body = '### ✅ Code Snippet Validation Passed\n\nAll code snippets in markdown files passed syntax validation.';
+                body = '### ✅ Code Snippet Validation Passed\n\nAll code snippets across markdown files passed syntax validation.';
               } else {
-                body = `### ❌ Code Snippet Validation Failed\n\n**${errors.length} snippet(s)** have errors:\n\n`;
+                body = `### ❌ Code Snippet Validation Failed\n\n**${errors.length} snippet(s)** failed syntax validation:\n\n`;
                 body += '| File | Line | Language | Error |\n|------|------|----------|-------|\n';
 
                 for (const err of errors) {
@@ -71,10 +75,10 @@ jobs:
                   body += `| \`${err.file}\` | ${err.line} | \`${err.language}\` | ${escapedMsg} |\n`;
                 }
 
-                body += '\n> Use `<!-- snippet-skip-next -->` before a code fence to exclude a block from validation.';
+                body += '\n> Place `<!-- snippet-skip-next -->` immediately before a fenced block to opt it out of syntax validation.';
               }
             } else {
-              body = '### ⚠️ Code Snippet Validation\n\nNo validation results file found. The validation script may have crashed.';
+              body = '### ⚠️ Code Snippet Validation\n\nNo validation report was generated. Check the workflow logs for script errors.';
             }
 
             const marker = '<!-- snippet-validation-result -->';
@@ -104,6 +108,6 @@ jobs:
               });
             }
 
-      - name: Fail if validation found errors
+      - name: Fail job if snippet validation reported errors
         if: steps.validate.outcome == 'failure'
         run: exit 1

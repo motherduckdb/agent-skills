@@ -84,7 +84,7 @@ For Gemini automation, `--consent` skips the installation confirmation; it is op
 ## Verification
 
 - `GitHub Copilot CLI`: `/plugin list` shows `motherduck`, and `/mcp` lists the `motherduck` server
-- `Google Antigravity`: `agy plugin list` shows `motherduck`, and **Agent settings → Customizations** lists the `motherduck` MCP server ready to authenticate
+- `Google Antigravity`: `agy plugin list` shows `motherduck` (skills, `motherduck-analyst` agent, rules, and MCP server), and **Agent settings → Customizations** lists the `motherduck` MCP server ready to authenticate
 - `Claude Code`: plugin shows up and can be invoked on a MotherDuck task
 - `Codex`: plugin appears in `/plugins`
 - `Cursor`: installed skills appear after reload and can be invoked on a MotherDuck task

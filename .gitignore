@@ -12,8 +12,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Local virtual environments
+# Local virtual environments and Node dependencies
 .venv/
+node_modules/
 
 # Local DuckDB repro files
 *.duckdb
