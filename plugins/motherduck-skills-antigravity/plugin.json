@@ -2,7 +2,7 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "motherduck",
   "displayName": "MotherDuck",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Connect Antigravity to MotherDuck's hosted MCP server with skills to explore schemas, run DuckDB SQL, and build Dives, Flights, and analytics apps.",
   "author": {
     "name": "MotherDuck",

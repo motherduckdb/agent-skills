@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "motherduck",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "MotherDuck skills and the MotherDuck MCP server for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
   "author": {
     "name": "MotherDuck",
