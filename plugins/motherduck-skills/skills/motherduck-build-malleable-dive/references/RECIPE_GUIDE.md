@@ -119,11 +119,11 @@ BOARDS = {
         "LABEL": "Leadership",
         "CADENCE": "monthly",                          # report on the last complete month
         "AUDIENCE": "city leadership, reading once a month",
-        "BRIEFING_QUESTION": "…",
+        "BRIEFING_QUESTION": "...",
         "DEFAULT_COMPARE": "previous_year",
-        "WATCH": [("requests.requests", "Requests"), …],
-        "PLANNER_HINTS": PLANNER_HINTS + "\n- This is a monthly leadership view: …",
-        "BRIEFING_PLAN": {"title": "…", "blocks": [{"type": "kpi", "window": "last_full_month", …}, …]},
+        "WATCH": [("requests.requests", "Requests")],
+        "PLANNER_HINTS": PLANNER_HINTS + "\n- This is a monthly leadership view: ...",
+        "BRIEFING_PLAN": {"title": "...", "blocks": [{"type": "kpi", "window": "last_full_month"}]},
     },
 }
 ```

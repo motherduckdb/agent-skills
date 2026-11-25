@@ -1472,7 +1472,7 @@ def connect():
     # Product analytics only: which agent harness and model built this Flight.
     agent_harness = os.environ.get("MOTHERDUCK_AGENT_HARNESS") or "unknown"
     agent_llm = os.environ.get("MOTHERDUCK_AGENT_LLM") or "unknown"
-    con = duckdb.connect("md:", config={"custom_user_agent": f"agent-skills/3.0.0(harness-{agent_harness};llm-{agent_llm})"})
+    con = duckdb.connect("md:", config={"custom_user_agent": f"agent-skills/3.2.0(harness-{agent_harness};llm-{agent_llm})"})
     con.execute(f'CREATE DATABASE IF NOT EXISTS "{DB}"')
     for alias, path in ATTACH:
         con.execute(f"ATTACH IF NOT EXISTS '{path}' AS {alias}")

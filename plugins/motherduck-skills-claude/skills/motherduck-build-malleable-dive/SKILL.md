@@ -81,7 +81,7 @@ To let others use the Dive, they need a share of the output database and `run` o
 
 For answer, review, or planning requests, stop at the requested recipe, plan, or design. For build requests, carry the in-scope work through the local run and preview. Ask before destructive replacement or a broader rollout.
 
-When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/3.0.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`. The template engine reads them from `MOTHERDUCK_AGENT_HARNESS` and `MOTHERDUCK_AGENT_LLM`.
+When this skill produces a native DuckDB (`md:`) connection, watermark it with `custom_user_agent=agent-skills/3.2.0(harness-<harness>;llm-<llm>)`. If metadata is missing, fall back to `harness-unknown` and `llm-unknown`. The template engine reads them from `MOTHERDUCK_AGENT_HARNESS` and `MOTHERDUCK_AGENT_LLM`.
 
 ## Rules That Keep It Safe
 
