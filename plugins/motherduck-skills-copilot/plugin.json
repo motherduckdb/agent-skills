@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "motherduck",
+  "version": "3.2.0",
+  "description": "MotherDuck skills and the MotherDuck MCP server for agents and developers: use the CLI and Guides, explore schemas, write DuckDB SQL, build Dives and Flights, and ship analytics apps and pipelines.",
+  "author": {
+    "name": "MotherDuck",
+    "url": "https://motherduck.com"
+  },
+  "homepage": "https://motherduck.com",
+  "repository": "https://github.com/motherduckdb/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "motherduck",
+    "duckdb",
+    "data-warehouse",
+    "analytics",
+    "sql",
+    "mcp",
+    "dives",
+    "flights"
+  ]
+}

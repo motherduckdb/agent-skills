@@ -24,7 +24,7 @@
     ],
     "source_docs": [
       "https://motherduck.com/docs/getting-started/customer-facing-analytics/",
-      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/concepts/compute/hypertenancy/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/dives/embedding-dives/",
@@ -87,7 +87,7 @@
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/",
       "https://motherduck.com/docs/key-tasks/loading-data-into-motherduck/considerations-for-loading-data/",
-      "https://motherduck.com/docs/concepts/ducklake/",
+      "https://motherduck.com/docs/concepts/database-and-storage/ducklake/",
       "https://motherduck.com/docs/key-tasks/flights/",
       "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-secret/"
@@ -133,7 +133,7 @@
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/multithreading-and-parallelism/",
       "https://motherduck.com/docs/sql-reference/connection-string-parameters/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-setup/"
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/mcp-workflows/mcp-setup/"
     ],
     "needs_live_discovery": false
   },
@@ -170,7 +170,7 @@
       "https://motherduck.com/docs/key-tasks/dives/run-flights-from-dives/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-run-flight/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/dives/use-flight-run/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/ai-in-the-ui/agent-chat/",
       "https://motherduck.com/product/dives/"
     ],
     "needs_live_discovery": false
@@ -191,7 +191,7 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/flights/",
-      "https://motherduck.com/docs/concepts/flights/",
+      "https://motherduck.com/docs/concepts/compute/flights/",
       "https://motherduck.com/docs/sql-reference/mcp/flights/get-flight-guide/",
       "https://motherduck.com/docs/sql-reference/mcp/flights/create-flight/",
       "https://motherduck.com/docs/sql-reference/mcp/flights/update-flight/",
@@ -258,7 +258,7 @@
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
-      "https://motherduck.com/docs/concepts/data-recovery/",
+      "https://motherduck.com/docs/concepts/database-and-storage/data-recovery/",
       "https://motherduck.com/docs/troubleshooting/version-lifecycle-schedules/"
     ],
     "needs_live_discovery": false
@@ -277,7 +277,7 @@
     ],
     "artifacts": [],
     "source_docs": [
-      "https://motherduck.com/docs/concepts/ducklake/",
+      "https://motherduck.com/docs/concepts/database-and-storage/ducklake/",
       "https://motherduck.com/docs/integrations/file-formats/ducklake/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-database/",
       "https://motherduck.com/blog/announcing-ducklake-1-0-on-motherduck/",
@@ -403,8 +403,8 @@
     ],
     "source_docs": [
       "https://motherduck.com/product/postgres-integration/",
-      "https://motherduck.com/docs/concepts/ducklake/",
-      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/concepts/database-and-storage/ducklake/",
+      "https://motherduck.com/docs/concepts/compute/hypertenancy/",
       "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/guides/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/create-database/",
@@ -455,7 +455,7 @@
       "artifacts/client_delivery_example.ts"
     ],
     "source_docs": [
-      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/concepts/compute/hypertenancy/",
       "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
@@ -477,7 +477,7 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/product/pricing/",
-      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/concepts/compute/hypertenancy/",
       "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/flights/",
       "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
@@ -504,7 +504,7 @@
       "https://motherduck.com/docs/sql-reference/duckdb-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/shutdown-terminate/",
-      "https://motherduck.com/docs/concepts/data-recovery/",
+      "https://motherduck.com/docs/concepts/database-and-storage/data-recovery/",
       "https://motherduck.com/docs/sql-reference/mcp/core/query-rw/",
       "https://motherduck.com/docs/sql-reference/postgres-endpoint/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/ai-functions/prompt-jev/",
@@ -540,7 +540,7 @@
   },
   "motherduck-security-governance": {
     "name": "motherduck-security-governance",
-    "description": "Assess or configure MotherDuck access control: roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.",
+    "description": "Assess or configure MotherDuck access control, including roles (RBAC), share grants, table-, row-, and column-level security, masking, tenant isolation, residency, and Terraform governance.",
     "layer": "workflow",
     "depends_on": [
       "motherduck-connect",
@@ -553,19 +553,19 @@
     "artifacts": [],
     "source_docs": [
       "https://motherduck.com/docs/key-tasks/service-accounts-guide/",
-      "https://motherduck.com/docs/concepts/hypertenancy/",
+      "https://motherduck.com/docs/concepts/compute/hypertenancy/",
       "https://motherduck.com/docs/about-motherduck/cloud-regions/",
       "https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/",
       "https://motherduck.com/docs/key-tasks/sharing-data/",
       "https://motherduck.com/docs/key-tasks/sharing-data/table-level-security/",
-      "https://motherduck.com/docs/concepts/roles-and-access-control/",
+      "https://motherduck.com/docs/concepts/security-and-access/roles-and-access-control/",
       "https://motherduck.com/docs/key-tasks/managing-organizations/managing-roles/",
       "https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/sso-setup/",
-      "https://motherduck.com/docs/concepts/data-recovery/",
+      "https://motherduck.com/docs/concepts/database-and-storage/data-recovery/",
       "https://motherduck.com/trust-and-security/",
       "https://motherduck.com/docs/key-tasks/sharing-data/secure-views/",
       "https://motherduck.com/docs/integrations/data-science-ai/typesafe/",
-      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/agent-chat/",
+      "https://motherduck.com/docs/key-tasks/ai-and-motherduck/ai-in-the-ui/agent-chat/",
       "https://motherduck.com/docs/sql-reference/motherduck-sql-reference/flights/grant-run-on-flight/",
       "https://motherduck.com/docs/integrations/dev-tools/terraform/",
       "https://github.com/motherduckdb/terraform-provider-motherduck/tree/main/examples"

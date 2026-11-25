@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.motherduckdb/motherduck",
+  "title": "MotherDuck",
+  "description": "Hosted MotherDuck MCP server: explore data, run DuckDB SQL, and build Dives and Flights.",
+  "version": "1.0.0",
+  "icons": [
+    {
+      "src": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://motherduck.com&size=64",
+      "mimeType": "image/jpeg",
+      "sizes": [
+        "64x64"
+      ]
+    }
+  ],
+  "websiteUrl": "https://motherduck.com/docs/sql-reference/mcp/",
+  "repository": {
+    "url": "https://github.com/motherduckdb/agent-skills",
+    "source": "github",
+    "subfolder": "mcp-registry"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.motherduck.com/mcp"
+    }
+  ]
+}

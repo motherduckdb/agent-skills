@@ -2,6 +2,51 @@
 
 Customer-facing release notes for MotherDuck Skills. Each section becomes the GitHub release notes for its tag, and editing a published section updates that release when the change merges to `main`.
 
+## 3.2.0
+
+### Highlights
+
+- **The GitHub Copilot plugin is now named `motherduck`.** It has the same name as the MotherDuck MCP server it adds, so the plugin and the server are found under one name.
+- **The hosted MotherDuck MCP server has an MCP Registry entry**, `io.github.motherduckdb/motherduck`, so MCP clients and registries that read the official MCP Registry can list it.
+
+### Changed
+
+- **Breaking for GitHub Copilot CLI:** the plugin `motherduck-skills` is renamed to `motherduck`. The skills and the MCP server are unchanged.
+- The Claude Code, Codex, and Cursor plugins keep the name `motherduck-skills`. The Gemini CLI extension is unchanged.
+
+### Upgrade notes
+
+- GitHub Copilot CLI users replace the old plugin with the renamed one:
+
+  ```text
+  /plugin marketplace update motherduck-skills
+  /plugin uninstall motherduck-skills
+  /plugin install motherduck@motherduck-skills
+  ```
+
+- No action is needed for Claude Code, Codex, Cursor, or Gemini CLI.
+
+## 3.1.0
+
+### Highlights
+
+- **A native GitHub Copilot plugin.** GitHub Copilot CLI now installs a Copilot-format package instead of the Claude-format one. The install commands are unchanged.
+- **The MotherDuck MCP server is included for GitHub Copilot.** The plugin registers the remote MotherDuck MCP server, so Copilot can explore schemas, run queries, and work with Dives, Flights, and Guides without separate MCP setup. Sign-in happens in the browser; no token is stored in configuration.
+
+### Added
+
+- `plugins/motherduck-skills-copilot`, an [Agent Plugins 1.0](https://agent-plugins.org) package with the 21 skills and an `mcp.json` that points at `https://api.motherduck.com/mcp`.
+- `.github/plugin/marketplace.json`, the marketplace catalog GitHub Copilot CLI reads for this repository.
+
+### Fixed
+
+- The `motherduck-security-governance` skill had a description that strict YAML parsers rejected, so some agents and linters loaded the skill without a name or description. The description is reworded and now parses everywhere.
+
+### Upgrade notes
+
+- GitHub Copilot CLI users: run `/plugin update motherduck-skills@motherduck-skills`. The skills are the same. A `motherduck` MCP server is added, and Copilot asks for a browser sign-in to MotherDuck the first time the server is used. Disable the server from `/mcp` if it is not wanted.
+- Claude Code, Codex, Cursor, and Gemini CLI installs are unchanged apart from the description fix.
+
 ## 3.0.0
 
 ### Highlights
